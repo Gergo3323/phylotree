@@ -1,28 +1,22 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hosting Teszt</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fejlesztés alatt</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+@keyframes pulseSlow { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
+.pulse-slow { animation: pulseSlow 3s infinite; }
+</style>
 </head>
-<body>
-    <h1>🚀 Sikeres hosting teszt!</h1>
-    <p>Ha ezt látod a saját domaineden, akkor a GitHub Pages működik 0-24-ben tárhely nélkül is.</p>
-
-    <h2>JSON betöltés teszt</h2>
-    <button onclick="loadJSON()">JSON betöltése</button>
-    <pre id="output"></pre>
-
-    <script>
-        async function loadJSON() {
-            try {
-                const res = await fetch("test.json");
-                const data = await res.json();
-                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-            } catch (err) {
-                document.getElementById("output").textContent = "Hiba a JSON betöltésekor: " + err;
-            }
-        }
-    </script>
+<body class="bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white flex items-center justify-center min-h-screen p-4">
+<div class="text-center space-y-6">
+<h1 class="text-5xl md:text-7xl font-extrabold tracking-wide pulse-slow">UNDER CONSTRUCTION</h1>
+<p class="text-xl md:text-2xl text-gray-300">Valami izgalmas épül itt… 👀</p>
+<div class="inline-block px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl shadow-lg border border-white/20">
+<p class="text-sm md:text-base uppercase tracking-widest text-gray-400">Készülj, hamarosan indul</p>
+</div>
+</div>
 </body>
 </html>
