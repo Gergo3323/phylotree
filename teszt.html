@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hosting Teszt</title>
+</head>
+<body>
+    <h1>🚀 Sikeres hosting teszt!</h1>
+    <p>Ha ezt látod a saját domaineden, akkor a GitHub Pages működik 0-24-ben tárhely nélkül is.</p>
+
+    <h2>JSON betöltés teszt</h2>
+    <button onclick="loadJSON()">JSON betöltése</button>
+    <pre id="output"></pre>
+
+    <script>
+        async function loadJSON() {
+            try {
+                const res = await fetch("test.json");
+                const data = await res.json();
+                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                document.getElementById("output").textContent = "Hiba a JSON betöltésekor: " + err;
+            }
+        }
+    </script>
+</body>
+</html>
