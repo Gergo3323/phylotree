@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Biokémia - fogalmak</title>
+  <meta name="color-scheme" content="dark" />
+  <style>
+    :root{
+      --bg0:#060B16;
+      --bg1:#0A1226;
+      --card:#0C1832;
+      --stroke: rgba(255,255,255,.10);
+      --text:#EAF1FF;
+      --muted: rgba(234,241,255,.72);
+
+      /* Kért kék: rgb(0, 110, 183) */
+      --blue: rgb(0, 110, 183);
+      --blue2: rgba(0, 110, 183, .70);
+
+      --good:#2ED47A;
+      --bad:#FF4D5E;
+      --warning:#FFCC66;
+
+      --shadow: 0 14px 45px rgba(0,0,0,.45);
+      --radius: 18px;
+      --focus: 0 0 0 3px rgba(0,110,183,.35);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:var(--font);
+      background:
+        radial-gradient(1100px 650px at 15% -10%, rgba(0,110,183,.35), transparent 55%),
+        radial-gradient(1000px 650px at 110% 0%, rgba(0,110,183,.18), transparent 45%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      color:var(--text);
+    }
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 14px 26px;
+      min-height: 100%;
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+    }
+
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      padding: 16px 16px 12px;
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: rgba(12,24,50,.55);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    /* ÚJ: középre igazított cím felül */
+    .pageTitle{
+      position:absolute;
+      left:50%;
+      top: 14px;
+      transform: translateX(-50%);
+      text-align:center;
+      font-weight: 900;
+      letter-spacing: .3px;
+      font-size: 16px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,110,183,.35);
+      background: linear-gradient(180deg, rgba(0,110,183,.18), rgba(255,255,255,.02));
+      color: rgba(234,241,255,.92);
+      pointer-events:none;
+      white-space:nowrap;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      padding-top: 28px; /* hely a középső címnek */
+    }
+    .brand a{
+      font-weight: 800;
+      letter-spacing: .3px;
+      font-size: 20px;
+      color: var(--text);
+    }
+    .tagline{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:flex-end;
+      align-items:center;
+      padding-top: 30px; /* hely a középső címnek */
+    }
+    .pill{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: var(--muted);
+      display:flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+    }
+    .pill b{ color: var(--text); font-weight: 700; }
+    .dot{
+      width:10px; height:10px; border-radius:99px; display:inline-block;
+    }
+    .dot.good{ background: var(--good); }
+    .dot.bad{ background: var(--bad); }
+    .dot.blue{ background: var(--blue); }
+
+    main{
+      flex: 1;
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+    }
+
+    .panel{
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: rgba(12,24,50,.45);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px 14px 12px;
+      border-bottom: 1px solid var(--stroke);
+    }
+    .note{
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.35;
+      max-width: 56ch;
+    }
+    .btnrow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    button{
+      appearance:none;
+      border:none;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      cursor:pointer;
+    }
+    .btn{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-weight: 650;
+      font-size: 13.5px;
+      user-select:none;
+    }
+    .btn:hover{ background: rgba(255,255,255,.08); }
+    .btn:active{ transform: translateY(1px); }
+    .btn:focus-visible{ outline:none; box-shadow: var(--focus); }
+
+    .btn.primary{
+      border-color: rgba(0,110,183,.40);
+      background: linear-gradient(180deg, rgba(0,110,183,.45), rgba(0,110,183,.22));
+    }
+    .btn.good{
+      border-color: rgba(46,212,122,.40);
+      background: linear-gradient(180deg, rgba(46,212,122,.26), rgba(46,212,122,.12));
+    }
+    .btn.bad{
+      border-color: rgba(255,77,94,.40);
+      background: linear-gradient(180deg, rgba(255,77,94,.22), rgba(255,77,94,.10));
+    }
+    .btn.warn{
+      border-color: rgba(255,204,102,.35);
+      background: linear-gradient(180deg, rgba(255,204,102,.18), rgba(255,204,102,.08));
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,.03);
+    }
+    .btn[disabled]{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .card{
+      padding: 18px 14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+
+    .progress{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .bar{
+      flex:1;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .bar > div{
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blue), rgba(0,110,183,.85));
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+
+    .flash{
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      padding: 16px;
+      min-height: 200px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap: 10px;
+      position:relative;
+      overflow:hidden;
+    }
+    .flash:before{
+      content:"";
+      position:absolute;
+      inset:-60px;
+      background: radial-gradient(450px 220px at 10% 15%, rgba(0,110,183,.18), transparent 55%);
+      pointer-events:none;
+    }
+    .term{
+      position:relative;
+      z-index:1;
+      font-weight: 850;
+      font-size: clamp(18px, 2.2vw, 22px);
+      line-height: 1.2;
+      letter-spacing: .2px;
+    }
+    .def{
+      position:relative;
+      z-index:1;
+      color: var(--muted);
+      font-size: 14.5px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .answers{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+    }
+    .answers .left, .answers .right{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .end{
+      padding: 16px 14px 18px;
+      border-top: 1px solid var(--stroke);
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .endgrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .summary{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .legend{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    footer{
+      padding: 14px 16px;
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: rgba(12,24,50,.40);
+      color: var(--muted);
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      position: relative;
+      overflow:hidden;
+    }
+    footer:before{
+      content:"";
+      position:absolute;
+      inset:-60px;
+      background: radial-gradient(600px 240px at 0% 0%, rgba(0,110,183,.14), transparent 55%);
+      pointer-events:none;
+    }
+    .footrow{
+      position: relative;
+      z-index: 1;
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .footlinks{
+      display:flex;
+      gap: 14px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .icon{
+      width: 16px; height: 16px;
+      display:inline-block;
+      vertical-align: -3px;
+      margin-right: 6px;
+      opacity: .95;
+    }
+    .small{
+      position: relative;
+      z-index: 1;
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
+    .copyrightPill{
+      position: relative;
+      z-index: 1;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,110,183,.35);
+      background: linear-gradient(180deg, rgba(0,110,183,.18), rgba(255,255,255,.02));
+      color: rgba(234,241,255,.82);
+      font-size: 12.5px;
+      white-space:nowrap;
+    }
+
+    @media (min-width: 720px){
+      .card{ padding: 20px; }
+      .controls{ padding: 16px 18px 14px; }
+      .end{ padding: 18px; }
+      .endgrid{ grid-template-columns: 1fr 1fr; align-items:start; }
+
+      .pageTitle{
+        top: 16px;
+        font-size: 17px;
+      }
+      .brand{ padding-top: 30px; }
+      .stats{ padding-top: 32px; }
+    }
+
+    /* “Újrakezdés” vizuális jelzés a kártyán */
+    .flash.good{ border-color: rgba(46,212,122,.50); box-shadow: 0 0 0 1px rgba(46,212,122,.18) inset; }
+    .flash.bad{ border-color: rgba(255,77,94,.55); box-shadow: 0 0 0 1px rgba(255,77,94,.14) inset; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="pageTitle" aria-label="Oldalcím">Biokémia - fogalmak</div>
+
+      <div class="brand">
+        <a href="https://phylotree.hu" target="_blank" rel="noopener noreferrer">Phylotree</a>
+        <div class="tagline">Interaktív evolúciótanulás filogenetikai fákkal</div>
+      </div>
+
+      <div class="stats" aria-live="polite">
+        <div class="pill" title="Kártyák állása">
+          <span class="dot blue"></span>
+          <span><b id="statIndex">1</b>/<span id="statTotal">0</span></span>
+        </div>
+        <div class="pill" title="Helyes válaszok">
+          <span class="dot good"></span>
+          <span>Helyes: <b id="statCorrect">0</b></span>
+        </div>
+        <div class="pill" title="Helytelen válaszok">
+          <span class="dot bad"></span>
+          <span>Helytelen: <b id="statWrong">0</b></span>
+        </div>
+      </div>
+    </header>
+
+    <main class="panel">
+      <div class="controls">
+        <div class="note">
+          Alapból a kártyák a megadott sorrendben mennek (ajánlott első tanulásra).
+          Többszöri gyakorlás után használd a randomizálást.
+        </div>
+
+        <div class="btnrow">
+          <button class="btn ghost" id="btnShuffle" type="button" title="Keverés / vissza alap sorrendre">
+            Randomizálás: <span id="shuffleState" style="color: var(--muted); font-weight: 750;">KI</span>
+          </button>
+          <button class="btn primary" id="btnReveal" type="button" title="Válasz megjelenítése (Space)">
+            Válasz mutatása
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="progress">
+          <div class="bar" aria-hidden="true"><div id="barFill"></div></div>
+          <div id="modeText">Mód: Alap sorrend</div>
+        </div>
+
+        <section id="flash" class="flash" aria-labelledby="term">
+          <div class="term" id="term">–</div>
+          <div class="def" id="def" style="display:none;">–</div>
+        </section>
+
+        <div class="answers">
+          <div class="left">
+            <button class="btn" id="btnBack" type="button" title="Vissza (bal nyíl)">Vissza</button>
+          </div>
+          <div class="right">
+            <button class="btn good" id="btnKnow" type="button" title="Tudtam (1)">Tudtam</button>
+            <button class="btn bad" id="btnNoKnow" type="button" title="Nem tudtam (2)">Nem tudtam</button>
+          </div>
+        </div>
+
+        <div class="end" id="endPanel" style="display:none;">
+          <div class="endgrid">
+            <div class="summary" id="endSummary"></div>
+            <div class="legend">
+              <span><span class="dot good"></span> Tudtad</span>
+              <span><span class="dot bad"></span> Nem tudtad</span>
+              <span><span class="dot blue"></span> Haladás</span>
+            </div>
+          </div>
+          <div class="btnrow" style="justify-content:flex-start;">
+            <button class="btn warn" id="btnRestartAll" type="button">Újra (összes)</button>
+            <button class="btn" id="btnRestartWrong" type="button">Újra (csak hibásak)</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="footrow">
+        <div class="copyrightPill" title="Szerzői jog">
+          <span aria-hidden="true">&copy;</span>
+          <span>Copyright – Phylotree, minden jog fenntartva</span>
+        </div>
+
+        <div class="footlinks">
+          <a class="small" href="https://instagram.com/frks_geryy" target="_blank" rel="noopener noreferrer" title="Instagram">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7.5 2.75h9A4.75 4.75 0 0 1 21.25 7.5v9A4.75 4.75 0 0 1 16.5 21.25h-9A4.75 4.75 0 0 1 2.75 16.5v-9A4.75 4.75 0 0 1 7.5 2.75Z" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M12 16.1a4.1 4.1 0 1 0 0-8.2 4.1 4.1 0 0 0 0 8.2Z" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M17.3 6.9h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+            instagram.com/frks_geryy
+          </a>
+          <a class="small" href="mailto:gergo@phylotree.hu" title="Email">
+            @ <span>gergo@phylotree.hu</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="small">
+        Ha kérdésed lenne, vagy ötleted van, jelezd az alábbi elérhetőségek egyikén.
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    function normalizeArrows(s){
+      return String(s).replaceAll("","→");
+    }
+
+    const BASE_CARDS = [
+      { t:"Biogén elemek", d:"Makroelemek és Mikroelemek(nyomelemek)" },
+      { t:"Elsődleges biogén elemek", d:"Minden élőlényben nagy mennyiségben előfordulnak ( C, H, N, O)" },
+      { t:"Másodlagos biogén elemek", d:"Minden élőlényben kis mennyiségben előfordulnak. (P, S, Na, K, Cl, Mg, Ca)" },
+      { t:"Mikroelemek(nyomelemek)", d:"Bizonyos élőlényekben változó mennyiségben előfordulnak (Si, Fe, I, F, Zn, Co)" },
+      { t:"Szén kötései", d:"4 kovalens kötés → tetraéderes szerkezet → nagy stabilitás + változatos szerkezet(gyűrűs, nyílt láncú)" },
+      { t:"C(Szén)-nel szervetlen vegyületek", d:"Co2, CaCo3, MgCo3(magnézium-karbonát)" },
+      { t:"C(Szén)-hez tartozó képlet", d:"H2Co3(Szénsav) ⇆ HCO3-(hidrogén-karbonát)+H+" },
+      { t:"H(Hidrogén) jelentősége", d:"Redoxireakcióban redukálószer, Univerzális Elektron és Proton donor" },
+      { t:"Redoxireakció", d:"Oxidáció és Redukció" },
+      { t:"Oxidáció", d:"Oxigén felvétel, Hidrogén leadás, Elektron leadás" },
+      { t:"Redukció", d:"Oxigén leadás, Hidrogén felvétel, Elektron felvétel" },
+      { t:"Fotolízis", d:"Fotoszintézisben a vízbontás 2H2O → 4H+ + 4e- + O2" },
+      { t:"O(Oxigén) jelentősége", d:"Szerves vegyületek funkciós csoportja (-OH, -COOH), Az O2 a biológiai oxidáció végső Elektron és Proton akceptora(befogadója)" },
+      { t:"N(Nitrogén) jelentősége", d:"Szerves vegyületek funkciós csoportja (-NH3+), Aminosavak és Nukleotidok alkotója" },
+      { t:"Methemoglobin betegség okozója", d:"Nitrátion(No3-) és Nitrition(No2-))" },
+      { t:"Nitrátion(No3-) jelentősége", d:"Növények nitrogénforrása, nitrifikáló baktériumok anyagcsereterméke" },
+      { t:"Nitrition(No2-)) jelentősége", d:"Nitrifikáló baktériumok anyagcsereterméke, élelmiszerek tartósítása, baktériumölő hatás, emberekben rákkeltő hatás" },
+      { t:"P(Foszfor) jelentősége", d:"Nukleotidok alkotója (A, G, C, T, U), nukleotid trifoszfátok (ATP…), Foszfolipidek, Csontszövetekben foszfát ion(Po43-) → Ca3(Po4)2, Mg3(PO4)2" },
+      { t:"S(Kén) jelentősége", d:"Kéntartalmű aminosavak: Cisztein, Metionin, Koenzim-A, Vas-kén fehérjék(elektronszállítás)" },
+      { t:"Na+, K+, Cl- jelentősége", d:"Ingerületi folyamatok, Testfolyadék összetétele" },
+      { t:"Mg2+, Ca2+ jelentősége", d:"Csontok felépítése(Kalcium és Magnézium-karbonát és foszfát), Izmok működése, Kalcium véralvadási faktor, Kalcium ion jelátvivő anyag, Magnézium a klorofil porfilinvázának központi atomja" },
+      { t:"Si(Szilícium) jelentősége", d:"Kovamoszatok összetevője, Szivacsok vázának alkotója, Zsurlók vázanyaga" },
+      { t:"Fe(Vas)", d:"Hemoglobin hem csoport porfilinvázának központi atomja Fe2+, Számos enzim alkotója(citokrómok), Vas-Kén fehérjék" },
+      { t:"Citokrómok", d:"Sejtlégzésben és Fotoszintézisben szerepet játszó fehérjék → elektronszállítás, mitokondriumban megtalálható" },
+      { t:"F(Fluor) jelentősége", d:"Fogak felépítője" },
+      { t:"I(Jód) jelentősége", d:"Pajzsmirigy hormonjainak tiroxin, trijód-tiroxin felépítője" },
+      { t:"Szénhidrátok", d:"Polihidroxioxovegyületek" },
+      { t:"Egyszerű szénhidrátok", d:"Monoszacharidok" },
+      { t:"Összetett szénhidrátok", d:"Diszacharidok, Poliszacharidok" },
+      { t:"Monoszacharidok[6]", d:"Egy egységből épülnek fel, Hidrolízissel nem bonthatók egyszerűbb vegyületekre, Vízben oldódnak, Édes ízűek, Aldózok vagy ketózok, Nyílt láncúak de 5 C atomnál gyűrűvé záródhatnak" },
+      { t:"Hidrolízis", d:"Vízzel történő bontás" },
+      { t:"Kondenzáció", d:"Vízzel történő egyesülés" },
+      { t:"Triózok(C3)", d:"Aldotrióz: Glicerinaldehid C3H6O3, Ketotrióz: Dihidroxi-aceton C3H6O3, Ezek a glikolízis termékei" },
+      { t:"Pentózok(C5)", d:"D-ribóz(C5H10O5), 2-dezoxi-D-ribóz(C5H9O4)" },
+      { t:"D-ribóz", d:"C5H10O5, RNS felépítője, Nukleotid típusú vegyületek: ATP…, NAD, NADP" },
+      { t:"2-dezoxi-D-ribóz", d:"C5H9O4, DNS felépítője" },
+      { t:"Hexózok(C6)", d:"Aldohexóz: D-glükóz, Ketohexóz: D-fruktóz" },
+      { t:"D-glükóz", d:"Legfontosabb energiaszolgáltató, Fotoszintézis terméke" },
+      { t:"D-fruktóz", d:"Legédesebb cukor, Glikolízis köztes terméke, Energiaszolgáltató" },
+      { t:"Diszacharidok[5]", d:"Két monoszacharidból állnak melyeket éterkötés kapcsol össze, Hidrolízissel monoszacharidokra bonthatók, Kondenzációban legalább az egyik monoszacharid glikozidos OH-ja vesz részt, Általában édes ízűek, Vízben jól oldódnak" },
+      { t:"Maltóz[4]", d:"Két alfa-D-glükóz, Alfa(1→4) glikozidos éterkötés, Redukáló tulajdonságú, Ezüsttükör próba" },
+      { t:"Cellulóz[4]", d:"Két béta-D-glükóz, Béta(1→4) glikozidos éterkötés, Redukáló tulajdonságú, Szabadon nem fordul elő" },
+      { t:"Szacharóz[4](Répacukor, Nádcukor, Kristálycukor)", d:"alfa-D-glükóz és béta-D-fruktóz, Alfa-Béta(1→2) glikozidos éterkötés, Nem redukáló tulajdonságú, Növények háncsrészében szállított diszacharid" },
+      { t:"Tejcukor(Laktóz)", d:"béta-D-galaktóz és béta-D-glükóz, Béta(1→4) glikozidos éterkötés" },
+      { t:"Poliszacharidok[7]", d:"Több száz vagy ezer monoszacharid polikondenzációjával létrejött makromolekulák, Általános összegképlet: C6H10O5, Hidrolízissel monoszacharidokra bonthatók, Glükóz monomerekből állnak melyek 1→4 glikozidos éterkötéssel kapcsolódnak, Vízben nem oldódnak, Nem édes ízűek, Tartalék energiatárolók és vázanyagok" },
+      { t:"Cellulóz[6]", d:"Több ezer béta-D-glükózból áll melyek hosszú el nem ágazó láncokat alkotnak, Béta(1→4) glikozidos éterkötések→lineáris szerkezet, Láncon belüli és közötti hidrogén-kötések stabilizálják, Növényi sejtalkotó, A legelterjettebb szénhidrát, Vázanyag" },
+      { t:"Keményítő[3]", d:"Több száz alfa-D-glükózból áll, A növények keményítő szemcséiben, Két összetevője: Amilóz és Amilopektin" },
+      { t:"Amilóz[5]", d:"Hélix szerkezetű, El nem ágazó lánc, Láncon belül hidrogén-kötések stabilizálják, az amiláz enzim bontja, Kimutatása Lugol oldattal(KI-os jódoldat)" },
+      { t:"Amilopektin", d:"Kb. 25 glükózegységenként elágazik" },
+      { t:"Keményítő kimutatása", d:"Lugol oldattal(KI-os jódoldat), Jódmolekulák beépülnek az amilóz hélixbe, Elektronszerkezet torzul, Más frekvenciájú fény elnyelése történik" },
+      { t:"Glikogén", d:"Több ezer alfa-D-glükóz alkotja, Alfa(1→4) glikozidos éterkötések" },
+      { t:"Kitin", d:"Nitrogén tartalmú poliszacharid, Gombák sejtfala és ízeltlábúak váza" },
+      { t:"Heparin", d:"Szénhidrátszármazék, Véralvadásgátló, Pióca termeli" },
+      { t:"Baktérium sejtfala", d:"Speciális szénhidrátszármazék, Peptidláncok által stabilizált" },
+      { t:"Lipid", d:"Zsírszerű anyagok, Előlényekben előforduló apoláris oldószerekben oldódó szerves vegyületek" },
+      { t:"Lipidek csoportjai[5]", d:"Neutrális zsírok, Foszfolipidek, Karotinoidok, Szteroidok, Viaszok" },
+      { t:"Neutrális zsírok / Trigliceridek", d:"Glicerin nagy széntartalmú karbonsavakkal alkotott észterei" },
+      { t:"Palmitinsav", d:"C₁₆H₃₂O₂" },
+      { t:"Sztearinsav", d:"C₁₈H₃₆O₂" },
+      { t:"Olajsav", d:"C₁₈H₃₄O₂" },
+      { t:"Neutrális zsírok / Trigliceridek biológiai szerepe[4]", d:"Tartalék tápanyag: Olajos magvak(telítetlen zsírsav→folyékony) és Állati zsírszövetekben(telített zsírsav→szilárd), Zsírban oldódó vitaminok(D, E, K, A), Hőszigetelés, Mechanikai védelem" },
+      { t:"Foszfotidsav", d:"Molekula, Két oldhatóságú tulajdonságú azaz amfipatikus azaz vízben/zsíroldószerekben is oldódik" },
+      { t:"Amfipatikus", d:"Két oldhatóságú, azaz vízben/zsíroldószerekben is oldódik" },
+      { t:"Foszfolipidek biológiai szerepe", d:"Biológiai membránt építenek fel, Kettős oldhatóság: Kettős foszfolipid réteg" },
+      { t:"Karotinoidok", d:"Színes vegyületek, A látható fény gerjeszti a molekuláiban lévő elektront, 1x-es és 2x-es kovalens kötések váltakoznak = konjugált kettős kötés" },
+      { t:"Narancssárga színanyag", d:"Karotin sárgarépában" },
+      { t:"Piros színanyag", d:"Likopin paradicsomban" },
+      { t:"Sárga színanyag", d:"Xantofil" },
+      { t:"Zöld színanyag", d:"Klorofil" },
+      { t:"Kék színanyag", d:"Fikocián" },
+      { t:"Fotoszintézisben a pigmentek", d:"Xantofil és Karotin" },
+      { t:"Karotin származék", d:"A vitamin(retina receptorsejtjeiben látófehérje felépítője)→Retina szerkezet változása fény hatására" },
+      { t:"Szteroidok", d:"Szteránvázas vegyületek" },
+      { t:"Szteroidokra példa", d:"D vitamin: Bélben kalcium felszívás, Kalcium beépülése a csontokba, Ivari hormonok: Nemi jellegek kialakulása, Epesavak: Koleszterin származék" },
+      { t:"Fehérjék felépítő alkotó elemei", d:"C, H, N, O" },
+      { t:"Fehérjék monomerei", d:"Aminosavak" },
+      { t:"Legegyszerűbb aminosav", d:"Glicin, nála az oldallánc=hidrogén" },
+      { t:"Fehérjék oldallánca", d:"20 féle lehet" },
+      { t:"Féhérjék kialakulása", d:"Kondenzációval alakulnak ki aminosavakból peptidkötések létesítésével (100-300 aminosavakból állnak)" },
+      { t:"Dipeptid", d:"Apoláris aminosavak(hidrofób): oldallánc= csak szén+hidrogén, Poláris aminosavak(hidrofil): oldallánc= -OH, -SH, -NH2, -COOH" },
+      { t:"Fehérjék elsődleges szerkezete", d:"Az aminosavak kapcsolódási sorrendje(aminosavszekvencia)" },
+      { t:"Fehérjék másodlagos szerkezete", d:"Fehérjemolekulán belüli lokális(helyi) térszerkezet, Alfa-hélix és Béta-redő a hidrogénkötések által" },
+      { t:"Fehérjék harmadlagos szerkezete", d:"Az egész molekula térbeli szerkezete" },
+      { t:"Fibrilláris(szálas) fehérje példák", d:"Keratin, Kollagén, Pókselyem" },
+      { t:"Globuláris fehérje példák", d:"Hemoglobin, Mioglobin, Immunglobulin" },
+      { t:"Fehérjék negyedleges szerkezete", d:"Csak a több fehérjemolekulából/alegységből álló fehérjéknek van" },
+      { t:"Fibrilláris fehérjék", d:"Szálas szerkezet, Rendezett, Vagy csak alfa-hélix vagy béta-lemez építi fel" },
+      { t:"Globuláris fehérjék", d:"Gombolyag szerű szerkezet a kevésbé összerendezett szerkezet miatt, Többféle másodlagos szerkezet építi fel, Alfa-hélix és Béta-redő is" },
+      { t:"Hemoglobin", d:"Tejsavas erjedéssel nyeri az energiát, Összetett fehérje, Fe2+ ion oxigént köt→4 O2" },
+      { t:"Összetett fehérjék(proteidek)", d:"Szerves vagy szervetlen nem fehérje részt is tartalmazó fehérjék így hidrolíziskor nem csak aminosavakra bomlanak" },
+      { t:"Összetett fehérje példák[6]", d:"Hemoglobin, Lipoproteid, Glükoproteid, Kromoproteid, Foszfoproteid, Metalloproteid" },
+      { t:"Lipoproteid", d:"Lipid tartalmú fehérje" },
+      { t:"Glükoproteid", d:"Szénhidrát tartalmú fehérje, pl.: Mucin" },
+      { t:"Kromoproteid", d:"Színes vegyületet tartalmazó fehérje, pl.: retina fényérzékeny receptorsejtjeinek látófehérjéje azaz radopszinja(retinal+opszin)" },
+      { t:"Metalloproteid", d:"Fémet tartalmazó fehérje" },
+      { t:"Egyszerű fehérjék(proteinek)", d:"Csak aminosavakra hidrolizálható fehérjék" },
+      { t:"Egyszerű fehérjékre példa[4]", d:"Kollagén, Albumin, Aktin, Miozin" },
+      { t:"Enzim", d:"Globuláris fehérjék, biokatalizátorok, melyek olyan reakciókat nyitnak meg, aminek kisebb az aktiválási energiája, ezáltal növelik a reakciósebességet és a reakció végén változatlan formában visszamaradnak" },
+      { t:"Szubsztrát", d:"Kiindulási anyag" },
+      { t:"Produktum", d:"A termék" },
+      { t:"Enzimek tulajdonságai", d:"Szubsztrátspecifikusak és Reakcióspecifikusak" },
+      { t:"Szubsztrátspecifikus", d:"Csak bizonyos anyagokat tudnak megkötni és átalakítani" },
+      { t:"Reakcióspecifikus", d:"Csak bizonyos reakciót tudnak katalizálni" },
+      { t:"Aktív centrum", d:"Az a hely, ahol az enzim megköti a szubsztrátot" },
+      { t:"Nitrogén tartalmú bázisok[5]", d:"Adenin, Guanin, Citozin, Timin, Uracil" },
+      { t:"Purin bázis", d:"Pirimidin(6) és Imidazol(5) gyűrű" },
+      { t:"Purin bázisok", d:"Adenin, Guanin" },
+      { t:"Pirimidin bázisok", d:"Citozin, Timin, Uracil" },
+      { t:"Nukleotid", d:"Bázis" },
+      { t:"Nukleozid", d:"Bázis + Pentóz" },
+      { t:"Nukleotid", d:"Bázis + Pentóz + Foszfát" },
+      { t:"Foszforsav", d:"H3Po4" },
+      { t:"Nukleotidok biológiai szerepe", d:"Önálló biológiai funkcióval rendelkeznek, A sejt energiaszolgáltatója→ATP, Koenzimek felépítői" },
+      { t:"Koenzim", d:"Az enzimek működését segíti és kémiai átalakuláson megy keresztül" },
+      { t:"Koenzimekre példa", d:"NAD+, NADP+, Koenzim-A" },
+      { t:"Polinukleotidok(Nukleinsavak)", d:"Örökítőanyag felépítői, Biológiai információtároló→DNS, Biológiai információelőhívő→RNS, 5’ foszfát vég, 3’ OH vég foszfodiészter-kötésekkel" },
+      { t:"Makroerg kötés", d:"A foszfátcsoportok között, Hidrolízisekor nagy mennyiségű energia szabadul fel(25kJ/mol), Szerepe az energiaszolgáltatás" },
+      { t:"NAD+", d:"Nikotinamid-adenin-dinukleotid, Hidrogénszállítás, 1 proton és 2 elektron megkötése és 1 proton a molekulával mozog a közegben, lebontó folyamatokban szállítja a hidrogént(sejtlégzés), Niacin(B3 vitamin) származék" },
+      { t:"NADP+", d:"Nikotinamin-adenin-dinukleotid-foszfát: Általában felépítő folyamatokban szállít hidrogént(fotoszintézis)" },
+      { t:"KoA", d:"Koenzim-A, Adenin + Ribóz + Vitamin jellegű rész +  szulfhidril csoport ciszteinből, Acetilcsoport szállítását végzi→acetil-koenzim-A" },
+      { t:"Nukleotidok elsődleges szerkezete", d:"A nukleotidok(bázisok) kapcsolódási sorrendje a polinukleotid láncban" },
+      { t:"RNS", d:"Ribonukleinsav" },
+      { t:"RNS bázisai", d:"A, G, C, U" },
+      { t:"RNS pentóza", d:"D-ribóz" },
+      { t:"RNS láncszerkezete", d:"polinukleotid lánc általában" },
+      { t:"RNS funkciója", d:"Információelőhívás" },
+      { t:"RNS mérete", d:"Nagyon változó, Pár ezer-százezer bázis" },
+      { t:"RNS típusai", d:"rRNS, mRNS, tRNS" },
+      { t:"rRNS", d:"Riboszómális-RNS, Riboszóma felépítője" },
+      { t:"mRNS", d:"Messenger(hírvivő)-RNS, Fehérje aminosavsorrendjét meghatározó információt szállítja a riboszómához" },
+      { t:"tRNS", d:"Transzfer(szállító)-RNS, Az aktivált aminosavat a fehérjeszintézishez szállítja" },
+      { t:"DNS", d:"Dezoxiribonukleinsav" },
+      { t:"DNS bázisai", d:"A, G, C, T" },
+      { t:"DNS pentóza", d:"2-dezoxi-D-ribóz" },
+      { t:"DNS láncszerkezete", d:"Kettős hélix, Ellentétes lefutású, Komplementer bázispárosodás" },
+      { t:"Komplementer bázispárosodás", d:"A-T(2 hidrogén-kötés), C-G(3 hidrogén-kötés)" },
+      { t:"DNS funkciója", d:"Információtárolás" },
+      { t:"DNS kettős hélix felfedezése", d:"Watson és Crick" }
+    ].map(c => ({ t: normalizeArrows(c.t), d: normalizeArrows(c.d) }));
+
+    let mode = "base";         // "base" | "shuffle"
+    let onlyWrongMode = false; // csak hibásak
+    let deck = [];
+    let idx = 0;
+    let reveal = false;
+
+    // 0 = még nem, 1 = helyes, -1 = helytelen
+    let results = new Array(BASE_CARDS.length).fill(0);
+
+    // Vissza gombhoz előzmény
+    let history = [];
+
+    const elTerm = document.getElementById("term");
+    const elDef  = document.getElementById("def");
+    const elFlash = document.getElementById("flash");
+
+    const elStatIndex = document.getElementById("statIndex");
+    const elStatTotal = document.getElementById("statTotal");
+    const elCorrect = document.getElementById("statCorrect");
+    const elWrong = document.getElementById("statWrong");
+
+    const elBarFill = document.getElementById("barFill");
+    const elModeText = document.getElementById("modeText");
+    const elShuffleState = document.getElementById("shuffleState");
+
+    const btnReveal = document.getElementById("btnReveal");
+    const btnKnow = document.getElementById("btnKnow");
+    const btnNoKnow = document.getElementById("btnNoKnow");
+    const btnBack = document.getElementById("btnBack");
+    const btnShuffle = document.getElementById("btnShuffle");
+
+    const endPanel = document.getElementById("endPanel");
+    const endSummary = document.getElementById("endSummary");
+    const btnRestartAll = document.getElementById("btnRestartAll");
+    const btnRestartWrong = document.getElementById("btnRestartWrong");
+
+    function computeCounts(){
+      let c = 0, w = 0;
+      for(const r of results){
+        if(r === 1) c++;
+        if(r === -1) w++;
+      }
+      return {c,w};
+    }
+
+    // Fisher-Yates shuffle
+    function shuffleInPlace(arr){
+      for(let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function buildDeck(){
+      const indices = [];
+      for(let i=0;i<BASE_CARDS.length;i++){
+        if(onlyWrongMode){
+          if(results[i] === -1) indices.push(i);
+        }else{
+          indices.push(i);
+        }
+      }
+      if(indices.length === 0) return [];
+      if(mode === "shuffle") shuffleInPlace(indices);
+      return indices.map(baseIndex => ({ baseIndex, ...BASE_CARDS[baseIndex] }));
+    }
+
+    function setReveal(state){
+      reveal = state;
+      elDef.style.display = reveal ? "block" : "none";
+      btnReveal.textContent = reveal ? "Válasz elrejtése" : "Válasz mutatása";
+    }
+
+    function updateFlashBorder(){
+      elFlash.classList.remove("good","bad");
+      const card = deck[idx];
+      if(!card) return;
+      const r = results[card.baseIndex];
+      if(r === 1) elFlash.classList.add("good");
+      if(r === -1) elFlash.classList.add("bad");
+    }
+
+    function updateUI(){
+      const total = deck.length;
+      elStatTotal.textContent = String(total);
+
+      const {c,w} = computeCounts();
+      elCorrect.textContent = String(c);
+      elWrong.textContent = String(w);
+
+      elShuffleState.textContent = (mode === "shuffle") ? "BE" : "KI";
+      elModeText.textContent =
+        "Mód: " + (mode === "shuffle" ? "Random" : "Alap sorrend") + (onlyWrongMode ? " (csak hibásak)" : "");
+
+      const progress = total ? ((idx+1) / total) * 100 : 0;
+      elBarFill.style.width = total ? (progress.toFixed(1) + "%") : "0%";
+
+      const atEnd = total === 0 || idx >= total;
+      endPanel.style.display = atEnd ? "block" : "none";
+
+      const hasCard = total > 0 && idx < total;
+      btnReveal.disabled = !hasCard;
+      btnKnow.disabled = !hasCard;
+      btnNoKnow.disabled = !hasCard;
+      btnBack.disabled = history.length === 0;
+
+      if(!hasCard){
+        elTerm.textContent = total === 0
+          ? (onlyWrongMode ? "Nincs hibás kártya." : "Nincs betöltött kártya.")
+          : "Vége.";
+        elDef.textContent = "";
+        setReveal(false);
+
+        const allTotal = BASE_CARDS.length;
+        endSummary.textContent = `Gyakorlás vége. Összes kártya: ${allTotal}. Helyes: ${c}. Helytelen: ${w}.`;
+        return;
+      }
+
+      elStatIndex.textContent = String(idx + 1);
+      const card = deck[idx];
+      elTerm.textContent = card.t;
+      elDef.textContent = card.d;
+
+      updateFlashBorder();
+    }
+
+    function goTo(i){
+      idx = i;
+      setReveal(false);
+      updateUI();
+    }
+
+    function next(){
+      goTo(idx + 1);
+    }
+
+    function mark(known){
+      const card = deck[idx];
+      if(!card) return;
+
+      const baseIndex = card.baseIndex;
+      const prev = results[baseIndex];
+      const nextVal = known ? 1 : -1;
+
+      history.push({ deckIndex: idx, baseIndex, prevResult: prev });
+      results[baseIndex] = nextVal;
+
+      next();
+    }
+
+    function back(){
+      const h = history.pop();
+      if(!h) return;
+      results[h.baseIndex] = h.prevResult;
+      goTo(h.deckIndex);
+    }
+
+    function restartAll(){
+      onlyWrongMode = false;
+      history = [];
+      idx = 0;
+      deck = buildDeck();
+      setReveal(false);
+      updateUI();
+    }
+
+    function restartWrong(){
+      onlyWrongMode = true;
+      history = [];
+      idx = 0;
+      deck = buildDeck();
+      setReveal(false);
+      updateUI();
+    }
+
+    function toggleShuffle(){
+      mode = (mode === "shuffle") ? "base" : "shuffle";
+      history = [];
+      idx = 0;
+      deck = buildDeck();
+      setReveal(false);
+      updateUI();
+    }
+
+    btnReveal.addEventListener("click", () => setReveal(!reveal));
+    btnKnow.addEventListener("click", () => mark(true));
+    btnNoKnow.addEventListener("click", () => mark(false));
+    btnBack.addEventListener("click", () => back());
+    btnShuffle.addEventListener("click", () => toggleShuffle());
+
+    btnRestartAll.addEventListener("click", () => restartAll());
+    btnRestartWrong.addEventListener("click", () => restartWrong());
+
+    window.addEventListener("keydown", (e) => {
+      const key = e.key;
+      if(key === " "){
+        e.preventDefault();
+        if(!btnReveal.disabled) setReveal(!reveal);
+      }else if(key === "1"){
+        if(!btnKnow.disabled) mark(true);
+      }else if(key === "2"){
+        if(!btnNoKnow.disabled) mark(false);
+      }else if(key === "ArrowLeft"){
+        if(!btnBack.disabled) back();
+      }
+    });
+
+    function init(){
+      mode = "base";
+      onlyWrongMode = false;
+      deck = buildDeck();
+      idx = 0;
+      reveal = false;
+      updateUI();
+    }
+    init();
+  </script>
+
+</body>
+</html>
