@@ -1,0 +1,2314 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Biokémia Gyakorló</title>
+  <meta name="color-scheme" content="dark" />
+
+  <style>
+    :root{
+      --bg0:#050915;
+      --bg1:#070F22;
+      --stroke: rgba(255,255,255,.10);
+      --text:#EAF1FF;
+      --muted: rgba(234,241,255,.72);
+      --muted2: rgba(234,241,255,.56);
+      --blue: rgb(0,110,183);
+      --good:#2ED47A;
+      --bad:#FF4D5E;
+      --warning:#FFCC66;
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --shadow2: 0 10px 34px rgba(0,0,0,.45);
+      --radius: 18px;
+      --focus: 0 0 0 3px rgba(0,110,183,.35);
+      --glassA: rgba(12,24,50,.56);
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 15% -10%, rgba(0,110,183,.40), transparent 55%),
+        radial-gradient(900px 600px at 105% 10%, rgba(46,212,122,.14), transparent 50%),
+        radial-gradient(900px 700px at 60% 120%, rgba(255,77,94,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      z-index:-3;
+      background:
+        radial-gradient(1100px 820px at 15% 10%, rgba(0,110,183,.18), transparent 58%),
+        radial-gradient(900px 720px at 85% 35%, rgba(46,212,122,.12), transparent 55%),
+        radial-gradient(980px 820px at 50% 120%, rgba(255,77,94,.08), transparent 60%),
+        linear-gradient(180deg, rgba(4,8,18,.45), rgba(4,8,18,.78));
+      filter:saturate(1.15);
+      pointer-events:none;
+      transform:translateZ(0);
+    }
+    body::after{
+      content:"";
+      position:fixed; inset:-2px;
+      z-index:-2;
+      pointer-events:none;
+      background:
+        radial-gradient(closest-side at 22% 28%, rgba(46,212,122,.12), transparent 62%),
+        radial-gradient(closest-side at 70% 40%, rgba(0,110,183,.14), transparent 62%),
+        radial-gradient(closest-side at 58% 78%, rgba(255,204,102,.08), transparent 60%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.030), rgba(255,255,255,.030) 1px, transparent 1px, transparent 4px);
+      opacity:.34;
+      mask-image: radial-gradient(circle at 50% 45%, rgba(0,0,0,1) 0 70%, transparent 88%);
+      animation: globalPulse 10s ease-in-out infinite;
+    }
+    @keyframes globalPulse{
+      0%,100%{ transform:translateY(0) scale(1); opacity:.28; }
+      50%{ transform:translateY(-10px) scale(1.01); opacity:.42; }
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+
+    .bubbles{
+      position:fixed; inset:0;
+      z-index:-1;
+      pointer-events:none;
+      opacity:.55;
+      mask-image: radial-gradient(circle at 50% 45%, rgba(0,0,0,1) 0 72%, transparent 92%);
+    }
+    .bubble{
+      position:absolute;
+      width:420px; height:420px;
+      border-radius:999px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(46,212,122,.16), transparent 62%),
+        radial-gradient(circle at 70% 60%, rgba(0,110,183,.12), transparent 62%),
+        radial-gradient(circle at 45% 80%, rgba(255,77,94,.06), transparent 62%);
+      border: 1px solid rgba(255,255,255,.06);
+      mix-blend-mode:screen;
+      opacity:.62;
+      animation: bubbleDrift 18s ease-in-out infinite;
+    }
+    @keyframes bubbleDrift{
+      0%,100%{ transform: translate3d(0,0,0) scale(1); }
+      50%{ transform: translate3d(26px,-18px,0) scale(1.06); }
+    }
+
+    .wrap{
+      max-width:1040px;
+      margin:0 auto;
+      padding:18px 14px 26px;
+      min-height:100%;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      position:relative;
+    }
+    .glass{
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background:var(--glassA);
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+    }
+
+    header{
+      position:relative;
+      padding:16px 16px 14px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      overflow:hidden;
+      transform: translateZ(0);
+    }
+    header::before{
+      content:"";
+      position:absolute;
+      inset:-90px;
+      background:
+        radial-gradient(680px 280px at 0 0, rgba(0,110,183,.22), transparent 60%),
+        radial-gradient(520px 240px at 80% -10%, rgba(46,212,122,.10), transparent 60%);
+      pointer-events:none;
+      animation: headerGlow 7s ease-in-out infinite;
+      opacity:.95;
+    }
+    @keyframes headerGlow{
+      0%,100%{ transform: translateY(0) scale(1); }
+      50%{ transform: translateY(-7px) scale(1.01); }
+    }
+    .titlePill{
+      position:absolute;
+      left:50%;
+      top:14px;
+      transform:translateX(-50%);
+      padding:7px 12px;
+      border-radius:999px;
+      border:1px solid rgba(0,110,183,.42);
+      background: linear-gradient(180deg, rgba(0,110,183,.24), rgba(255,255,255,.02));
+      color: rgba(234,241,255,.94);
+      font-weight:980;
+      letter-spacing:.3px;
+      font-size:16px;
+      pointer-events:none;
+      white-space:nowrap;
+      z-index:2;
+      box-shadow: 0 0 0 1px rgba(0,110,183,.10) inset;
+    }
+    .brand{
+      position:relative;
+      z-index:2;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      padding-top:28px;
+      min-width:220px;
+    }
+    .brand a{
+      font-weight:900;
+      letter-spacing:.3px;
+      font-size:20px;
+    }
+    .tagline{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.25;
+    }
+
+    .hud{
+      position:relative;
+      z-index:2;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:flex-end;
+      align-items:center;
+      padding-top:28px;
+    }
+    .pill{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:13px;
+      color:var(--muted);
+      display:flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.02) inset;
+    }
+    .pill b{ color:var(--text); font-weight:850; }
+    .dot{ width:10px; height:10px; border-radius:99px; display:inline-block; }
+    .dot.good{ background:var(--good); }
+    .dot.bad{ background:var(--bad); }
+    .dot.blue{ background:var(--blue); box-shadow: 0 0 16px rgba(0,110,183,.38); }
+    .dot.warn{ background:var(--warning); }
+
+    main{ flex:1; display:flex; flex-direction:column; gap:14px; }
+    .panel{ overflow:hidden; }
+
+    .controls{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+      padding:14px 14px 12px;
+      border-bottom:1px solid var(--stroke);
+      background: rgba(255,255,255,.02);
+      position:relative;
+      overflow:hidden;
+    }
+    .controls::before{
+      content:"";
+      position:absolute;
+      inset:-40px;
+      background:
+        linear-gradient(90deg, transparent, rgba(46,212,122,.10), transparent),
+        radial-gradient(520px 220px at 20% 0, rgba(0,110,183,.10), transparent 60%);
+      opacity:0;
+      pointer-events:none;
+      transform: rotate(14deg) translateX(-40%);
+      animation: hudSweep 6.2s ease-in-out infinite;
+    }
+    @keyframes hudSweep{
+      0%,30%{ opacity:0; transform: rotate(14deg) translateX(-60%); }
+      45%{ opacity:.55; }
+      70%{ opacity:0; transform: rotate(14deg) translateX(70%); }
+      100%{ opacity:0; transform: rotate(14deg) translateX(70%); }
+    }
+    .btnrow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+      position:relative;
+      z-index:1;
+    }
+    button,input,select{ font:inherit; color:inherit; }
+    button{ appearance:none; border:none; background:transparent; cursor:pointer; }
+
+    .btn{
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      transition: transform .10s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease, filter .2s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-weight:780;
+      font-size:13.5px;
+      user-select:none;
+      white-space:nowrap;
+      position:relative;
+      overflow:hidden;
+      box-shadow: var(--shadow2);
+      transform: translateZ(0);
+    }
+    .btn.primary{
+      border-color: rgba(0,110,183,.48);
+      background: linear-gradient(180deg, rgba(0,110,183,.56), rgba(0,110,183,.26));
+      box-shadow: 0 18px 40px rgba(0,110,183,.12), var(--shadow2);
+    }
+    .btn.bad{
+      border-color: rgba(255,77,94,.45);
+      background: linear-gradient(180deg, rgba(255,77,94,.22), rgba(255,77,94,.10));
+    }
+    .btn.warn{
+      border-color: rgba(255,204,102,.40);
+      background: linear-gradient(180deg, rgba(255,204,102,.18), rgba(255,204,102,.08));
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,.03);
+      box-shadow:none;
+    }
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+      filter:none;
+    }
+    .btn:hover{ background: rgba(255,255,255,.09); transform: translateY(-1px); }
+    .btn:active{ transform: translateY(1px) scale(.995); }
+    .btn:focus-visible{ outline:none; box-shadow: var(--focus), var(--shadow2); }
+
+    .card{
+      padding:18px 14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .topline{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .progressWrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:1;
+      min-width:220px;
+    }
+    .bar{
+      flex:1;
+      height:10px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.25);
+      overflow:hidden;
+      position:relative;
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--blue), rgba(0,110,183,.85));
+      border-radius:999px;
+      transition: width .32s cubic-bezier(.2,.9,.2,1);
+    }
+
+    .view{
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      padding:16px;
+      min-height:270px;
+      position:relative;
+      overflow:hidden;
+      transform: translateZ(0);
+    }
+    .view::before{
+      content:"";
+      position:absolute;
+      inset:-90px;
+      background:
+        radial-gradient(640px 260px at 10% 0, rgba(0,110,183,.18), transparent 60%),
+        radial-gradient(600px 260px at 90% 30%, rgba(46,212,122,.10), transparent 60%),
+        repeating-radial-gradient(circle at 50% 45%, rgba(255,255,255,.05) 0 1px, transparent 1px 10px);
+      pointer-events:none;
+      animation: bgFloat 10s ease-in-out infinite;
+      opacity:.9;
+      filter:saturate(1.1);
+    }
+    @keyframes bgFloat{
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(-10px); }
+    }
+    .animSwap{ animation: swapIn .42s cubic-bezier(.2,.95,.2,1) both; }
+    @keyframes swapIn{
+      from{ transform: translateY(14px) scale(.992); opacity:0; filter: blur(2px); }
+      to{ transform: translateY(0) scale(1); opacity:1; filter: blur(0); }
+    }
+
+    .setupGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    @media (min-width: 860px){
+      .setupGrid{ grid-template-columns: 1fr 1fr; }
+    }
+    .setupCard{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.03);
+      border-radius:var(--radius);
+      padding:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .setupTitle{
+      font-weight:980;
+      margin:2px 0 10px;
+      letter-spacing:.2px;
+      position:relative;
+      z-index:1;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      position:relative;
+      z-index:1;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      flex: 1 1 220px;
+      min-width:220px;
+      position:relative;
+      z-index:1;
+    }
+    label{ color:var(--muted); font-size:12.5px; }
+    .select,.num{
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.16);
+      outline:none;
+    }
+    .select:focus,.num:focus{ box-shadow: var(--focus); }
+
+    .presetRow{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; position:relative; z-index:1; }
+
+    .mixWrap{ display:flex; flex-direction:column; gap:10px; margin-top:8px; position:relative; z-index:1; }
+    .mixLine{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; color:var(--muted); font-size:12.5px; }
+    input[type="range"]{ width:100%; }
+
+    .qMeta{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px; color:var(--muted); font-size:12.5px; position:relative; z-index:1; }
+    .qChip{
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      border-radius:999px;
+      padding:6px 10px;
+      white-space:nowrap;
+    }
+    .qText{
+      font-weight:980;
+      font-size: clamp(18px, 2.4vw, 22px);
+      line-height:1.2;
+      letter-spacing:.2px;
+      margin-bottom:10px;
+      text-shadow: 0 8px 30px rgba(0,0,0,.40);
+      position:relative; z-index:1;
+    }
+    #qImg{
+      display:none;
+      max-width:100%;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      margin: 0 0 10px 0;
+      position:relative; z-index:1;
+    }
+
+    .answers{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-top:12px;
+      position:relative; z-index:1;
+    }
+    @media (min-width: 760px){
+      .answers.grid2{ grid-template-columns: 1fr 1fr; }
+    }
+    .opt{
+      text-align:left;
+      border:1px solid var(--stroke);
+      border-radius:14px;
+      padding:12px 12px;
+      background: rgba(255,255,255,.04);
+      transition: transform .12s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      position:relative;
+      overflow:hidden;
+    }
+    .opt:hover{ background: rgba(255,255,255,.07); transform: translateY(-2px); }
+    .opt:active{ transform: translateY(1px) scale(.996); }
+    .opt:disabled{ opacity:.86; cursor:not-allowed; transform:none; }
+    .opt.correct{
+      border-color: rgba(46,212,122,.72) !important;
+      background: linear-gradient(180deg, rgba(46,212,122,.20), rgba(0,0,0,.10)) !important;
+      box-shadow: 0 0 22px rgba(46,212,122,.24);
+    }
+    .opt.wrong{
+      border-color: rgba(255,77,94,.74) !important;
+      background: linear-gradient(180deg, rgba(255,77,94,.15), rgba(0,0,0,.10)) !important;
+      box-shadow: 0 0 22px rgba(255,77,94,.18);
+    }
+    .badge{
+      width:26px; height:26px;
+      border-radius:10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      color: rgba(234,241,255,.90);
+      font-weight:980;
+      flex: 0 0 auto;
+    }
+
+    .inputRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; align-items:center; position:relative; z-index:1; }
+    .txt{
+      flex: 1 1 240px;
+      min-width:220px;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.18);
+      outline:none;
+    }
+    .txt:focus{
+      box-shadow: 0 0 0 3px rgba(0,110,183,.35), 0 0 30px rgba(0,110,183,.12);
+      border-color: rgba(0,110,183,.45);
+    }
+    .txt.correct{ border-color: rgba(46,212,122,.70) !important; }
+    .txt.wrong{ border-color: rgba(255,77,94,.72) !important; }
+
+    .explainBox{
+      margin-top:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      padding:12px 12px;
+      background: rgba(0,0,0,.14);
+      color: rgba(234,241,255,.78);
+      display:none;
+      position:relative; z-index:1;
+    }
+    .explainBox.show{ display:block; }
+    .explainBox b{ color: rgba(234,241,255,.92); font-weight:980; }
+
+    .navRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:10px;
+      position:relative; z-index:1;
+    }
+    .navLeft,.navRight{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .resultBox{
+      border-top:1px solid var(--stroke);
+      padding:16px 14px 18px;
+      display:none;
+    }
+    .resultBox.show{ display:block; }
+    .resultTitle{ font-weight:980; font-size:18px; margin:0 0 6px; }
+    .resultMsg{ color:var(--muted); margin:0 0 12px; line-height:1.4; }
+    .topics{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin: 10px 0 14px; }
+    .topicBtn{
+      border:1px solid rgba(0,110,183,.38);
+      background: rgba(0,110,183,.12);
+      padding:9px 10px;
+      border-radius:999px;
+      font-weight:950;
+      font-size:12.5px;
+      transition: transform .12s ease, background .18s ease, box-shadow .2s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.25);
+    }
+    .topicBtn:hover{ background: rgba(0,110,183,.20); transform: translateY(-2px); }
+
+    /* Pie block in results */
+    .resultGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (min-width: 860px){
+      .resultGrid{ grid-template-columns: 1fr 260px; }
+    }
+    .pieCard{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      border-radius: 18px;
+      padding: 12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+    }
+    .pieLabel{
+      color: var(--muted);
+      font-size: 12.5px;
+      text-align:center;
+      line-height:1.35;
+    }
+    canvas{ display:block; }
+
+    footer{
+      padding:14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    footer::before{
+      content:"";
+      position:absolute;
+      inset:-70px;
+      background: radial-gradient(600px 240px at 0 0, rgba(0,110,183,.14), transparent 55%);
+      pointer-events:none;
+    }
+    .footrow{ position:relative; z-index:1; display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+    .copyrightPill{
+      position:relative; z-index:1;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(0,110,183,.35);
+      background: linear-gradient(180deg, rgba(0,110,183,.18), rgba(255,255,255,.02));
+      color: rgba(234,241,255,.82);
+      font-size:12.5px;
+      white-space:nowrap;
+    }
+    .small{ position:relative; z-index:1; font-size:12.5px; line-height:1.35; color:var(--muted); }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size:12px;
+      padding:2px 6px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: rgba(234,241,255,.88);
+      white-space:nowrap;
+    }
+
+    /* History dialog */
+    dialog{
+      border:none;
+      border-radius:16px;
+      padding:0;
+      background: rgba(12,24,50,.86);
+      color: var(--text);
+      max-width: min(860px, calc(100vw - 24px));
+      width: 860px;
+      box-shadow: 0 22px 80px rgba(0,0,0,.65);
+      border:1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+    }
+    dialog::backdrop{
+      background: rgba(0,0,0,.18);
+      backdrop-filter: blur(1px);
+    }
+    .modalHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 12px 10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .modalHead b{ font-weight:980; }
+    .modalBody{
+      padding:12px;
+      color: var(--muted);
+      line-height:1.45;
+      max-height: min(70vh, 620px);
+      overflow:auto;
+    }
+    .modalFoot{
+      padding:12px;
+      border-top:1px solid rgba(255,255,255,.10);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .table{
+      width:100%;
+      border-collapse:collapse;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+    }
+    .table th,.table td{
+      padding:10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      text-align:left;
+      vertical-align:top;
+      font-size:12.8px;
+      color: rgba(234,241,255,.88);
+    }
+    .table th{
+      background: rgba(255,255,255,.04);
+      font-weight:980;
+      color: rgba(234,241,255,.82);
+    }
+    .table tr:last-child td{ border-bottom:none; }
+    .rowBtn{
+      padding:6px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      cursor:pointer;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .kpi{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin: 10px 0 12px;
+    }
+    .kpi .pill{ box-shadow:none; background: rgba(255,255,255,.03); }
+
+    .detailBox{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      border-radius:14px;
+      padding:10px;
+      margin-top:10px;
+    }
+    .detailTitle{
+      font-weight:980;
+      color: rgba(234,241,255,.92);
+      margin:0 0 8px;
+    }
+    .detailGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:8px;
+    }
+    @media (min-width: 720px){
+      .detailGrid{ grid-template-columns: 1fr 1fr; }
+    }
+    .item{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      border-radius:12px;
+      padding:9px;
+      color: rgba(234,241,255,.86);
+      font-size:12.8px;
+      line-height:1.35;
+    }
+    .item b{ font-weight:980; }
+
+    @media (prefers-reduced-motion: reduce){
+      body::after, header::before, .bubble { animation:none !important; }
+      .btn, .opt, .bar > div { transition:none !important; }
+      .animSwap { animation:none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bubbles" aria-hidden="true">
+    <div class="bubble" style="left:42%; bottom:-240px;"></div>
+    <div class="bubble" style="left:-120px; top:120px; width:520px; height:520px; opacity:.55;"></div>
+    <div class="bubble" style="right:-170px; top:220px; width:460px; height:460px; opacity:.50;"></div>
+  </div>
+
+  <div class="wrap">
+    <header class="glass" id="hudHeader">
+      <div class="titlePill">Biokémia</div>
+
+      <div class="brand">
+        <a href="https://phylotree.hu" target="_blank" rel="noopener noreferrer">Phylotree</a>
+        <div class="tagline">Biokémia gyakorló és vizsgamód random kérdésekkel</div>
+      </div>
+
+      <div class="hud" aria-live="polite" id="miniHud">
+        <div class="pill" title="Mód"><span class="dot blue"></span><span><b id="hudMode">Gyakorló</b></span></div>
+        <div class="pill" title="Kérdés"><span class="dot blue"></span><span><b id="hudIndex">0</b>/<span id="hudTotal">0</span></span></div>
+        <div class="pill" title="Idő"><span class="dot warn"></span><span id="hudTimer">—</span></div>
+        <div class="pill" title="Helyes"><span class="dot good"></span><span>Jó <b id="hudCorrect">0</b></span></div>
+        <div class="pill" title="Rossz"><span class="dot bad"></span><span>Rossz <b id="hudWrong">0</b></span></div>
+      </div>
+    </header>
+
+    <main class="glass panel">
+      <div class="controls">
+        <div class="btnrow" id="topActions">
+          <button class="btn ghost" id="btnHistory" type="button" title="Előzmények">Előzmények</button>
+          <button class="btn ghost" id="btnContinue" type="button" style="display:none;">Folytatás</button>
+          <button class="btn primary" id="btnStart" type="button">Indítás</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="topline">
+          <div class="progressWrap">
+            <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Haladás">
+              <div id="barFill"></div>
+            </div>
+          </div>
+          <div id="modeLine">Készen áll.</div>
+        </div>
+
+        <section class="view" id="view">
+          <!-- SETUP -->
+          <div id="setup" class="animSwap">
+            <div class="setupGrid">
+              <div class="setupCard">
+                <div class="setupTitle">Mód és kérdésszám</div>
+                <div class="row">
+                  <div class="field">
+                    <label for="modeSel">Mód</label>
+                    <select id="modeSel" class="select">
+                      <option value="practice">Gyakorló</option>
+                      <option value="exam">Vizsga (45 mp/kérdés)</option>
+                    </select>
+                  </div>
+
+                  <div class="field">
+                    <label for="countCustom">Kérdések száma</label>
+                    <input id="countCustom" class="num" type="number" min="5" max="60" step="1" value="20" />
+                  </div>
+                </div>
+
+                <div class="presetRow">
+                  <button class="btn" id="btn10" type="button">10</button>
+                  <button class="btn" id="btn20" type="button">20</button>
+                  <button class="btn" id="btn30" type="button">30</button>
+                </div>
+
+                <div class="small" style="margin-top:10px;">Vizsga idő: <b id="examTimeText">15:00</b></div>
+                <div class="small" style="margin-top:8px;" id="bankWarn"></div>
+              </div>
+
+              <div class="setupCard">
+                <div class="setupTitle">Nehézség mix</div>
+
+                <div class="mixWrap">
+                  <div class="mixLine">
+                    <span>Könnyű</span>
+                    <span><b id="mixEasyLabel">50</b>%</span>
+                  </div>
+                  <input id="mixEasy" type="range" min="0" max="100" step="5" value="50" aria-label="Könnyű arány" />
+
+                  <div class="mixLine">
+                    <span>Közepes</span>
+                    <span><b id="mixMedLabel">35</b>%</span>
+                  </div>
+                  <input id="mixMed" type="range" min="0" max="100" step="5" value="35" aria-label="Közepes arány" />
+
+                  <div class="mixLine">
+                    <span>Nehéz</span>
+                    <span><b id="mixHardLabel">15</b>%</span>
+                  </div>
+                  <input id="mixHard" type="range" min="0" max="100" step="5" value="15" aria-label="Nehéz arány" />
+
+                  <div class="presetRow">
+                    <button class="btn" id="mixOnlyEasy" type="button">Csak könnyű</button>
+                    <button class="btn" id="mixOnlyMed" type="button">Csak közepes</button>
+                    <button class="btn" id="mixOnlyHard" type="button">Csak nehéz</button>
+                    <button class="btn ghost" id="mixDefault" type="button">Alap</button>
+                  </div>
+
+                  <div class="small">Ha az arányok nem 100-ra jönnek ki, automatikusan beállítjuk.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUIZ -->
+          <div id="quiz" style="display:none;">
+            <div class="qMeta" id="qMeta"></div>
+            <img id="qImg" alt="kérdés kép" />
+            <div class="qText" id="qText"></div>
+
+            <div id="mcArea" style="display:none;">
+              <div class="answers grid2" id="optGrid"></div>
+            </div>
+
+            <div id="multiArea" style="display:none;">
+              <div class="answers grid2" id="chkGrid"></div>
+              <div class="navRow" style="margin-top:12px;">
+                <div class="navLeft"></div>
+                <div class="navRight">
+                  <button class="btn primary" id="btnCheckMulti" type="button">Ellenőrzés</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="inputArea" style="display:none;">
+              <div class="inputRow">
+                <input class="txt" id="txtAnswer" type="text" placeholder="Írd be a választ..." autocomplete="off" autocapitalize="none" />
+                <button class="btn primary" id="btnSubmitInput" type="button">Beküldés</button>
+              </div>
+            </div>
+
+            <div class="explainBox" id="explainBox">
+              <b>Magyarázat</b>
+              <div class="t" id="explainText"></div>
+            </div>
+
+            <div class="navRow">
+              <div class="navLeft">
+                <button class="btn" id="btnPrev" type="button">Vissza</button>
+                <button class="btn ghost" id="btnQuit" type="button">Kilépés</button>
+              </div>
+              <div class="navRight">
+                <button class="btn primary" id="btnNext" type="button" disabled>Következő</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RESULT -->
+          <section class="resultBox" id="resultBox">
+            <div class="resultGrid">
+              <div>
+                <div class="resultTitle" id="resTitle">Eredmény</div>
+                <p class="resultMsg" id="resMsg"></p>
+                <div class="small" id="resStats"></div>
+
+                <div class="small" style="margin-top:10px;"><b>Mit érdemes átnézni</b></div>
+                <div class="topics" id="topicBtns"></div>
+
+                <div class="btnrow" style="justify-content:flex-start; margin-top:10px;">
+                  <button class="btn warn" id="btnRestart" type="button">Új kör</button>
+                  <button class="btn ghost" id="btnBackToSetup" type="button">Beállítások</button>
+                </div>
+              </div>
+
+              <div class="pieCard">
+                <canvas id="pieCanvas" width="220" height="220" aria-label="Sikeresség kördiagram" role="img"></canvas>
+                <div class="pieLabel" id="pieLabel">Sikeresség: —</div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
+    </main>
+
+    <footer class="glass">
+      <div class="footrow">
+        <div class="copyrightPill">
+          <span aria-hidden="true">©</span>
+          <span>Biokémia gyakorló – demo</span>
+        </div>
+        <div class="small">
+          Tipp: <span class="kbd">1-4</span> választ, <span class="kbd">Enter</span> beküld, <span class="kbd">→</span> következő.
+        </div>
+      </div>
+    </footer>
+
+    <!-- History dialog -->
+    <dialog id="dlgHistory">
+      <div class="modalHead">
+        <b>Előzmények</b>
+        <button class="btn ghost" id="histClose" type="button">Bezár</button>
+      </div>
+      <div class="modalBody">
+        <div class="small">Kattints a Részletek-re, és lent megjelenik a kör bontása.</div>
+
+        <div class="kpi" id="histKpi"></div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center; margin: 10px 0;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <label style="min-width:120px;">Szűrő</label>
+            <select id="histFilter" class="select" style="max-width:220px;">
+              <option value="all">Összes</option>
+              <option value="practice">Gyakorló</option>
+              <option value="exam">Vizsga</option>
+            </select>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <button class="btn ghost" id="histExport" type="button">Export JSON</button>
+            <button class="btn bad" id="histClear" type="button">Összes törlése</button>
+          </div>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Dátum</th>
+              <th>Mód</th>
+              <th>Kérdés</th>
+              <th>Eredmény</th>
+              <th>Legrosszabb témák</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="histRows"></tbody>
+        </table>
+
+        <div class="detailBox" id="histDetail" style="display:none;">
+          <div class="detailTitle" id="detailTitle">Részletek</div>
+          <div class="detailGrid" id="detailGrid"></div>
+        </div>
+      </div>
+
+      <div class="modalFoot">
+        <div class="small">Bezárás: Esc</div>
+        <div class="btnrow">
+          <button class="btn primary" id="histOk" type="button">Kész</button>
+        </div>
+      </div>
+    </dialog>
+  </div>
+
+<script>
+  // ---- Helpers ----
+  const $ = (s, root = document) => root.querySelector(s);
+  const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
+  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+  const nowISO = () => new Date().toISOString();
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const formatMMSS = (sec) => {
+    sec = Math.max(0, Math.floor(sec));
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${pad2(m)}:${pad2(s)}`;
+  };
+  const normalizeText = (s) => {
+    s = String(s ?? "");
+    s = s.trim().toLowerCase();
+    s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    s = s.replace(/-/g, " ");
+    s = s.replace(/\s+/g, " ");
+    return s;
+  };
+  const shuffleInPlace = (a) => {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const pickRandom = (arr, n) => {
+    const a = arr.slice();
+    shuffleInPlace(a);
+    return a.slice(0, n);
+  };
+  const uniq = (arr) => Array.from(new Set(arr));
+  const escapeHtml = (s) =>
+    String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  // Opciók randomizálása index-mappel (MC + MULTI)
+  function shuffleOptionsWithCorrect(options, correctIdxs) {
+    const pairs = options.map((t, i) => ({ text: t, oldIndex: i }));
+    shuffleInPlace(pairs);
+
+    const newOptions = pairs.map((p) => p.text);
+    const correctSet = new Set(correctIdxs);
+
+    const newCorrect = pairs
+      .map((p, newIndex) => ({ newIndex, ok: correctSet.has(p.oldIndex) }))
+      .filter((x) => x.ok)
+      .map((x) => x.newIndex);
+
+    return { options: newOptions, correct: newCorrect };
+  }
+
+    // ===== ALAP KÉRDÉSEK =====
+    const BASE_QUESTIONS = [
+      { id:"bio-01", topic:"Biokémia alapok", difficulty:"easy", type:"input",
+        q:"Mit jelent a hidrolízis?",
+        answers:["vízzel történő bontás","vizzel torteno bontas"],
+        synonyms:["viz felvetelevel torteno bontas","víz felvételével történő bontás"],
+        explain:"Hidrolízis = vízzel történő bontás (a víz beépül a kötés felhasításakor)."
+      },
+      { id:"bio-02", topic:"Biokémia alapok", difficulty:"easy", type:"mc",
+        q:"Mi a redoxireakció?",
+        options:["Oxidáció és redukció együtt","Csak oxidáció","Csak redukció","Sav-bázis reakció"],
+        correct:[0],
+        explain:"Redox = oxidáció + redukció egyszerre."
+      },
+      { id:"bio-03", topic:"Biokémia alapok", difficulty:"medium", type:"mc",
+        q:"Mi a szubsztrát?",
+        options:["Kiindulási anyag","A termék","Egy vitamin","Egy bázis"],
+        correct:[0],
+        explain:"Szubsztrát = a reakció kiindulási anyaga."
+      }
+    ];
+
+    // ===== EXTRA KÉRDÉSEK A FOGALMAKBÓL =====
+    const EXTRA_QUESTIONS = [
+      { id:"bio-x01", topic:"Biogén elemek", difficulty:"easy", type:"input",
+        q:"Sorolj fel legalább 2 elsődleges biogén elemet (C,H,N,O) közül!",
+        answers:["c h","c, h","c h n","c h o","c h n o","c h o n","chno","c,h,n,o"],
+        synonyms:["szén hidrogén","szén, hidrogén","szén hidrogén nitrogén oxigén","carbon hydrogen nitrogen oxygen"],
+        explain:"Az elsődleges biogén elemek: C, H, N, O."
+      },
+      { id:"bio-x02", topic:"Redox", difficulty:"easy", type:"input",
+        q:"Mit jelent az oxidáció? (írj 1 helyes megfogalmazást)",
+        answers:["elektron leadas","elektronleadás","oxigen felvetel","hidrogen leadas"],
+        synonyms:["oxigén felvétel","hidrogén leadás","e- leadás"],
+        explain:"Oxidáció: elektronleadás (gyakran oxigénfelvétel vagy hidrogénleadás)."
+      },
+      { id:"bio-x03", topic:"Redox", difficulty:"easy", type:"input",
+        q:"Mit jelent a redukció? (írj 1 helyes megfogalmazást)",
+        answers:["elektron felvetel","elektronfelvétel","oxigen leadas","hidrogen felvetel"],
+        synonyms:["oxigén leadás","hidrogén felvétel","e- felvétel"],
+        explain:"Redukció: elektronfelvétel (gyakran oxigénleadás vagy hidrogénfelvétel)."
+      },
+      { id:"bio-x04", topic:"Fotoszintézis", difficulty:"medium", type:"input",
+        q:"Hogy hívjuk a fotoszintézisben a vízbontást?",
+        answers:["fotolizis","fotolízis"],
+        synonyms:["fotolizis a fotoszintezisben","vízbontás fotolízis"],
+        explain:"A fotoszintézisben a vízbontás neve: fotolízis."
+      },
+      { id:"bio-x05", topic:"Nukleinsavak", difficulty:"easy", type:"input",
+        q:"Melyik pentóz található a DNS-ben?",
+        answers:["2-dezoxi-d-riboz","dezoxi riboz","dezoxiriboz","2 dezoxi riboz"],
+        synonyms:["2-dezoxi-d-ribóz","deoxyribose"],
+        explain:"DNS pentóza: 2-dezoxi-D-ribóz."
+      },
+      { id:"bio-x06", topic:"Nukleinsavak", difficulty:"easy", type:"input",
+        q:"Melyik bázis van a DNS-ben, de az RNS-ben nincs?",
+        answers:["timin"],
+        synonyms:["t"],
+        explain:"DNS: timin; RNS: uracil."
+      },
+      { id:"bio-x07", topic:"Nukleinsavak", difficulty:"easy", type:"input",
+        q:"Melyik bázis van az RNS-ben, de a DNS-ben nincs?",
+        answers:["uracil"],
+        synonyms:["u"],
+        explain:"RNS: uracil; DNS: timin."
+      },
+      { id:"bio-x08", topic:"Enzimek", difficulty:"medium", type:"input",
+        q:"Hogy hívják az enzimen azt a helyet, ahol a szubsztrát kötődik?",
+        answers:["aktiv centrum","aktív centrum"],
+        synonyms:["active site","aktív hely"],
+        explain:"Az enzim szubsztrátkötő helye az aktív centrum."
+      },
+      { id:"bio-x09", topic:"Biogén elemek", difficulty:"easy", type:"mc",
+        q:"Melyik NEM elsődleges biogén elem?",
+        options:["Szén (C)","Hidrogén (H)","Nitrogén (N)","Kalcium (Ca)"],
+        correct:[3],
+        explain:"Elsődleges: C, H, N, O. A Ca másodlagos biogén elem."
+      },
+      { id:"bio-x10", topic:"Nitrogén", difficulty:"medium", type:"mc",
+        q:"Melyik ion a növények fontos nitrogénforrása?",
+        options:["NO3− (nitrát)","NO2− (nitrit)","CO3^2− (karbonát)","PO4^3− (foszfát)"],
+        correct:[0],
+        explain:"A nitrát (NO3−) fontos N-forrás a növényeknek."
+      },
+      { id:"bio-x11", topic:"Nukleinsavak", difficulty:"easy", type:"mc",
+        q:"Melyik bázispár komplementer a DNS-ben?",
+        options:["A–U","A–T","C–U","G–T"],
+        correct:[1],
+        explain:"DNS-ben A–T és C–G a komplementer párok."
+      },
+      { id:"bio-x12", topic:"Nukleinsavak", difficulty:"medium", type:"mc",
+        q:"Hány hidrogénkötés van A–T között a DNS-ben?",
+        options:["1","2","3","4"],
+        correct:[1],
+        explain:"A–T között 2 hidrogénkötés van."
+      },
+      { id:"bio-x13", topic:"Nukleinsavak", difficulty:"medium", type:"mc",
+        q:"Hány hidrogénkötés van C–G között a DNS-ben?",
+        options:["1","2","3","4"],
+        correct:[2],
+        explain:"C–G között 3 hidrogénkötés van."
+      },
+      { id:"bio-x14", topic:"Szénhidrátok", difficulty:"easy", type:"mc",
+        q:"Mi a hidrolízis lényege?",
+        options:["Víz kilépésével összekapcsolás","Víz belépésével bontás","Oxigén felvétele","Elektron leadása"],
+        correct:[1],
+        explain:"Hidrolízis: vízzel történő bontás."
+      },
+      { id:"bio-x15", topic:"Szénhidrátok", difficulty:"easy", type:"mc",
+        q:"Melyik monoszacharid az RNS felépítésének pentóza?",
+        options:["D-ribóz","2-dezoxi-D-ribóz","D-glükóz","D-fruktóz"],
+        correct:[0],
+        explain:"RNS pentóza: D-ribóz."
+      },
+      { id:"bio-x16", topic:"Lipidek", difficulty:"medium", type:"mc",
+        q:"Melyik állítás igaz a foszfolipidekre?",
+        options:["Teljesen vízoldékonyak","Amfipatikusak","Csak növényekben fordulnak elő","Mindig szteránvázasak"],
+        correct:[1],
+        explain:"A foszfolipidek amfipatikusak (kétféle oldhatóság)."
+      },
+      { id:"bio-x17", topic:"Fehérjék", difficulty:"medium", type:"mc",
+        q:"Mi írja le a fehérje elsődleges szerkezetét?",
+        options:["Alfa-hélix és béta-redő","A teljes térszerkezet","Aminosavsorrend (szekvencia)","Több alegység kapcsolódása"],
+        correct:[2],
+        explain:"Elsődleges szerkezet: aminosavszekvencia."
+      },
+      { id:"bio-x18", topic:"Enzimek", difficulty:"easy", type:"mc",
+        q:"Mi a szubsztrát?",
+        options:["A reakció kiindulási anyaga","A reakció végterméke","Egy koenzim","Egy fehérje alegység"],
+        correct:[0],
+        explain:"A szubsztrát az enzim által átalakított kiindulási anyag."
+      },
+      { id:"bio-x19", topic:"Biogén elemek", difficulty:"easy", type:"multi",
+        q:"Válaszd ki a másodlagos biogén elemeket!",
+        options:["P","S","Na","K","Cl","Mg","Ca","I"],
+        correct:[0,1,2,3,4,5,6],
+        explain:"Másodlagos: P, S, Na, K, Cl, Mg, Ca. (I inkább mikroelem.)"
+      },
+      { id:"bio-x20", topic:"Fehérjék", difficulty:"medium", type:"multi",
+        q:"Melyek kéntartalmú aminosavak?",
+        options:["Cisztein","Metionin","Glicin","Lizin"],
+        correct:[0,1],
+        explain:"Kéntartalmú aminosavak: cisztein, metionin."
+      }
+    ];
+
+    const IMAGE_QUESTIONS = [
+      { id:"img-01", topic:"Képfelismerés", difficulty:"easy", type:"input",
+        img:"img/glukoz.png", alt:"glükóz",
+        q:"Mi látható a képen? (1 szó)",
+        answers:["glukoz","glükóz"],
+        synonyms:["d-glukoz","d-glükóz","szőlőcukor"],
+        explain:"A képen a glükóz (szőlőcukor) szerepel."
+      }
+    ];
+
+    const QUESTIONS = [
+      ...BASE_QUESTIONS,
+      ...EXTRA_QUESTIONS,
+      ...IMAGE_QUESTIONS
+    ];
+
+  // ---- Storage keys ----
+  const STATEKEY = "phylotree_biochem_state_v13";
+  const PREFKEY = "phylotree_biochem_prefs_v13";
+  const SESSKEY = "phylotree_biochem_sessions_v1";
+
+  // ---- UI refs ----
+  const ui = {
+    hudMode: $("#hudMode"),
+    hudIndex: $("#hudIndex"),
+    hudTotal: $("#hudTotal"),
+    hudTimer: $("#hudTimer"),
+    hudCorrect: $("#hudCorrect"),
+    hudWrong: $("#hudWrong"),
+    barFill: $("#barFill"),
+    modeLine: $("#modeLine"),
+
+    setup: $("#setup"),
+    quiz: $("#quiz"),
+
+    modeSel: $("#modeSel"),
+    countCustom: $("#countCustom"),
+    examTimeText: $("#examTimeText"),
+    bankWarn: $("#bankWarn"),
+
+    mixEasy: $("#mixEasy"),
+    mixMed: $("#mixMed"),
+    mixHard: $("#mixHard"),
+    mixEasyLabel: $("#mixEasyLabel"),
+    mixMedLabel: $("#mixMedLabel"),
+    mixHardLabel: $("#mixHardLabel"),
+
+    qMeta: $("#qMeta"),
+    qText: $("#qText"),
+    qImg: $("#qImg"),
+
+    mcArea: $("#mcArea"),
+    optGrid: $("#optGrid"),
+
+    multiArea: $("#multiArea"),
+    chkGrid: $("#chkGrid"),
+    btnCheckMulti: $("#btnCheckMulti"),
+
+    inputArea: $("#inputArea"),
+    txtAnswer: $("#txtAnswer"),
+    btnSubmitInput: $("#btnSubmitInput"),
+
+    explainBox: $("#explainBox"),
+    explainText: $("#explainText"),
+
+    btnPrev: $("#btnPrev"),
+    btnNext: $("#btnNext"),
+    btnQuit: $("#btnQuit"),
+
+    btnStart: $("#btnStart"),
+    btnHistory: $("#btnHistory"),
+    btnContinue: $("#btnContinue"),
+
+    btn10: $("#btn10"),
+    btn20: $("#btn20"),
+    btn30: $("#btn30"),
+
+    mixOnlyEasy: $("#mixOnlyEasy"),
+    mixOnlyMed: $("#mixOnlyMed"),
+    mixOnlyHard: $("#mixOnlyHard"),
+    mixDefault: $("#mixDefault"),
+
+    resultBox: $("#resultBox"),
+    resTitle: $("#resTitle"),
+    resMsg: $("#resMsg"),
+    resStats: $("#resStats"),
+
+    topicBtns: $("#topicBtns"),
+    btnRestart: $("#btnRestart"),
+    btnBackToSetup: $("#btnBackToSetup"),
+
+    pieCanvas: $("#pieCanvas"),
+    pieLabel: $("#pieLabel"),
+
+    dlgHistory: $("#dlgHistory"),
+    histClose: $("#histClose"),
+    histOk: $("#histOk"),
+    histRows: $("#histRows"),
+    histKpi: $("#histKpi"),
+    histFilter: $("#histFilter"),
+    histClear: $("#histClear"),
+    histExport: $("#histExport"),
+    histDetail: $("#histDetail"),
+    detailTitle: $("#detailTitle"),
+    detailGrid: $("#detailGrid"),
+  };
+
+  // ---- App state ----
+  const app = {
+    running: false,
+    phase: "setup", // setup | quiz | result
+    mode: "practice", // practice | exam
+    count: 20,
+    mix: { easy: 50, medium: 35, hard: 15 },
+
+    deck: [],
+    idx: 0,
+    correct: 0,
+    wrong: 0,
+    wrongTopics: {},
+
+    answered: false,
+    timer: null,
+    timeLeftSec: 0,
+
+    autoNextMs: 6500,
+    autoNext: null,
+
+    startedAt: null,
+    perQuestion: {},
+
+    cur: { options: null, correct: null },
+  };
+
+  // ---- UI rendering helpers ----
+  function setHud() {
+    ui.hudCorrect.textContent = String(app.correct);
+    ui.hudWrong.textContent = String(app.wrong);
+    ui.hudTimer.textContent = app.mode === "exam" ? formatMMSS(app.timeLeftSec) : "—";
+    ui.hudMode.textContent = app.mode === "exam" ? "Vizsga" : "Gyakorló";
+  }
+
+  function setProgress() {
+    const total = app.deck.length || 0;
+    ui.hudIndex.textContent = String(app.running ? app.idx + 1 : 0);
+    ui.hudTotal.textContent = String(total);
+
+    const pct = total ? ((app.running ? app.idx + 1 : 0) / total) * 100 : 0;
+    ui.barFill.style.width = `${pct.toFixed(1)}%`;
+    $(".bar").setAttribute("aria-valuenow", String(Math.round(pct)));
+  }
+
+  function normalizeMix() {
+    let e = Number(ui.mixEasy.value);
+    let m = Number(ui.mixMed.value);
+    let h = Number(ui.mixHard.value);
+
+    e = clamp(e, 0, 100);
+    m = clamp(m, 0, 100);
+    h = clamp(h, 0, 100);
+
+    let sum = e + m + h;
+    if (sum === 0) {
+      e = 50; m = 35; h = 15;
+      sum = 100;
+    }
+
+    const ne = Math.round((e / sum) * 100);
+    const nm = Math.round((m / sum) * 100);
+    let nh = 100 - ne - nm;
+    nh = clamp(nh, 0, 100);
+
+    ui.mixEasyLabel.textContent = String(ne);
+    ui.mixMedLabel.textContent = String(nm);
+    ui.mixHardLabel.textContent = String(nh);
+
+    app.mix = { easy: ne, medium: nm, hard: nh };
+
+    updateBankWarn();
+    autoSave();
+  }
+
+  function setMix(e, m, h) {
+    ui.mixEasy.value = String(e);
+    ui.mixMed.value = String(m);
+    ui.mixHard.value = String(h);
+    normalizeMix();
+  }
+
+  function updateExamTimeText() {
+    const count = clamp(parseInt(ui.countCustom.value || "20", 10), 5, 60);
+    ui.examTimeText.textContent = formatMMSS(count * 45);
+    updateBankWarn();
+    autoSave();
+  }
+
+  function updateBankWarn() {
+    const requested = clamp(parseInt(ui.countCustom.value || "20", 10), 5, 60);
+    if (QUESTIONS.length < requested) {
+      ui.bankWarn.textContent = `Figyelem: a kérdésbank jelenleg ${QUESTIONS.length} kérdés, ezért maximum ennyit tud adni.`;
+    } else {
+      ui.bankWarn.textContent = "";
+    }
+  }
+
+  function buildDeck() {
+    const requested = clamp(parseInt(ui.countCustom.value || "20", 10), 5, 60);
+    const count = Math.min(requested, QUESTIONS.length);
+
+    app.count = count;
+    app.mode = ui.modeSel.value;
+    normalizeMix();
+
+    const byDiff = {
+      easy: QUESTIONS.filter((q) => q.difficulty === "easy"),
+      medium: QUESTIONS.filter((q) => q.difficulty === "medium"),
+      hard: QUESTIONS.filter((q) => q.difficulty === "hard"),
+    };
+
+    let wantEasy = Math.round(count * (app.mix.easy / 100));
+    let wantMed = Math.round(count * (app.mix.medium / 100));
+    let wantHard = count - wantEasy - wantMed;
+    if (wantHard < 0) wantHard = 0;
+
+    let deck = [];
+    deck.push(...pickRandom(byDiff.easy, Math.min(wantEasy, byDiff.easy.length)));
+    deck.push(...pickRandom(byDiff.medium, Math.min(wantMed, byDiff.medium.length)));
+    deck.push(...pickRandom(byDiff.hard, Math.min(wantHard, byDiff.hard.length)));
+
+    const used = new Set(deck.map((q) => q.id));
+    const remaining = QUESTIONS.filter((q) => !used.has(q.id));
+    shuffleInPlace(remaining);
+
+    while (deck.length < count && remaining.length) deck.push(remaining.shift());
+    deck = deck.slice(0, count);
+    shuffleInPlace(deck);
+
+    return deck;
+  }
+
+  function renderMeta(q) {
+    const typeLabel =
+      q.type === "mc" ? "4 opció" :
+      q.type === "multi" ? "Több válasz" :
+      q.type === "input" ? "Beírás" : "Kérdés";
+
+    ui.qMeta.innerHTML =
+      `<span class="qChip">${escapeHtml(q.topic)}</span>` +
+      `<span class="qChip">${escapeHtml(q.difficulty)}</span>` +
+      `<span class="qChip">${escapeHtml(typeLabel)}</span>` +
+      (app.mode === "exam" ? `<span class="qChip">Vizsga</span>` : "");
+  }
+
+  function resetQuestionUI() {
+    ui.btnNext.disabled = true;
+
+    ui.mcArea.style.display = "none";
+    ui.multiArea.style.display = "none";
+    ui.inputArea.style.display = "none";
+
+    ui.optGrid.innerHTML = "";
+    ui.chkGrid.innerHTML = "";
+
+    app.answered = false;
+
+    ui.txtAnswer.value = "";
+    ui.txtAnswer.disabled = false;
+    ui.btnSubmitInput.disabled = false;
+    ui.btnCheckMulti.disabled = false;
+
+    ui.txtAnswer.classList.remove("correct", "wrong");
+
+    ui.explainBox.classList.remove("show");
+    ui.explainText.textContent = "";
+
+    if (app.autoNext) {
+      clearTimeout(app.autoNext);
+      app.autoNext = null;
+    }
+
+    ui.qImg.style.display = "none";
+    ui.qImg.removeAttribute("src");
+    ui.qImg.alt = "kérdés kép";
+
+    app.cur.options = null;
+    app.cur.correct = null;
+  }
+
+  function lockInputs(lock) {
+    const disable = !!lock;
+    $$(".opt", ui.optGrid).forEach((b) => (b.disabled = disable));
+    $$("input[type='checkbox']", ui.chkGrid).forEach((i) => (i.disabled = disable));
+    ui.txtAnswer.disabled = disable;
+    ui.btnSubmitInput.disabled = disable;
+    ui.btnCheckMulti.disabled = disable;
+  }
+
+  function addWrongTopic(topic) {
+    app.wrongTopics[topic] = (app.wrongTopics[topic] || 0) + 1;
+  }
+
+  function recordQuestion(qid, payload) {
+    app.perQuestion[qid] = { ...(app.perQuestion[qid] || {}), ...payload };
+  }
+
+  function showExplain(q) {
+    if (!q || !q.explain) return;
+    if (app.mode === "exam") return;
+    ui.explainText.textContent = q.explain;
+    ui.explainBox.classList.add("show");
+  }
+
+  function maybeAutoNext() {
+    ui.btnNext.disabled = false;
+    if (app.mode === "practice") {
+      app.autoNext = setTimeout(() => {
+        if (!ui.btnNext.disabled) goNext();
+      }, app.autoNextMs);
+    }
+    autoSave();
+  }
+
+  function renderQuestion() {
+    resetQuestionUI();
+    setProgress();
+    setHud();
+
+    const q = app.deck[app.idx];
+    if (!q) return;
+
+    renderMeta(q);
+
+    if (q.img) {
+      ui.qImg.src = q.img;
+      ui.qImg.style.display = "block";
+      ui.qImg.alt = q.alt || "kérdés kép";
+    }
+
+    ui.qText.textContent = q.q;
+
+    if (q.type === "mc") {
+      const shuffled = shuffleOptionsWithCorrect((q.options || []).slice(0, 4), (q.correct || []).slice());
+      app.cur.options = shuffled.options;
+      app.cur.correct = shuffled.correct;
+
+      ui.mcArea.style.display = "block";
+      ui.optGrid.classList.add("grid2");
+
+      const labels = ["1", "2", "3", "4"];
+      app.cur.options.forEach((text, i) => {
+        const b = document.createElement("button");
+        b.className = "opt";
+        b.type = "button";
+        b.innerHTML = `<span class="badge">${labels[i] || ""}</span><span>${escapeHtml(text)}</span>`;
+        b.addEventListener("click", () => answerMC(i));
+        ui.optGrid.appendChild(b);
+      });
+    }
+
+    if (q.type === "multi") {
+      const shuffled = shuffleOptionsWithCorrect((q.options || []).slice(), (q.correct || []).slice());
+      app.cur.options = shuffled.options;
+      app.cur.correct = shuffled.correct;
+
+      ui.multiArea.style.display = "block";
+      ui.chkGrid.classList.add("grid2");
+
+      app.cur.options.forEach((text, i) => {
+        const id = `chk_${q.id}_${i}`;
+        const wrap = document.createElement("div");
+        wrap.className = "opt";
+        wrap.style.cursor = "pointer";
+        wrap.innerHTML =
+          `<span class="badge"></span>` +
+          `<div style="display:flex; flex-direction:column; gap:8px; width:100%;">` +
+          `<div>${escapeHtml(text)}</div>` +
+          `<div style="display:flex; align-items:center; gap:10px; color: var(--muted2); font-size: 12.5px;">` +
+          `<input id="${id}" type="checkbox" data-i="${i}" />` +
+          `<label for="${id}" style="cursor:pointer;">Jelöld</label>` +
+          `</div>` +
+          `</div>`;
+
+        wrap.addEventListener("click", (e) => {
+          if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "LABEL")) return;
+          const input = $("input[type='checkbox']", wrap);
+          input.checked = !input.checked;
+          autoSave();
+        });
+
+        ui.chkGrid.appendChild(wrap);
+      });
+
+      ui.btnNext.disabled = true;
+    }
+
+    if (q.type === "input") {
+      ui.inputArea.style.display = "block";
+      setTimeout(() => {
+        ui.txtAnswer.disabled = false;
+        ui.txtAnswer.focus({ preventScroll: true });
+      }, 0);
+    }
+
+    ui.btnPrev.disabled = app.mode === "exam";
+    autoSave();
+  }
+
+  function revealAllForMC(correctIdxs) {
+    const btns = $$(".opt", ui.optGrid);
+    btns.forEach((b, idx) => {
+      if (correctIdxs.includes(idx)) b.classList.add("correct");
+      else b.classList.add("wrong");
+      b.disabled = true;
+    });
+  }
+
+  function answerMC(i) {
+    if (app.answered) return;
+
+    const q = app.deck[app.idx];
+    const correctIdxs = (app.cur.correct || []).slice();
+
+    const ok = correctIdxs.includes(i);
+    recordQuestion(q.id, { ok, chosen: i, correct: correctIdxs.slice() });
+
+    app.answered = true;
+
+    revealAllForMC(correctIdxs);
+    showExplain(q);
+
+    if (ok) app.correct++;
+    else {
+      app.wrong++;
+      addWrongTopic(q.topic);
+    }
+
+    setHud();
+    maybeAutoNext();
+  }
+
+  function answerMulti() {
+    if (app.answered) return;
+
+    const q = app.deck[app.idx];
+
+    const chosen = $$("input[type='checkbox']", ui.chkGrid)
+      .filter((x) => x.checked)
+      .map((x) => parseInt(x.getAttribute("data-i"), 10))
+      .sort((a, b) => a - b);
+
+    const correct = (app.cur.correct || []).slice().sort((a, b) => a - b);
+
+    const ok = chosen.length === correct.length && chosen.every((v, idx) => v === correct[idx]);
+
+    recordQuestion(q.id, { ok, chosen: chosen.slice(), correct: correct.slice() });
+
+    app.answered = true;
+
+    const cards = $$(".opt", ui.chkGrid);
+    cards.forEach((card, idx) => {
+      if (correct.includes(idx)) card.classList.add("correct");
+      else card.classList.add("wrong");
+    });
+
+    lockInputs(true);
+    showExplain(q);
+
+    if (ok) app.correct++;
+    else {
+      app.wrong++;
+      addWrongTopic(q.topic);
+    }
+
+    setHud();
+    maybeAutoNext();
+  }
+
+  function answerInput() {
+    if (app.answered) return;
+
+    const q = app.deck[app.idx];
+    const given = normalizeText(ui.txtAnswer.value);
+
+    const baseAnswers = (q.answers || []).map(normalizeText);
+    const syns = (q.synonyms || []).map(normalizeText);
+    const all = uniq(baseAnswers.concat(syns));
+
+    const ok = all.includes(given) && given.length > 0;
+
+    recordQuestion(q.id, { ok, chosen: ui.txtAnswer.value, correct: (q.answers && q.answers[0]) ? q.answers[0] : "" });
+
+    app.answered = true;
+
+    ui.txtAnswer.classList.add(ok ? "correct" : "wrong");
+    lockInputs(true);
+
+    showExplain(q);
+
+    if (ok) app.correct++;
+    else {
+      app.wrong++;
+      addWrongTopic(q.topic);
+    }
+
+    setHud();
+    maybeAutoNext();
+  }
+
+  function startRun(fromContinue = false) {
+    if (!fromContinue) {
+      app.deck = buildDeck();
+      app.idx = 0;
+      app.correct = 0;
+      app.wrong = 0;
+      app.wrongTopics = {};
+      app.perQuestion = {};
+      app.startedAt = nowISO();
+      app.mode = ui.modeSel.value;
+    }
+
+    app.running = true;
+    app.phase = "quiz";
+
+    ui.resultBox.classList.remove("show");
+    ui.quiz.style.display = "block";
+    ui.setup.style.display = "none";
+
+    if (app.mode === "exam") {
+      app.timeLeftSec = app.timeLeftSec || app.count * 45;
+      startTimer();
+      ui.modeLine.textContent = `Vizsga • ${app.count} kérdés • ${formatMMSS(app.timeLeftSec)}`;
+    } else {
+      stopTimer();
+      ui.modeLine.textContent = `Gyakorló • ${app.count} kérdés`;
+    }
+
+    setProgress();
+    setHud();
+    renderQuestion();
+    autoSave();
+  }
+
+  function goNext() {
+    if (!app.running) return;
+    if (ui.btnNext.disabled) return;
+
+    if (app.autoNext) {
+      clearTimeout(app.autoNext);
+      app.autoNext = null;
+    }
+
+    if (app.idx < app.deck.length - 1) {
+      app.idx++;
+      renderQuestion();
+      autoSave();
+    } else {
+      finishRun(false);
+    }
+  }
+
+  function goPrev() {
+    if (!app.running) return;
+    if (app.mode === "exam") return;
+
+    if (app.idx > 0) {
+      app.idx--;
+      renderQuestion();
+      autoSave();
+    }
+  }
+
+  function startTimer() {
+    stopTimer();
+    ui.hudTimer.textContent = formatMMSS(app.timeLeftSec);
+
+    app.timer = setInterval(() => {
+      app.timeLeftSec--;
+      setHud();
+      if (app.timeLeftSec <= 0) {
+        finishRun(true);
+      }
+      autoSave();
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (app.timer) clearInterval(app.timer);
+    app.timer = null;
+  }
+
+  function slugTopic(topic) {
+    return normalizeText(topic).replace(/\s+/g, "-");
+  }
+
+  // ---- Pie chart ----
+  function drawPie(correct, wrong) {
+    const c = ui.pieCanvas;
+    const ctx = c.getContext("2d");
+    const w = c.width, h = c.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const total = Math.max(1, correct + wrong);
+    const pct = Math.round((correct / total) * 100);
+
+    // Background ring
+    const cx = w / 2, cy = h / 2;
+    const r = Math.min(w, h) / 2 - 12;
+
+    const start = -Math.PI / 2;
+    const correctAngle = (correct / total) * Math.PI * 2;
+
+    // Shadow glow
+    ctx.save();
+    ctx.translate(0, 0);
+    ctx.shadowColor = "rgba(0,110,183,.18)";
+    ctx.shadowBlur = 18;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(255,255,255,.06)";
+    ctx.lineWidth = 16;
+    ctx.stroke();
+    ctx.restore();
+
+    // Wrong slice (red) as background slice ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, start, start + Math.PI * 2);
+    ctx.strokeStyle = "rgba(255,77,94,.55)";
+    ctx.lineWidth = 16;
+    ctx.lineCap = "round";
+    ctx.stroke();
+
+    // Correct slice (green)
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, start, start + correctAngle);
+    ctx.strokeStyle = "rgba(46,212,122,.85)";
+    ctx.lineWidth = 16;
+    ctx.lineCap = "round";
+    ctx.stroke();
+
+    // Inner cutout
+    ctx.beginPath();
+    ctx.arc(cx, cy, r - 18, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(0,0,0,.20)";
+    ctx.fill();
+
+    // Text
+    ctx.fillStyle = "rgba(234,241,255,.92)";
+    ctx.font = "900 34px ui-sans-serif, system-ui";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(`${pct}%`, cx, cy - 6);
+
+    ctx.fillStyle = "rgba(234,241,255,.62)";
+    ctx.font = "700 12.5px ui-sans-serif, system-ui";
+    ctx.fillText(`siker`, cx, cy + 22);
+
+    ui.pieLabel.textContent = `Sikeresség: ${pct}% (${correct}/${total})`;
+  }
+
+  // ---- Sessions (history) ----
+  function loadSessions() {
+    try {
+      const raw = localStorage.getItem(SESSKEY);
+      if (!raw) return [];
+      const data = JSON.parse(raw);
+      return Array.isArray(data) ? data : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveSessions(list) {
+    localStorage.setItem(SESSKEY, JSON.stringify(list));
+  }
+
+  function pushSession(session) {
+    const list = loadSessions();
+    list.unshift(session);
+    if (list.length > 60) list.length = 60;
+    saveSessions(list);
+  }
+
+  function summarizeWrongTopics(wt) {
+    const entries = Object.entries(wt || {}).sort((a, b) => b[1] - a[1]).slice(0, 2);
+    if (!entries.length) return "";
+    return entries.map(([t, c]) => `${t} (${c})`).join(", ");
+  }
+
+  function fmtDate(iso) {
+    try {
+      const d = new Date(iso);
+      return new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }).format(d);
+    } catch {
+      return iso;
+    }
+  }
+
+  function mkItem(title, html) {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `<b>${escapeHtml(title)}</b><div style="margin-top:6px; color: rgba(234,241,255,.82)">${html}</div>`;
+    return div;
+  }
+
+  function renderHistory() {
+    const list = loadSessions();
+    const filter = ui.histFilter.value;
+    const filtered = filter === "all" ? list : list.filter((s) => s.mode === filter);
+
+    const total = filtered.length;
+    const avg = total ? Math.round(filtered.reduce((a, s) => a + (s.percent || 0), 0) / total) : 0;
+    const best = total ? Math.max(...filtered.map((s) => s.percent || 0)) : 0;
+
+    ui.histKpi.innerHTML =
+      `<div class="pill"><span class="dot blue"></span><span>Körök <b>${total}</b></span></div>` +
+      `<div class="pill"><span class="dot good"></span><span>Átlag <b>${avg}%</b></span></div>` +
+      `<div class="pill"><span class="dot warn"></span><span>Legjobb <b>${best}%</b></span></div>`;
+
+    ui.histRows.innerHTML = "";
+    ui.histDetail.style.display = "none";
+    ui.detailGrid.innerHTML = "";
+
+    if (!filtered.length) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="6" style="color: rgba(234,241,255,.72)">Még nincs mentett kör.</td>`;
+      ui.histRows.appendChild(tr);
+      return;
+    }
+
+    filtered.forEach((s) => {
+      const tr = document.createElement("tr");
+      const wrongTop = summarizeWrongTopics(s.wrongTopics);
+
+      tr.innerHTML = `
+        <td>${escapeHtml(fmtDate(s.finishedAt || s.startedAt))}</td>
+        <td>${s.mode === "exam" ? "Vizsga" : "Gyakorló"}</td>
+        <td>${escapeHtml(String(s.totalQ ?? ""))}</td>
+        <td>${escapeHtml(String(s.correct ?? 0))}/${escapeHtml(String(s.totalQ ?? 0))} • ${escapeHtml(String(s.percent ?? 0))}%</td>
+        <td>${escapeHtml(wrongTop)}</td>
+        <td><button class="rowBtn" data-id="${escapeHtml(s.id)}">Részletek</button></td>
+      `;
+      ui.histRows.appendChild(tr);
+    });
+
+    $$(".rowBtn", ui.histRows).forEach((btn) => {
+      btn.addEventListener("click", () => showSessionDetail(btn.getAttribute("data-id")));
+    });
+  }
+
+  function showSessionDetail(id) {
+    const list = loadSessions();
+    const s = list.find((x) => x.id === id);
+    if (!s) return;
+
+    ui.histDetail.style.display = "block";
+    ui.detailTitle.textContent = `Részletek • ${fmtDate(s.finishedAt || s.startedAt)} • ${s.mode === "exam" ? "Vizsga" : "Gyakorló"}`;
+
+    const wrongTopics = Object.entries(s.wrongTopics || {}).sort((a, b) => b[1] - a[1]);
+    const wrongTopicText = wrongTopics.length ? wrongTopics.map(([t, c]) => `${t}: ${c}`).join(", ") : "Nem volt hibás téma.";
+
+    const per = s.perQuestion || {};
+    const wrongQ = (s.deck || []).filter((q) => per[q.id] && per[q.id].ok === false);
+
+    ui.detailGrid.innerHTML = "";
+    ui.detailGrid.appendChild(
+      mkItem(
+        "Összefoglaló",
+        `<b>Eredmény</b> ${escapeHtml(String(s.correct))}/${escapeHtml(String(s.totalQ))} • ${escapeHtml(String(s.percent))}%<br>` +
+          `<b>Hibás témák</b> ${escapeHtml(wrongTopicText)}`
+      )
+    );
+
+    ui.detailGrid.appendChild(
+      mkItem(
+        "Beállítások",
+        `<b>Mix</b> könnyű ${escapeHtml(String(s.mix?.easy ?? ""))}%, közepes ${escapeHtml(String(s.mix?.medium ?? ""))}%, nehéz ${escapeHtml(String(s.mix?.hard ?? ""))}%<br>` +
+          `<b>Idő</b> ${s.mode === "exam" ? escapeHtml(formatMMSS(s.timeLimitSec || 0)) : "—"}`
+      )
+    );
+
+    ui.detailGrid.appendChild(
+      mkItem(
+        "Hibás kérdések",
+        wrongQ.length
+          ? wrongQ
+              .map((q) => {
+                const pq = per[q.id];
+                const chosen = pq?.chosen;
+                const corr = pq?.correct;
+
+                // NOTE: a session.deck-ben az options az eredeti sorrend (statisztika), nem a kevert UI.
+                let chosenTxt = "";
+                let corrTxt = "";
+
+                if (Array.isArray(chosen)) chosenTxt = chosen.map((i) => q.options?.[i] ?? String(i)).join(", ");
+                else if (typeof chosen === "number") chosenTxt = q.options?.[chosen] ?? String(chosen);
+                else if (typeof chosen === "string") chosenTxt = chosen;
+
+                if (Array.isArray(corr)) corrTxt = corr.map((i) => q.options?.[i] ?? String(i)).join(", ");
+                else corrTxt = String(corr ?? "");
+
+                return (
+                  `<b>${escapeHtml(q.topic)}</b><br>` +
+                  `${escapeHtml(q.q)}<br>` +
+                  `<span style="color: rgba(234,241,255,.72)">Te:</span> ${escapeHtml(chosenTxt)}<br>` +
+                  `<span style="color: rgba(234,241,255,.72)">Helyes:</span> ${escapeHtml(corrTxt)}`
+                );
+              })
+              .join("<br><br>")
+          : "Nem volt hibás kérdés ebben a körben."
+      )
+    );
+
+    ui.histDetail.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+
+  // ---- Finish run / save state ----
+  function finishRun(byTimeout) {
+    app.running = false;
+    app.phase = "result";
+    stopTimer();
+
+    ui.quiz.style.display = "none";
+    ui.resultBox.classList.add("show");
+
+    const total = app.deck.length || 1;
+    const pct = Math.round((app.correct / total) * 100);
+
+    ui.resTitle.textContent = `Eredmény • ${pct}%`;
+    ui.resMsg.textContent = byTimeout ? "Lejárt az idő. Kész." : "Kész.";
+    ui.resStats.textContent = `Összes: ${total} • Jó: ${app.correct} • Rossz: ${app.wrong} • Mód: ${app.mode === "exam" ? "Vizsga" : "Gyakorló"}`;
+
+    // Topics (rossz témák)
+    const topics = Object.entries(app.wrongTopics)
+      .sort((a, b) => b[1] - a[1])
+      .map(([topic, count]) => ({ topic, count }));
+
+    ui.topicBtns.innerHTML = "";
+    if (!topics.length) {
+      const s = document.createElement("div");
+      s.className = "small";
+      s.textContent = "Nem volt hibás témakör.";
+      ui.topicBtns.appendChild(s);
+    } else {
+      topics.forEach((t) => {
+        const a = document.createElement("a");
+        a.className = "topicBtn";
+        a.href = `tananyag.html#${slugTopic(t.topic)}`;
+        a.innerHTML = `Ugrás: ${escapeHtml(t.topic)} <span style="color: var(--muted2); font-weight: 950;">${t.count}</span>`;
+        ui.topicBtns.appendChild(a);
+      });
+    }
+
+    // Pie chart
+    drawPie(app.correct, app.wrong);
+
+    // Save session
+    const session = {
+      id: (crypto?.randomUUID ? crypto.randomUUID() : `sess_${Math.random().toString(16).slice(2)}`),
+      startedAt: app.startedAt,
+      finishedAt: nowISO(),
+      mode: app.mode,
+      totalQ: total,
+      correct: app.correct,
+      wrong: app.wrong,
+      percent: pct,
+      mix: { ...app.mix },
+      timeLimitSec: app.mode === "exam" ? app.count * 45 : null,
+      wrongTopics: { ...app.wrongTopics },
+      deck: app.deck.map((q) => ({
+        id: q.id,
+        topic: q.topic,
+        difficulty: q.difficulty,
+        type: q.type,
+        q: q.q,
+        options: q.options ?? null,
+      })),
+      perQuestion: app.perQuestion,
+    };
+    pushSession(session);
+
+    autoSave();
+  }
+
+  function quitToSetup() {
+    app.running = false;
+    app.phase = "setup";
+    stopTimer();
+
+    if (app.autoNext) {
+      clearTimeout(app.autoNext);
+      app.autoNext = null;
+    }
+
+    ui.quiz.style.display = "none";
+    ui.resultBox.classList.remove("show");
+    ui.setup.style.display = "block";
+    ui.modeLine.textContent = "Készen áll.";
+
+    setProgress();
+    setHud();
+    autoSave();
+  }
+
+  function autoSave() {
+    // prefs
+    const prefs = {
+      v: 13,
+      modeSel: ui.modeSel.value,
+      count: ui.countCustom.value,
+      mixEasy: ui.mixEasy.value,
+      mixMed: ui.mixMed.value,
+      mixHard: ui.mixHard.value,
+    };
+    localStorage.setItem(PREFKEY, JSON.stringify(prefs));
+
+    // state
+    const data = {
+      v: 13,
+      savedAt: nowISO(),
+      app: {
+        phase: app.phase,
+        mode: app.mode,
+        count: app.count,
+        mix: app.mix,
+        idx: app.idx,
+        correct: app.correct,
+        wrong: app.wrong,
+        wrongTopics: app.wrongTopics,
+        running: app.running,
+        deck: app.deck,
+        timeLeftSec: app.timeLeftSec,
+        startedAt: app.startedAt,
+        perQuestion: app.perQuestion,
+      },
+    };
+    localStorage.setItem(STATEKEY, JSON.stringify(data));
+
+    // continue button
+    ui.btnContinue.style.display = app.running ? "inline-flex" : "none";
+  }
+
+  function loadLocal() {
+    // prefs
+    try {
+      const p = JSON.parse(localStorage.getItem(PREFKEY) || "null");
+      if (p && p.v === 13) {
+        ui.modeSel.value = p.modeSel || "practice";
+        ui.countCustom.value = p.count || "20";
+        ui.mixEasy.value = p.mixEasy ?? "50";
+        ui.mixMed.value = p.mixMed ?? "35";
+        ui.mixHard.value = p.mixHard ?? "15";
+      }
+    } catch {}
+
+    normalizeMix();
+    updateExamTimeText();
+
+    // can continue?
+    try {
+      const s = JSON.parse(localStorage.getItem(STATEKEY) || "null");
+      const canContinue = !!(s && s.v === 13 && s.app && s.app.running && Array.isArray(s.app.deck) && s.app.deck.length);
+      ui.btnContinue.style.display = canContinue ? "inline-flex" : "none";
+    } catch {
+      ui.btnContinue.style.display = "none";
+    }
+  }
+
+  function continueRun() {
+    try {
+      const s = JSON.parse(localStorage.getItem(STATEKEY) || "null");
+      if (!s || s.v !== 13 || !s.app || !s.app.running) return;
+
+      app.phase = s.app.phase || "quiz";
+      app.mode = s.app.mode || "practice";
+      app.count = s.app.count || 20;
+      app.mix = s.app.mix || { easy: 50, medium: 35, hard: 15 };
+
+      app.deck = s.app.deck || [];
+      app.idx = clamp(s.app.idx || 0, 0, Math.max(0, app.deck.length - 1));
+
+      app.correct = s.app.correct || 0;
+      app.wrong = s.app.wrong || 0;
+      app.wrongTopics = s.app.wrongTopics || {};
+      app.timeLeftSec = s.app.timeLeftSec || (app.count * 45);
+
+      app.startedAt = s.app.startedAt || nowISO();
+      app.perQuestion = s.app.perQuestion || {};
+
+      startRun(true);
+    } catch {}
+  }
+
+  // ---- Events ----
+  ui.btnCheckMulti.addEventListener("click", answerMulti);
+  ui.btnSubmitInput.addEventListener("click", answerInput);
+  ui.txtAnswer.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") answerInput();
+  });
+
+  ui.btn10.addEventListener("click", () => { ui.countCustom.value = "10"; updateExamTimeText(); });
+  ui.btn20.addEventListener("click", () => { ui.countCustom.value = "20"; updateExamTimeText(); });
+  ui.btn30.addEventListener("click", () => { ui.countCustom.value = "30"; updateExamTimeText(); });
+
+  ui.countCustom.addEventListener("input", updateExamTimeText);
+  ui.modeSel.addEventListener("change", updateExamTimeText);
+
+  ui.mixEasy.addEventListener("input", normalizeMix);
+  ui.mixMed.addEventListener("input", normalizeMix);
+  ui.mixHard.addEventListener("input", normalizeMix);
+
+  ui.mixOnlyEasy.addEventListener("click", () => setMix(100, 0, 0));
+  ui.mixOnlyMed.addEventListener("click", () => setMix(0, 100, 0));
+  ui.mixOnlyHard.addEventListener("click", () => setMix(0, 0, 100));
+  ui.mixDefault.addEventListener("click", () => setMix(50, 35, 15));
+
+  ui.btnRestart.addEventListener("click", () => startRun(false));
+  ui.btnBackToSetup.addEventListener("click", quitToSetup);
+
+  ui.btnStart.addEventListener("click", () => startRun(false));
+  ui.btnContinue.addEventListener("click", continueRun);
+  ui.btnNext.addEventListener("click", goNext);
+  ui.btnPrev.addEventListener("click", goPrev);
+  ui.btnQuit.addEventListener("click", quitToSetup);
+
+  // History modal
+  ui.btnHistory.addEventListener("click", () => {
+    renderHistory();
+    ui.dlgHistory.showModal();
+  });
+  ui.histClose.addEventListener("click", () => ui.dlgHistory.close());
+  ui.histOk.addEventListener("click", () => ui.dlgHistory.close());
+  ui.histFilter.addEventListener("change", renderHistory);
+
+  ui.histClear.addEventListener("click", () => {
+    if (!confirm("Biztos törlöd az összes előzményt?")) return;
+    saveSessions([]);
+    renderHistory();
+    autoSave();
+  });
+
+  ui.histExport.addEventListener("click", () => {
+    const data = loadSessions();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "biokemia-elozmenyek.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  // Keyboard shortcuts
+  window.addEventListener("keydown", (e) => {
+    if (ui.dlgHistory.open) {
+      if (e.key === "Escape") ui.dlgHistory.close();
+      return;
+    }
+
+    if (!app.running) return;
+
+    if (e.key === "ArrowRight") {
+      if (!ui.btnNext.disabled) goNext();
+      return;
+    }
+
+    if (e.key === "Escape") {
+      quitToSetup();
+      return;
+    }
+
+    // 1-4 for MC
+    if (["1", "2", "3", "4"].includes(e.key)) {
+      const i = parseInt(e.key, 10) - 1;
+      const btns = $$(".opt", ui.optGrid);
+      if (btns[i] && !btns[i].disabled) btns[i].click();
+    }
+  });
+
+  function init() {
+    loadLocal();
+    setHud();
+    setProgress();
+    updateBankWarn();
+
+    ui.modeLine.textContent = "Készen áll.";
+    ui.setup.style.display = "block";
+    ui.quiz.style.display = "none";
+    ui.resultBox.classList.remove("show");
+
+    autoSave();
+  }
+
+  init();
+</script>
+</body>
+</html>
