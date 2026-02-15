@@ -1,0 +1,1323 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Interaktív törzsfa (animált UI + 3D parallax)</title>
+
+  <style>
+    :root{
+      --bg:#060812;
+      --text:#E8EEFF;
+      --muted:#A7B6FF;
+      --neon:#00D9FF;
+      --neon2:#4C7DFF;
+      --panel: rgba(7,10,23,.45);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      overflow:hidden;
+    }
+
+    /* 3D background canvas */
+    #bg3d{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+    }
+
+    /* Back button */
+    #backBtn{
+      position:fixed;
+      top:14px; left:14px;
+      z-index:80;
+      background: rgba(8,12,35,.75);
+      color: var(--text);
+      border: 1px solid rgba(0,217,255,.25);
+      padding:10px 12px;
+      border-radius: 10px;
+      cursor:pointer;
+      backdrop-filter: blur(8px);
+      opacity:0;
+      transform: translateY(-6px);
+      pointer-events:none;
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    body.detail #backBtn{
+      opacity:1;
+      transform: translateY(0);
+      pointer-events:auto;
+    }
+    #backBtn:hover{border-color: rgba(0,217,255,.55)}
+    body.detail #backBtn{ top:72px }
+
+    /* ====== APP LAYERS ====== */
+    #full{
+      position:relative;
+      z-index:2;
+      height:100vh;
+      width:100vw;
+    }
+    body.detail #full{ z-index:10 }
+    header{
+      position:fixed;
+      top:0; left:0; right:0;
+      height:60px;
+      z-index:90;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 24px;
+      background: linear-gradient(90deg, rgba(5,9,24,.92), rgba(7,12,32,.90));
+      border-bottom:1px solid rgba(0,217,255,.18);
+      backdrop-filter: blur(12px);
+    }
+    #logo{
+      font-weight:900;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      font-size:24px;
+      text-align:center;
+    }
+    #nav{
+      position:absolute;
+      right:24px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      font-size:13px;
+    }
+    #nav a{
+      color:var(--text);
+      text-decoration:none;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid transparent;
+      background:transparent;
+      cursor:pointer;
+    }
+    #nav a:hover{
+      border-color:rgba(0,217,255,.4);
+      background:rgba(0,217,255,.08);
+    }
+
+    #detail{
+      position:fixed;
+      inset:0;
+      z-index:3;
+      display:grid;
+      grid-template-columns: 34% 66%;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .35s ease;
+    }
+    body.detail #detail{
+      opacity:1;
+      pointer-events:auto;
+    }
+    body.detail #detail{ padding-top:60px }
+
+    /* --- Tree "camera" wrapper: THIS makes the tree feel 3D --- */
+    #treeRig{
+      position:absolute;
+      inset:0;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform .8s cubic-bezier(.2,.9,.2,1), inset .8s cubic-bezier(.2,.9,.2,1);
+    }
+
+    /* Default: full screen */
+    body:not(.detail) #treeRig{
+      inset:0;
+      transform: perspective(900px) rotateX(0deg) rotateY(0deg) translateZ(0);
+    }
+
+    /* Detail: shrink + move to top-left (mini tree) */
+    body.detail #treeRig{
+      inset: 80px auto auto 14px;   /* top-left, pushed below header */
+      z-index: 100;                 /* above detail overlay for interaction */
+      pointer-events: auto;
+      width: 32vw;
+      height: 38vh;
+      border-radius: 14px;
+      overflow:hidden;
+      border: 1px solid rgba(0,217,255,.12);
+      background: rgba(7,10,23,.30);
+      transform: perspective(900px) rotateX(0deg) rotateY(0deg) translateZ(0);
+    }
+
+    /* Tree stage inside rig */
+    .stage{
+      position:absolute;
+      inset:0;
+      background: radial-gradient(1100px 800px at 20% 30%, rgba(11,20,64,.45) 0%, rgba(7,10,23,.25) 55%, rgba(7,10,23,.10) 100%);
+    }
+    .treeSvg{ width:100%; height:100%; display:block; }
+
+    /* SVG links/nodes */
+    .link{
+      fill:none;
+      stroke: rgba(0,217,255,.42);
+      stroke-width: 2.6;
+      filter: drop-shadow(0 0 10px rgba(0,217,255,.18));
+    }
+    .link.trunk{
+      stroke: rgba(76,125,255,.55);
+      stroke-width: 4.2;
+      filter: drop-shadow(0 0 14px rgba(76,125,255,.18));
+    }
+    .link.highlight{
+      stroke: rgba(255,255,255,.96);
+      stroke-width: 3.4;
+      filter: drop-shadow(0 0 20px rgba(255,255,255,.30));
+    }
+    .node text{
+      fill: rgba(232,238,255,.95);
+      font-size: 13px;
+      letter-spacing:.2px;
+      user-select:none;
+      paint-order: stroke;
+      stroke: rgba(0,0,0,.35);
+      stroke-width: 2px;
+    }
+    .node.category text{
+      font-weight:600;
+      font-size:14px;
+    }
+    .node circle{
+      fill: rgba(0,217,255,.10);
+      stroke: rgba(0,217,255,.95);
+      stroke-width:2;
+      filter: drop-shadow(0 0 12px rgba(0,217,255,.22));
+    }
+    .node.root circle{
+      fill: rgba(76,125,255,.25);
+      stroke: rgba(76,125,255,.98);
+      stroke-width:2.4;
+      filter: drop-shadow(0 0 18px rgba(76,125,255,.32));
+    }
+    .node.category circle{
+      fill: rgba(0,217,255,.22);
+      stroke: rgba(0,217,255,1);
+      stroke-width:2.4;
+    }
+    .node.selected circle{
+      fill: rgba(255,255,255,.20);
+      stroke:#FFFFFF;
+      filter: drop-shadow(0 0 22px rgba(255,255,255,.35));
+    }
+    .innov-dot{
+      fill: rgba(255,75,106,.95);
+      stroke: rgba(0,0,0,.75);
+      stroke-width:1.4;
+      filter: drop-shadow(0 0 16px rgba(255,75,106,.60));
+      cursor:pointer;
+    }
+
+    /* Tooltip */
+    .tooltip{
+      position:absolute;
+      pointer-events:none;
+      padding:10px 12px;
+      background: rgba(8,12,35,.92);
+      border: 1px solid rgba(0,217,255,.25);
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.45);
+      transform: translate(-50%,-120%);
+      min-width: 240px;
+      display:none;
+      backdrop-filter: blur(8px);
+      z-index:20;
+    }
+    .tooltip .t{color:rgba(232,238,255,.98); font-size:13px; line-height:1.3}
+    .tooltip .s{color:var(--muted); font-size:12px; margin-top:6px}
+
+    /* ===== Detail left column (image below mini tree) ===== */
+    #leftCol{
+      position:relative;
+      padding-top: calc(14px + 38vh + 14px); /* space for the mini tree (treeRig) */
+      padding-left:14px;
+      padding-right:14px;
+      padding-bottom:14px;
+      border-right: 1px solid rgba(0,217,255,.10);
+      background: radial-gradient(900px 700px at 20% 30%, rgba(11,20,64,.35) 0%, rgba(7,10,23,.20) 55%, rgba(7,10,23,.10) 100%);
+      transform: translateX(-14px);
+      opacity:0;
+      transition: transform .55s cubic-bezier(.2,.9,.2,1) .15s, opacity .55s ease .15s;
+    }
+    body.detail #leftCol{
+      transform: translateX(0);
+      opacity:1;
+    }
+
+    #imageWrap{
+      height: calc(100vh - (14px + 38vh + 14px) - 14px);
+      border: 1px solid rgba(0,217,255,.12);
+      border-radius: 14px;
+      overflow:hidden;
+      background: rgba(7,10,23,.30);
+      display:flex;
+      flex-direction:column;
+      position:relative;
+    }
+    #imageTitle{
+      padding:12px 12px 8px 12px;
+      font-weight: 600;
+      letter-spacing:.2px;
+      border-bottom: 1px solid rgba(0,217,255,.10);
+    }
+    #heroImg{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      filter: saturate(1.05) contrast(1.05);
+    }
+    #imgNote{
+      position:absolute;
+      left:12px;
+      bottom:12px;
+      font-size:12px;
+      color: rgba(232,238,255,.72);
+      background: rgba(8,12,35,.62);
+      padding:8px 10px;
+      border:1px solid rgba(0,217,255,.18);
+      border-radius: 10px;
+      backdrop-filter: blur(8px);
+      max-width: 92%;
+    }
+
+    /* ===== Detail right column (scroll panel) ===== */
+    #rightCol{
+      padding:18px;
+      background: linear-gradient(180deg, rgba(11,16,48,.55), rgba(7,10,23,.20));
+      transform: translateX(22px);
+      opacity:0;
+      transition: transform .55s cubic-bezier(.2,.9,.2,1) .10s, opacity .55s ease .10s;
+    }
+    body.detail #rightCol{
+      transform: translateX(0);
+      opacity:1;
+    }
+
+    #textCard{
+      height:calc(100vh - 36px);
+      border: 1px solid rgba(0,217,255,.12);
+      border-radius: 16px;
+      padding:18px;
+      overflow:auto;
+      background: var(--panel);
+    }
+    #title{ font-size:24px; margin:0 0 8px 0; }
+    #lead{ margin:0 0 14px 0; color:var(--muted); line-height:1.55; }
+
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(0,217,255,.18);
+      color:#BDEEFF;
+      background: rgba(0,217,255,.08);
+      font-size:12px;
+      margin-right:8px;
+      margin-bottom:8px;
+    }
+    .box{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(76,125,255,.20);
+      background: rgba(76,125,255,.08);
+    }
+    .box h3{margin:0 0 6px 0; font-size:14px; color:#D9E4FF}
+    .box p{margin:0; color:var(--muted); line-height:1.5; font-size:13px}
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+  <!-- Three.js background (stars + mouse interaction) -->
+  <script type="module">
+    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+    const canvas = document.getElementById("bg3d");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 3000);
+    camera.position.z = 520;
+
+    const starCount = 1600;
+    const positions = new Float32Array(starCount * 3);
+    for(let i=0;i<starCount;i++){
+      const r = 1100 * Math.cbrt(Math.random());
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2*Math.random()-1);
+      positions[i*3+0] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i*3+2] = r * Math.cos(phi);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+    const mat = new THREE.PointsMaterial({
+      color: 0x66ccff,
+      size: 1.7,
+      transparent: true,
+      opacity: 0.55,
+      depthWrite:false
+    });
+    const stars = new THREE.Points(geo, mat);
+    scene.add(stars);
+
+    let mouse = { x: 0, y: 0 };
+    window.addEventListener("pointermove", (e) => {
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    const posAttr = geo.getAttribute("position");
+    const base = posAttr.array.slice();
+
+    function resize(){
+      const w = window.innerWidth, h = window.innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    let t = 0;
+    function animate(){
+      t += 0.003;
+
+      stars.rotation.y = t * 0.22;
+      stars.rotation.x = t * 0.08;
+
+      camera.position.x += ((mouse.x * 25) - camera.position.x) * 0.04;
+      camera.position.y += ((mouse.y * 18) - camera.position.y) * 0.04;
+      camera.lookAt(0,0,0);
+
+      const influence = 160, strength = 0.35;
+      const mx = mouse.x * 260;
+      const my = mouse.y * 180;
+
+      for(let i=0;i<starCount;i++){
+        const ix = i*3;
+        const x0 = base[ix], y0 = base[ix+1], z0 = base[ix+2];
+        const dx = x0 - mx, dy = y0 - my;
+        const d2 = dx*dx + dy*dy;
+
+        if(d2 < influence*influence){
+          const k = (1 - d2/(influence*influence)) * strength;
+          posAttr.array[ix]   = x0 + dx * k;
+          posAttr.array[ix+1] = y0 + dy * k;
+          posAttr.array[ix+2] = z0;
+        } else {
+          posAttr.array[ix]   += (x0 - posAttr.array[ix]) * 0.04;
+          posAttr.array[ix+1] += (y0 - posAttr.array[ix+1]) * 0.04;
+          posAttr.array[ix+2] += (z0 - posAttr.array[ix+2]) * 0.02;
+        }
+      }
+      posAttr.needsUpdate = true;
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</head>
+
+<body>
+  <canvas id="bg3d"></canvas>
+  <button id="backBtn">Vissza</button>
+  <header>
+    <div id="logo">Phylotree</div>
+    <nav id="nav">
+      <a id="navAbout" href="#rolunk">Rólunk</a>
+      <a id="navTests" href="#tesztek">Tesztek</a>
+    </nav>
+  </header>
+
+  <!-- ONE tree that moves between modes -->
+  <div id="full">
+    <div id="treeRig">
+      <div class="stage">
+        <svg id="treeSvg" class="treeSvg"></svg>
+        <div id="tip" class="tooltip">
+          <div class="t" id="tipT"></div>
+          <div class="s" id="tipS"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail UI (appears with animation) -->
+  <div id="detail">
+    <div id="leftCol">
+      <div id="imageWrap">
+        <div id="imageTitle">Kép</div>
+        <div style="position:relative; height:100%;">
+          <img id="heroImg" alt="Csoport képe"
+               src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'%3E%3Cdefs%3E%3CradialGradient id='g' cx='30%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23151f5a'/%3E%3Cstop offset='55%25' stop-color='%23060a17'/%3E%3Cstop offset='100%25' stop-color='%23060a17'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' fill='%2300d9ff' font-family='Arial' font-size='42' text-anchor='middle'%3EK%C3%A9p helye%3C/text%3E%3C/svg%3E" />
+          <div id="imgNote">Később ide jön a választott állat/csoport képe (images/...).</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="rightCol">
+      <div id="textCard">
+        <h1 id="title">Cím</h1>
+        <p id="lead">Leírás</p>
+        <div id="tags"></div>
+
+        <div class="box">
+          <h3>Tulajdonságok</h3>
+          <p id="props">—</p>
+        </div>
+
+        <div class="box">
+          <h3>Tudod-e?</h3>
+          <p id="did">—</p>
+        </div>
+
+        <div class="box">
+          <h3>Érdekesség</h3>
+          <p id="fun">—</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TREE_DATA = {
+      name: "Élet / Közös ős",
+      type: "root",
+      innovations: ["Közös ős, amelyből a főbb nagy csoportok származnak."],
+      children: [
+        {
+          name: "Ősi többsejtűek",
+          type: "internal",
+          innovations: ["Többsejtűség megjelenése."],
+          children: [
+            {
+              name: "Szivacsok",
+              type: "category",
+              innovations: ["Többsejtű, de valódi szövetek nélkül."],
+              children: [
+                { name: "Microlobatas szivacs", type: "species", ref: "microlobatas_szivacs" }
+              ]
+            },
+            {
+              name: "Csalánozók",
+              type: "category",
+              innovations: ["Csalánsejtek, sugaras szimmetria."],
+              children: [
+                { name: "Sárga korall", type: "species", ref: "sarga_korall" }
+              ]
+            },
+            {
+              name: "Ősi kétoldaliak",
+              type: "internal",
+              innovations: ["Kéttengelyes szimmetria, fej-vég kialakulása."],
+              children: [
+                {
+                  name: "Férgek",
+                  type: "category",
+                  innovations: ["Hosszúkás test, féregszerű mozgás."],
+                  children: [
+                    {
+                      name: "Laposférgek",
+                      type: "subcat",
+                      innovations: ["Lapított test, egyszerű szervek."],
+                      children: [
+                        { name: "Rókaféreg", type: "species", ref: "rokafereg" }
+                      ]
+                    },
+                    {
+                      name: "Fonálférgek",
+                      type: "subcat",
+                      innovations: ["Hengeres test, álszövetes testüreg."],
+                      children: [
+                        { name: "Halós fonálféreg", type: "species", ref: "halos_fonalfereg" }
+                      ]
+                    },
+                    {
+                      name: "Gyűrűsférgek",
+                      type: "subcat",
+                      innovations: ["Szelvényezettség, zárt keringés."],
+                      children: [
+                        { name: "Mélytengeri gyűrűsféreg", type: "species", ref: "melytengeri_gyurusfereg" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  name: "Puhatestűek",
+                  type: "category",
+                  innovations: ["Köpeny, láb és héj jelenléte."],
+                  children: [
+                    {
+                      name: "Kagylók",
+                      type: "subcat",
+                      innovations: ["Két héj, szűrő életmód."],
+                      children: [
+                        { name: "Édesvízi kagyló", type: "species", ref: "edesvizi_kagylo" }
+                      ]
+                    },
+                    {
+                      name: "Csigák",
+                      type: "subcat",
+                      innovations: ["Csavarodott ház, fej-láb."],
+                      children: [
+                        { name: "Tengericsiga", type: "species", ref: "tengericsiga" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  name: "Ízeltlábúak",
+                  type: "category",
+                  innovations: ["Ízelt végtagok, vedlés, kitinpáncél."],
+                  children: [
+                    { name: "Madagaszkári pillangó", type: "species", ref: "madagaszkari_pillango" }
+                  ]
+                },
+                {
+                  name: "Tüskésbőrűek",
+                  type: "category",
+                  innovations: ["Tüskés mészváz, vízedényrendszer."],
+                  children: [
+                    { name: "Vörös tengeri csillag", type: "species", ref: "voros_tengeri_csillag" }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: "Gerincesek",
+          type: "internal",
+          innovations: ["Gerinchúr, belső váz, fejlett idegrendszer."],
+          children: [
+            {
+              name: "Halak",
+              type: "category",
+              innovations: ["Vízben élő gerincesek, kopoltyúval."],
+              children: [
+                {
+                  name: "Porcos halak",
+                  type: "subcat",
+                  innovations: ["Porcból álló váz, pl. cápák."],
+                  children: [
+                    { name: "Bikafejű cápa", type: "species", ref: "bikafeju_capa" }
+                  ]
+                },
+                {
+                  name: "Sugaras úszójú halak",
+                  type: "subcat",
+                  innovations: ["Finom sugarak alkotta úszók."],
+                  children: [
+                    { name: "Kéta lazac", type: "species", ref: "ketalazac" }
+                  ]
+                },
+                {
+                  name: "Bojtos úszójú halak",
+                  type: "subcat",
+                  innovations: ["Húsos, izmos úszók."],
+                  children: [
+                    { name: "Manadói óriás hal", type: "species", ref: "manadoi_orias_hal" }
+                  ]
+                },
+                {
+                  name: "Tüdőshalak",
+                  type: "subcat",
+                  innovations: ["Tüdővel is képesek levegőt venni."],
+                  children: [
+                    { name: "Afrikai gőtehal", type: "species", ref: "afrikai_gotehal" }
+                  ]
+                }
+              ]
+            },
+            {
+              name: "Négylábúak",
+              type: "internal",
+              innovations: ["Végtagok, szárazföldi mozgás."],
+              children: [
+                {
+                  name: "Kétéltűek",
+                  type: "category",
+                  innovations: ["Két élettér: víz és szárazföld."],
+                  children: [
+                    {
+                      name: "Farkatlan kétéltűek",
+                      type: "subcat",
+                      innovations: ["Farok nélkül, ugrólábakkal."],
+                      children: [
+                        { name: "Kínai varangy", type: "species", ref: "kinai_varangy" }
+                      ]
+                    },
+                    {
+                      name: "Farkas kétéltűek",
+                      type: "subcat",
+                      innovations: ["Megmaradó farok."],
+                      children: [
+                        { name: "Fei szalamandra", type: "species", ref: "fei_szalamandra" }
+                      ]
+                    },
+                    {
+                      name: "Lábatlan kétéltűek",
+                      type: "subcat",
+                      innovations: ["Lábak hiánya, föld alatti életmód."],
+                      children: [
+                        { name: "Sárgafejű földgőte", type: "species", ref: "sargafeju_foldgote" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  name: "Amnionosok",
+                  type: "internal",
+                  innovations: ["Amnionos tojás, jobb szárazföldi alkalmazkodás."],
+                  children: [
+                    {
+                      name: "Sauropsidák",
+                      type: "internal",
+                      innovations: ["Hüllőszerű vonal, pikkelyes bőr."],
+                      children: [
+                        {
+                          name: "Hüllők",
+                          type: "category",
+                          innovations: ["Pikkelyes bőr, tojásrakás."],
+                          children: [
+                            {
+                              name: "Krokodil-hüllők",
+                              type: "subcat",
+                              innovations: ["Félvízi ragadozók."],
+                              children: [
+                                { name: "Édesvízi krokodil", type: "species", ref: "edesvizi_krokodil" }
+                              ]
+                            },
+                            {
+                              name: "Teknős-hüllők",
+                              type: "subcat",
+                              innovations: ["Csontos páncél."],
+                              children: [
+                                { name: "Quachita teknős", type: "species", ref: "quachita_teknos" }
+                              ]
+                            },
+                            {
+                              name: "Pikkelyes hüllők",
+                              type: "subcat",
+                              innovations: ["Rugalmas pikkelyek, gyíkok, kígyók."],
+                              children: [
+                                { name: "Zöldfoltos anolisz", type: "species", ref: "zoldfoltos_anolisz" }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          name: "Madarak",
+                          type: "category",
+                          innovations: ["Toll, szárny, melegvérűség."],
+                          children: [
+                            { name: "Vetési varjú", type: "species", ref: "vetesi_varju" }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      name: "Synapsidák",
+                      type: "internal",
+                      innovations: ["Emlősszerű vonal, módosult koponya."],
+                      children: [
+                        {
+                          name: "Emlősök",
+                          type: "category",
+                          innovations: ["Szőr, emlőmirigy, melegvérűség."],
+                          children: [
+                            {
+                              name: "Tojásrakó emlősök",
+                              type: "subcat",
+                              innovations: ["Tojásrakás, de emlőmirigyek vannak."],
+                              children: [
+                                { name: "Nyugati hosszúcsőrű hangyász sün", type: "species", ref: "nyugati_hosszucsoru_hangyaszsun" }
+                              ]
+                            },
+                            {
+                              name: "Erszényes emlősök",
+                              type: "subcat",
+                              innovations: ["Erszényben fejlődő utódok."],
+                              children: [
+                                { name: "Fekete farkú erszényescickány", type: "species", ref: "feketefarku_erszenyescickany" }
+                              ]
+                            },
+                            {
+                              name: "Méhlepényes emlősök",
+                              type: "subcat",
+                              innovations: ["Placenta, hosszabb méhen belüli fejlődés."],
+                              children: [
+                                { name: "Fekete titi majom", type: "species", ref: "fekete_titi_majom" }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: "Egysejtűek",
+          type: "category",
+          innovations: ["Egyetlen sejtből álló szervezetek."],
+          children: [
+            { name: "Amőba", type: "species", ref: "amoba" }
+          ]
+        }
+      ]
+    };
+ 
+    const CONTENT = {
+      "Élet / Közös ős": {
+        title: "Élet / Közös ős",
+        subtitle: "A filogenetikai fa gyökere.",
+        tags:["Gyökér","Filogenetika"],
+        props:"Innen ágazik szét minden ma élő nagyobb csoport.",
+        did:"Minél később válik szét két ág, annál közelebbi a rokonság.",
+        fun:"A gyökér pontos helye sokszor vita tárgya.",
+        image:null,
+        quizUrl:null
+      },
+      "Szivacsok":{
+        title:"Szivacsok",
+        subtitle:"Ősi többsejtűek, valódi szövetek nélkül.",
+        tags:["Szivacs","Szűrő életmód"],
+        props:"Testük pórusos, szűrik a vizet.",
+        did:"Sejtjeik részben képesek átalakulni.",
+        fun:"Szétszűrve is képesek újra összeállni.",
+        image:null,
+        quizUrl:null
+      },
+      microlobatas_szivacs:{
+        title:"Microlobatas szivacs",
+        subtitle:"Példa egy tengeri szivacsra.",
+        tags:["Szivacs"],
+        props:"Szilárd váza támasztja a sejttömeget.",
+        did:"Élőhelyet ad más élőlényeknek.",
+        fun:"Gyakran színes.",
+        image:null,
+        quizUrl:null
+      },
+      sarga_korall:{
+        title:"Sárga korall",
+        subtitle:"Csalánozó, mészvázat épít.",
+        tags:["Korall","Csalánozó"],
+        props:"Telepeket alkot, gyakran algákkal él együtt.",
+        did:"Korallzátonyokat alakít ki.",
+        fun:"Hőmérséklet-változáskor kifehéredhet.",
+        image:null,
+        quizUrl:null
+      },
+      rokafereg:{
+        title:"Rókaféreg",
+        subtitle:"Laposféreg, gyakran parazita.",
+        tags:["Laposféreg","Parazita"],
+        props:"Lapított test, összetett életciklus.",
+        did:"Lárvái komoly egészségügyi kockázatot jelenthetnek.",
+        fun:"Nem minden laposféreg élősködő.",
+        image:null,
+        quizUrl:null
+      },
+      halos_fonalfereg:{
+        title:"Halós fonálféreg",
+        subtitle:"Fonálféreg, parazita formákkal.",
+        tags:["Fonálféreg"],
+        props:"Hengeres test, gyakori az élősködés.",
+        did:"Talajban is sok fontos fajuk él.",
+        fun:"Sok faj szabadon él.",
+        image:null,
+        quizUrl:null
+      },
+      melytengeri_gyurusfereg:{
+        title:"Mélytengeri gyűrűsféreg",
+        subtitle:"Extrém környezethez alkalmazkodott.",
+        tags:["Gyűrűsféreg"],
+        props:"Szelvényezett test, gyakran különleges színek.",
+        did:"Kürtők közelében élhet.",
+        fun:"Napfény nélkül is fennmarad.",
+        image:null,
+        quizUrl:null
+      },
+      edesvizi_kagylo:{
+        title:"Édesvízi kagyló",
+        subtitle:"Puhatestű, szűrő életmóddal.",
+        tags:["Kagyló"],
+        props:"Két héj védi a puha testet.",
+        did:"Lárvái halakon élősködhetnek átmenetileg.",
+        fun:"Héja alapján fajra is azonosítható.",
+        image:null,
+        quizUrl:null
+      },
+      tengericsiga:{
+        title:"Tengericsiga",
+        subtitle:"Puhatestű csiga, változatos formákkal.",
+        tags:["Csiga"],
+        props:"Csavarodott ház, talpon csúszik.",
+        did:"Sok faj mérgező.",
+        fun:"Más élőlények pigmentjeit is felveheti.",
+        image:null,
+        quizUrl:null
+      },
+      madagaszkari_pillango:{
+        title:"Madagaszkári pillangó",
+        subtitle:"Ízeltlábú, teljes átalakulással.",
+        tags:["Rovar"],
+        props:"Szárnyas rovar, lárvából bábon át fejlődik.",
+        did:"Fontos beporzó lehet.",
+        fun:"Színes mintázata a hőmérsékletre is reagálhat.",
+        image:null,
+        quizUrl:null
+      },
+      voros_tengeri_csillag:{
+        title:"Vörös tengeri csillag",
+        subtitle:"Tüskésbőrű, sugaras szimmetriával.",
+        tags:["Tüskésbőrű"],
+        props:"Karok és központi korong jellemzi.",
+        did:"Karjait regenerálni tudja.",
+        fun:"Színes, látványos fajok tartoznak ide.",
+        image:null,
+        quizUrl:null
+      },
+      bikafeju_capa:{
+        title:"Bikafejű cápa",
+        subtitle:"Porcos hal, ragadozó életmóddal.",
+        tags:["Porcos hal"],
+        props:"Porcos váz, hatékony érzékszervek.",
+        did:"Vannak édesvízi előfordulásai is.",
+        fun:"Folyamatosan pótlódó fogak.",
+        image:null,
+        quizUrl:null
+      },
+      ketalazac:{
+        title:"Kéta lazac",
+        subtitle:"Sugaras úszójú hal, vándorló faj.",
+        tags:["Hal"],
+        props:"Édes- és sósvízi életszakasz.",
+        did:"Születési helyére tér vissza ívni.",
+        fun:"Színe jelentősen változik ikrázáskor.",
+        image:null,
+        quizUrl:null
+      },
+      manadoi_orias_hal:{
+        title:"Manadói óriás hal",
+        subtitle:"Bojtos úszójú hal.",
+        tags:["Bojtos úszójú"],
+        props:"Húsos úszói átmenetet jelentenek a lábak felé.",
+        did:"Közel áll a szárazföldi gerincesek őseihez.",
+        fun:"Sokáig kihaltnak hitték rokonságát.",
+        image:null,
+        quizUrl:null
+      },
+      afrikai_gotehal:{
+        title:"Afrikai gőtehal",
+        subtitle:"Tüdőshal, átmeneti forma.",
+        tags:["Tüdőshal"],
+        props:"Tüdős légzésre is képes.",
+        did:"Száraz időszakokat is átvészel.",
+        fun:"Jó modell a vízből szárazföldre lépéshez.",
+        image:null,
+        quizUrl:null
+      },
+      kinai_varangy:{
+        title:"Kínai varangy",
+        subtitle:"Farkatlan kétéltű.",
+        tags:["Kétéltű"],
+        props:"Erős ugrólábakkal mozog.",
+        did:"Bőre mirigyei mérgezőek lehetnek.",
+        fun:"Hangja messziről hallható.",
+        image:null,
+        quizUrl:null
+      },
+      fei_szalamandra:{
+        title:"Fei szalamandra",
+        subtitle:"Farkas kétéltű.",
+        tags:["Kétéltű"],
+        props:"Megmaradó farok.",
+        did:"Végtagjait regenerálhatja.",
+        fun:"Neoténiát is mutathatnak rokonai.",
+        image:null,
+        quizUrl:null
+      },
+      sargafeju_foldgote:{
+        title:"Sárgafejű földgőte",
+        subtitle:"Lábatlan kétéltű.",
+        tags:["Kétéltű"],
+        props:"Föld alatt él, lábak nélkül.",
+        did:"Férgekre emlékeztető alakja van.",
+        fun:"Ritkán kerül szem elé.",
+        image:null,
+        quizUrl:null
+      },
+      edesvizi_krokodil:{
+        title:"Édesvízi krokodil",
+        subtitle:"Krokodil-hüllő.",
+        tags:["Hüllő"],
+        props:"Erős állkapcsokkal vadászik.",
+        did:"Élő kövületnek is tekinthető.",
+        fun:"Sokáig merül víz alatt.",
+        image:null,
+        quizUrl:null
+      },
+      quachita_teknos:{
+        title:"Quachita teknős",
+        subtitle:"Teknős-hüllő.",
+        tags:["Hüllő"],
+        props:"Csontos páncél védi.",
+        did:"Páncélja módosult bordákból alakult.",
+        fun:"Hosszú életű állat.",
+        image:null,
+        quizUrl:null
+      },
+      zoldfoltos_anolisz:{
+        title:"Zöldfoltos anolisz",
+        subtitle:"Pikkelyes hüllő.",
+        tags:["Hüllő"],
+        props:"Fán él, jól kapaszkodik.",
+        did:"Színt is válthat.",
+        fun:"Területét látványosan védi.",
+        image:null,
+        quizUrl:null
+      },
+      vetesi_varju:{
+        title:"Vetési varjú",
+        subtitle:"Madár, korvidaféle.",
+        tags:["Madár"],
+        props:"Intelligens, társas madár.",
+        did:"Eszközhasználatra képes.",
+        fun:"Hangja jellegzetes károgás.",
+        image:null,
+        quizUrl:null
+      },
+      nyugati_hosszucsoru_hangyaszsun:{
+        title:"Nyugati hosszúcsőrű hangyász sün",
+        subtitle:"Tojásrakó emlős.",
+        tags:["Emlős"],
+        props:"Tojásokat rak, de tejjel táplál.",
+        did:"Ősi emlőscsoporthoz tartozik.",
+        fun:"Tüskés testtel védekezik.",
+        image:null,
+        quizUrl:null
+      },
+      feketefarku_erszenyescickany:{
+        title:"Fekete farkú erszényescickány",
+        subtitle:"Erszényes emlős.",
+        tags:["Emlős"],
+        props:"Utódai az erszényben fejlődnek.",
+        did:"Ausztráliában és Amerikában sok erszényes él.",
+        fun:"Életmódja hasonló egyes cickányokhoz.",
+        image:null,
+        quizUrl:null
+      },
+      fekete_titi_majom:{
+        title:"Fekete titi majom",
+        subtitle:"Méhlepényes emlős.",
+        tags:["Emlős"],
+        props:"Fák koronájában mozog.",
+        did:"Monogám párokat is alkothat.",
+        fun:"Farkával egyensúlyoz.",
+        image:null,
+        quizUrl:null
+      },
+      amoba:{
+        title:"Amőba",
+        subtitle:"Egysejtű, állábakkal mozog.",
+        tags:["Egysejtű"],
+        props:"Állábszerű kitüremkedésekkel mozog és táplálkozik.",
+        did:"Membránján keresztül veszi fel a tápanyagot.",
+        fun:"Formája folyamatosan változik.",
+        image:null,
+        quizUrl:null
+      }
+    };
+ 
+    const body = document.body;
+    const backBtn = document.getElementById("backBtn");
+    const treeRig = document.getElementById("treeRig");
+    const svg = d3.select("#treeSvg");
+    const tip = document.getElementById("tip");
+    const tipT = document.getElementById("tipT");
+    const tipS = document.getElementById("tipS");
+    const heroImg = document.getElementById("heroImg");
+    const imageTitle = document.getElementById("imageTitle");
+    const titleEl = document.getElementById("title");
+    const leadEl = document.getElementById("lead");
+    const tagsEl = document.getElementById("tags");
+    const propsEl = document.getElementById("props");
+    const didEl = document.getElementById("did");
+    const funEl = document.getElementById("fun");
+ 
+    let view = { x:0, y:0, w:1000, h:600 };
+    let fullView = null;
+ 
+    function setViewBox(v){
+      svg.attr("viewBox", `${v.x} ${v.y} ${v.w} ${v.h}`);
+    }
+    function easeInOutCubic(t){
+      return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+    }
+    function animateViewBox(target, ms=700){
+      const start = { ...view };
+      const t0 = performance.now();
+      function frame(now){
+        const t = Math.min(1, (now-t0)/ms);
+        const k = easeInOutCubic(t);
+        view.x = start.x + (target.x-start.x)*k;
+        view.y = start.y + (target.y-start.y)*k;
+        view.w = start.w + (target.w-start.w)*k;
+        view.h = start.h + (target.h-start.h)*k;
+        setViewBox(view);
+        if(t<1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+    function elbowPath(sx, sy, tx, ty){
+      const mx = (sx + tx)/2;
+      return `M ${sx},${sy} H ${mx} V ${ty} H ${tx}`;
+    }
+    function buildTree(){
+      const rect = treeRig.getBoundingClientRect();
+      const width = rect.width || 1000;
+      const height = rect.height || 600;
+      const root = d3.hierarchy(TREE_DATA);
+      const treemap = d3.tree().size([height-80, width-200]).separation((a,b)=> (a.parent===b.parent ? 1.4 : 2.2));
+      treemap(root);
+      const nodes = root.descendants();
+      const links = root.links();
+      const X = d => d.y + 60;
+      const Y = d => d.x + 40;
+      const minX = d3.min(nodes, d => X(d));
+      const maxX = d3.max(nodes, d => X(d));
+      const minY = d3.min(nodes, d => Y(d));
+      const maxY = d3.max(nodes, d => Y(d));
+      const marginLeft = 180;
+      const marginRight = 260;
+      const marginTop = 120;
+      const marginBottom = 120;
+      fullView = {
+        x: minX - marginLeft,
+        y: minY - marginTop,
+        w: (maxX - minX) + marginLeft + marginRight,
+        h: (maxY - minY) + marginTop + marginBottom
+      };
+      view = { ...fullView };
+      setViewBox(view);
+      svg.selectAll("*").remove();
+      const linkSel = svg.append("g")
+        .selectAll("path")
+        .data(links)
+        .enter()
+        .append("path")
+        .attr("class", d => "link" + (d.source.depth===0 ? " trunk" : ""))
+        .attr("d", d => elbowPath(X(d.source), Y(d.source), X(d.target), Y(d.target)));
+      const innovData = [];
+      nodes.forEach(n => {
+        if(Array.isArray(n.data.innovations) && n.data.innovations.length>0 && n.parent){
+          const sx = X(n.parent), sy = Y(n.parent);
+          const tx = X(n), ty = Y(n);
+          const mx = (sx + tx) / 2;
+          let r = 7.5;
+          if(n.depth===0) r = 13;
+          else if(n.data.type==="category") r = 11;
+          else if(n.data.type==="subcat") r = 9.5;
+          const candidateX = mx + (tx - mx) * 0.85;
+          const px = Math.min(candidateX, tx - (r + 24));
+          const py = ty;
+          innovData.push({ node:n, x:px, y:py });
+        }
+      });
+      svg.append("g")
+        .selectAll("circle.innov-dot")
+        .data(innovData)
+        .enter()
+        .append("circle")
+        .attr("class","innov-dot")
+        .attr("r",4)
+        .attr("cx", d=>d.x)
+        .attr("cy", d=>d.y)
+        .on("pointermove",(event,d)=>{
+          tipT.textContent = d.node.data.name + " – újdonságok";
+          tipS.textContent = d.node.data.innovations.join(" • ");
+          tip.style.display = "block";
+          const r = treeRig.getBoundingClientRect();
+          tip.style.left = (event.clientX - r.left) + "px";
+          tip.style.top = (event.clientY - r.top) + "px";
+        })
+        .on("pointerleave",()=>{ tip.style.display="none"; })
+        .on("pointerdown",(event,d)=>{
+          event.preventDefault();
+          event.stopPropagation();
+          const chain = new Set(d.node.ancestors());
+          svg.selectAll(".link").classed("highlight", l => chain.has(l.target));
+        });
+      const nodeG = svg.append("g").selectAll("g").data(nodes).enter().append("g").attr("class", d => { let c = "node"; if(d.depth===0) c += " root"; if(d.data.type==="category") c += " category"; return c; }).attr("transform", d => `translate(${X(d)},${Y(d)})`).style("cursor","pointer");
+      nodeG.append("circle").attr("r", d => { if(d.depth===0) return 13; if(d.data.type==="category") return 11; if(d.data.type==="subcat") return 9.5; return 7.5; });
+      nodeG.append("text").attr("dy",".35em").attr("x", d => d.depth===0 ? -16 : 15).style("text-anchor", d => d.depth===0 ? "end" : "start").text(d => d.data.name);
+      nodeG.on("pointermove",(event,d)=>{ tipT.textContent = d.data.name; if(d.data.type==="category"){ tipS.textContent = "Kategória – kattints, hogy rázúmolj erre az ágra."; } else if(d.data.type==="subcat" || d.data.type==="internal"){ tipS.textContent = "Elágazás – kattints, hogy részletesen lásd ezt az ágat."; } else { const ref = d.data.ref; if(ref && CONTENT[ref]){ tipS.textContent = CONTENT[ref].subtitle || ""; } else { tipS.textContent = ""; } } tip.style.display="block"; const r = treeRig.getBoundingClientRect(); tip.style.left = (event.clientX - r.left) + "px"; tip.style.top = (event.clientY - r.top) + "px"; }).on("pointerleave",()=>{ tip.style.display="none"; }).on("pointerdown",(event,d)=>{ event.preventDefault(); event.stopPropagation(); selectNode(d); });
+    }
+    function selectNode(d){
+      svg.selectAll(".node").classed("selected", n => n === d);
+      const chain = new Set(d.ancestors());
+      svg.selectAll(".link").classed("highlight", l => chain.has(l.target));
+      const X = n => n.y + 60;
+      const Y = n => n.x + 40;
+      let target;
+      if(d.data.type==="category" || d.data.type==="subcat" || d.data.type==="internal" || d.depth===0){
+        const desc = d.descendants();
+        const minX = d3.min(desc, n => X(n));
+        const maxX = d3.max(desc, n => X(n));
+        const minY = d3.min(desc, n => Y(n));
+        const maxY = d3.max(desc, n => Y(n));
+        const margin = 40;
+        target = { x: minX - margin, y: minY - margin, w: (maxX-minX) + 2*margin, h: (maxY-minY) + 2*margin };
+      }else{
+        const cx = X(d), cy = Y(d);
+        const zoomW = fullView.w*0.35;
+        const zoomH = fullView.h*0.35;
+        target = { x:cx-zoomW/2, y:cy-zoomH/2, w:zoomW, h:zoomH };
+      }
+      animateViewBox(target,700);
+      body.classList.add("detail");
+      let contentKey = null;
+      if(d.data.ref && CONTENT[d.data.ref]) contentKey = d.data.ref;
+      else if(CONTENT[d.data.name]) contentKey = d.data.name;
+      let c;
+      if(contentKey && CONTENT[contentKey]){
+        c = CONTENT[contentKey];
+      }else{
+        const typeLabel =
+          d.data.type==="category" ? "Kategória" :
+          d.data.type==="subcat" ? "Alkategória" :
+          d.data.type==="internal" ? "Elágazás" :
+          d.data.type==="species" ? "Faj" : "Csomópont";
+        const innovationsText = Array.isArray(d.data.innovations) && d.data.innovations.length>0
+          ? d.data.innovations.join(" • ")
+          : "–";
+        c = {
+          title: d.data.name,
+          subtitle: typeLabel,
+          tags: [typeLabel],
+          props: innovationsText,
+          did: "–",
+          fun: "–",
+          image: null,
+          quizUrl: null
+        };
+      }
+      titleEl.textContent = c.title;
+      leadEl.textContent = c.subtitle || "";
+      tagsEl.innerHTML = (c.tags||[]).map(t=>`<span class="pill">${t}</span>`).join("");
+      propsEl.textContent = c.props || "–";
+      didEl.textContent = c.did || "–";
+      funEl.textContent = c.fun || "–";
+      imageTitle.textContent = "Kép";
+      if(c.image) heroImg.src = c.image;
+    }
+    backBtn.addEventListener("click", ()=>{
+      if(fullView){
+        animateViewBox(fullView,700);
+        body.classList.remove("detail");
+        svg.selectAll(".node").classed("selected", false);
+        svg.selectAll(".link").classed("highlight", false);
+        tip.style.display="none";
+      }
+    });
+    let rigMouse = { x:0, y:0 };
+    window.addEventListener("pointermove", (e) => {
+      rigMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      rigMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+    let rigRotX = 0, rigRotY = 0;
+    let rigT = 0;
+    function animateRig(){
+      rigT += 0.016;
+      const targetY = rigMouse.x * 6;
+      const targetX = rigMouse.y * 4;
+      rigRotY += (targetY - rigRotY) * 0.06;
+      rigRotX += (targetX - rigRotX) * 0.06;
+      const floatZ = Math.sin(rigT * 0.7) * 6;
+      const floatX = Math.cos(rigT * 0.45) * 3;
+      const floatY = Math.sin(rigT * 0.5) * 3;
+      const damp = body.classList.contains("detail") ? 0.55 : 1.0;
+      treeRig.style.transform = `perspective(900px) rotateX(${rigRotX*damp}deg) rotateY(${rigRotY*damp}deg) translate3d(${floatX*damp}px,${floatY*damp}px,${floatZ*damp}px)`;
+      requestAnimationFrame(animateRig);
+    }
+    buildTree();
+    animateRig();
+    window.addEventListener("resize", ()=>{ buildTree(); });
+    treeRig.addEventListener("transitionend",(e)=>{ if(e.propertyName === "inset" || e.propertyName === "transform"){ buildTree(); } });
+    const stageEl = document.querySelector(".stage");
+    let isDragging = false, dragStartX = 0, dragStartY = 0, startView = null;
+    stageEl.addEventListener("pointerdown", (e) => {
+      if(e.button !== 0) return;
+      if(e.target && e.target.closest && (e.target.closest(".node") || e.target.closest(".innov-dot"))) return;
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      startView = { ...view };
+      stageEl.setPointerCapture(e.pointerId);
+    });
+    stageEl.addEventListener("pointermove", (e) => {
+      if(!isDragging) return;
+      const rect = treeRig.getBoundingClientRect();
+      const scaleX = startView.w / rect.width;
+      const scaleY = startView.h / rect.height;
+      const dx = (e.clientX - dragStartX) * scaleX;
+      const dy = (e.clientY - dragStartY) * scaleY;
+      const minX = fullView ? fullView.x : startView.x - 10000;
+      const minY = fullView ? fullView.y : startView.y - 10000;
+      const maxX = fullView ? (fullView.x + fullView.w - view.w) : startView.x + 10000;
+      const maxY = fullView ? (fullView.y + fullView.h - view.h) : startView.y + 10000;
+      view.x = Math.max(minX, Math.min(startView.x - dx, maxX));
+      view.y = Math.max(minY, Math.min(startView.y - dy, maxY));
+      setViewBox(view);
+    });
+    function endDrag(e){
+      isDragging = false;
+      try{ stageEl.releasePointerCapture(e.pointerId); }catch{}
+    }
+    stageEl.addEventListener("pointerup", endDrag);
+    stageEl.addEventListener("pointerleave", endDrag);
+    function onWheel(eTarget, e){
+      e.preventDefault();
+      const rect = eTarget.getBoundingClientRect();
+      const rx = (e.clientX - rect.left) / rect.width;
+      const ry = (e.clientY - rect.top) / rect.height;
+      const dir = e.deltaY > 0 ? 1 : -1;
+      const factor = dir > 0 ? 1.12 : 0.88;
+      const minW = fullView ? fullView.w * 0.25 : 250;
+      const maxW = fullView ? fullView.w * 4.0 : 8000;
+      const newW = Math.min(maxW, Math.max(minW, view.w * factor));
+      const newH = view.h * (newW / view.w);
+      const dx = view.w - newW;
+      const dy = view.h - newH;
+      view.x = view.x + rx * dx;
+      view.y = view.y + ry * dy;
+      view.w = newW;
+      view.h = newH;
+      setViewBox(view);
+    }
+    treeRig.addEventListener("wheel", (e) => onWheel(treeRig, e), { passive: false });
+    document.getElementById("treeSvg").addEventListener("wheel", (e) => onWheel(treeRig, e), { passive: false });
+  </script>
+</body>
+</html>
