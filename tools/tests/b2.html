@@ -63,7 +63,9 @@
       height:100vh;
       width:100vw;
     }
-    body.detail #full{ z-index:10 }
+    body.detail #full{ z-index:10; pointer-events:none; }
+    #detail{ position:relative; z-index:20; }
+    #rightCol, #textCard{ pointer-events:auto; }
     header{
       position:fixed;
       top:0; left:0; right:0;
@@ -423,6 +425,43 @@
     }
     .box h3{margin:0 0 6px 0; font-size:14px; color:#D9E4FF}
     .box p{margin:0; color:var(--muted); line-height:1.5; font-size:13px}
+    #rich{ margin-top:12px; }
+    #rich .section{
+      margin:12px 0;
+      padding:14px 16px;
+      border:1px solid rgba(0,217,255,.18);
+      border-radius:14px;
+      background: linear-gradient(180deg, rgba(0,217,255,.07), rgba(0,217,255,.03));
+    }
+    #rich .section h3{
+      margin:0 0 8px 0;
+      font-size:15px;
+      letter-spacing:.2px;
+      color:#BDEEFF;
+    }
+    #rich ul{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:6px;
+    }
+    #rich li{
+      position:relative;
+      padding-left:18px;
+      color:var(--text);
+      font-size:13.5px;
+    }
+    #rich li::before{
+      content:"";
+      position:absolute;
+      left:0; top:8px;
+      width:8px; height:8px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #00d9ff, #0066ff);
+      box-shadow:0 0 8px rgba(0,217,255,.55);
+    }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -571,6 +610,7 @@
         <h1 id="title">Cím</h1>
         <p id="lead">Leírás</p>
         <div id="tags"></div>
+        <div id="rich"></div>
 
         <div class="box">
           <h3>Tulajdonságok</h3>
@@ -990,7 +1030,9 @@
           type: "category",
           innovations: ["Egyetlen sejtből álló szervezetek."],
           children: [
-            { name: "Amőba", type: "species", ref: "amoba" }
+            { name: "Amőba", type: "species", ref: "amoba" },
+            { name: "Zöldszemes ostoros", type: "species", ref: "zoldszemes_ostoros" },
+            { name: "Papucsállatka", type: "species", ref: "papucsallatka" }
           ]
         }
       ]
@@ -1008,12 +1050,51 @@
         quizUrl:null
       },
       "Szivacsok":{
-        title:"Szivacsok",
-        subtitle:"Ősi többsejtűek, valódi szövetek nélkül.",
-        tags:["Szivacs","Szűrő életmód"],
-        props:"Testük pórusos, szűrik a vizet.",
-        did:"Sejtjeik részben képesek átalakulni.",
-        fun:"Szétszűrve is képesek újra összeállni.",
+        title:"Szivacsok törzse",
+        subtitle:"Álszövetes, telepes állatok modern felépítéssel és szűrő életmóddal.",
+        tags:["Szivacsok","Álszövetes","Szűrő életmód"],
+        rich: `
+          <div class="section">
+            <h3>Szivacsok testfelépítése</h3>
+            <ul>
+              <li>Vizi élőlények, többnyire aljzathoz rögzülve.</li>
+              <li>Gyakran telepeket alkotnak.</li>
+              <li>Álszövetes testszerveződés.</li>
+              <li>Két sejtréteg: fedősejtek és galléros ostoros sejtek.</li>
+              <li>Testük rendszerint nem szimmetrikus.</li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3>Szivacsok életmódja</h3>
+            <ul>
+              <li>Szűrögető táplálkozás: a pólusokon beáramló vízből az űrbélbe jutó részecskéket a galléros ostoros sejtek veszik fel (endocitózis), majd sejten kívüli emésztés történik.</li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3>Egyéb sejttípusok</h3>
+            <ul>
+              <li>Amőboid vándorsejtek: a megemésztett anyagok szállítása.</li>
+              <li>Váztűképző sejtek: váztűk és szerves vázanyagok termelése.</li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3>Szaporodás</h3>
+            <ul>
+              <li>Hímnősek; az ivarsejtek érése időben elkülönül.</li>
+              <li>A hímivarsejtek a víz sodrásával jutnak a petesejthez → zigóta → csillós, mozgó lárva → megtapadás → kifejlett szivacs.</li>
+              <li>Ivartalan úton is: gyöngysarjjal vagy bimbózással (teleprészek leválása).</li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3>Rendszerezésük</h3>
+            <ul>
+              <li>A váztűk anyaga, alakja és mérete alapján.</li>
+              <li>Kalcium-karbonát: mészszivacsok.</li>
+              <li>Szilícium-dioxid (kova): üvegszivacsok.</li>
+              <li>Spongin (speciális fehérje): szerves vázelemek.</li>
+            </ul>
+          </div>
+        `,
         image:null,
         quizUrl:null
       },
@@ -1334,7 +1415,30 @@
         props:"Állábszerű kitüremkedésekkel mozog és táplálkozik.",
         did:"Membránján keresztül veszi fel a tápanyagot.",
         fun:"Formája folyamatosan változik.",
-        image:null,
+        image:"https://upload.wikimedia.org/wikipedia/commons/b/b4/Amoeba_proteus.jpg",
+        source:"https://hu.wikipedia.org/wiki/Am%C5%91ba",
+        quizUrl:null
+      },
+      zoldszemes_ostoros:{
+        title:"Zöldszemes ostoros (Euglena)",
+        subtitle:"Fotoszintetizáló egysejtű ostoros.",
+        tags:["Egysejtű","Euglena"],
+        props:"Kloroplasztisszal fotoszintetizál; ostorral mozog.",
+        did:"Fényérzékelő szemfolt segíti a fény irányába.",
+        fun:"Kedvezőtlen körülmények közt cisztát képezhet.",
+        image:"https://upload.wikimedia.org/wikipedia/commons/3/33/Euglena_gracilis_400x.jpg",
+        source:"https://hu.wikipedia.org/wiki/Z%C3%B6ldszemes_ostoros",
+        quizUrl:null
+      },
+      papucsallatka:{
+        title:"Papucsállatka (Paramecium)",
+        subtitle:"Csillókkal mozgó egysejtű.",
+        tags:["Egysejtű","Paramecium"],
+        props:"Csillóival mozog, táplálékot terel a szájtölcsérhez.",
+        did:"Kétféle sejtmagja van: mikro- és makronukleusz.",
+        fun:"Kontraktilis vakuólái a vízháztartást szabályozzák.",
+        image:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Paramecium_caudatum.jpg",
+        source:"https://hu.wikipedia.org/wiki/Papucs%C3%A1llatka",
         quizUrl:null
       }
     };
@@ -1354,6 +1458,7 @@
     const propsEl = document.getElementById("props");
     const didEl = document.getElementById("did");
     const funEl = document.getElementById("fun");
+    const richEl = document.getElementById("rich");
  
     let view = { x:0, y:0, w:1000, h:600 };
     let fullView = null;
@@ -1435,7 +1540,7 @@
         const nema = byName("Fonálférgek");
         if(arth && tard){
           const dir = (nema && nema.x < arth.x) ? -1 : 1;
-          tard.x = arth.x + 24 * dir;
+          tard.x = arth.x + 24 * dir + 28;
           if(tard.children) tard.children.forEach(ch => ch.x = tard.x);
         }
         if(nema && arth){
@@ -1525,7 +1630,8 @@
         });
       const drawNodes = nodes.filter(n => !(n.data && n.data.type==="internal" && (!n.data.name || n.data.name.trim()==="")));
       const nodeG = svg.append("g").selectAll("g").data(drawNodes).enter().append("g").attr("class", d => { let c = "node"; if(d.depth===0) c += " root"; if(d.data.type==="category") c += " category"; if(d.data.type==="species") c += " species"; return c; }).attr("transform", d => `translate(${X(d)},${Y(d)})`).style("cursor","pointer");
-      nodeG.append("circle").attr("r", d => { if(d.depth===0) return 13; if(d.data.type==="category") return 11; if(d.data.type==="subcat") return 9.5; return 7.5; });
+      nodeG.append("circle")
+        .attr("r", d => { if(d.depth===0) return 13; if(d.data.type==="category") return 11; if(d.data.type==="subcat") return 9.5; return 7.5; });
       nodeG.append("text")
         .attr("dy",".35em")
         .attr("x", d => d.depth===0 ? -14 : 12)
@@ -1589,6 +1695,13 @@
       propsEl.textContent = c.props || "–";
       didEl.textContent = c.did || "–";
       funEl.textContent = c.fun || "–";
+      if(c.rich){
+        richEl.innerHTML = c.rich;
+        document.querySelectorAll("#textCard .box").forEach(b => b.style.display="none");
+      }else{
+        richEl.innerHTML = "";
+        document.querySelectorAll("#textCard .box").forEach(b => b.style.display="");
+      }
       imageTitle.textContent = "Kép";
       if(c.image) heroImg.src = c.image;
     }
