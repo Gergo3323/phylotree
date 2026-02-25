@@ -63,7 +63,15 @@
       height:100vh;
       width:100vw;
     }
-    body.detail #full{ z-index:10; pointer-events:none; }
+    body.detail #full{
+      position:fixed;
+      left:14px;
+      top:80px;
+      width:32vw;
+      height:38vh;
+      z-index:10;
+      pointer-events:auto;
+    }
     #detail{ position:relative; z-index:20; }
     #rightCol, #textCard{ pointer-events:auto; }
     header{
@@ -222,11 +230,11 @@
 
     /* Detail: shrink + move to top-left (mini tree) */
     body.detail #treeRig{
-      inset: 80px auto auto 14px;   /* top-left, pushed below header */
+      inset: 0;                      /* fill the cropped #full box */
       z-index: 100;                 /* above detail overlay for interaction */
       pointer-events: auto;
-      width: 32vw;
-      height: 38vh;
+      width: 100%;
+      height: 100%;
       border-radius: 14px;
       overflow:hidden;
       border: 1px solid rgba(0,217,255,.12);
@@ -1808,17 +1816,25 @@
     treeRig.addEventListener("transitionend",(e)=>{ if(e.propertyName === "inset" || e.propertyName === "transform"){ buildTree(); } });
     const stageEl = document.querySelector(".stage");
     let isDragging = false, dragStartX = 0, dragStartY = 0, startView = null;
-    stageEl.addEventListener("pointerdown", (e) => {
+    // Pan / drag handling
+    function shouldBlockPan(target){
+      const header = document.querySelector("header");
+      const dropdowns = [document.getElementById("filterPanel"), document.getElementById("domainPanel")];
+      if(header && header.contains(target)) return true;
+      if(target && target.closest && (target.closest(".node") || target.closest(".innov-dot"))) return true;
+      if(dropdowns.some(p => p && p.style.display==="block" && p.contains(target))) return true;
+      return false;
+    }
+    window.addEventListener("pointerdown",(e)=>{
+      // both in full view and mini-map view
       if(e.button !== 0) return;
-      if(e.target && e.target.closest && (e.target.closest(".node") || e.target.closest(".innov-dot"))) return;
+      if(shouldBlockPan(e.target)) return;
       isDragging = true;
       dragStartX = e.clientX;
       dragStartY = e.clientY;
       startView = { ...view };
-      stageEl.setPointerCapture(e.pointerId);
     });
-    stageEl.addEventListener("pointermove", (e) => {
-      if(!isDragging) return;
+    function applyPan(e){
       const rect = treeRig.getBoundingClientRect();
       const scaleX = startView.w / rect.width;
       const scaleY = startView.h / rect.height;
@@ -1831,13 +1847,12 @@
       view.x = Math.max(minX, Math.min(startView.x - dx, maxX));
       view.y = Math.max(minY, Math.min(startView.y - dy, maxY));
       setViewBox(view);
-    });
-    function endDrag(e){
-      isDragging = false;
-      try{ stageEl.releasePointerCapture(e.pointerId); }catch{}
     }
-    stageEl.addEventListener("pointerup", endDrag);
-    stageEl.addEventListener("pointerleave", endDrag);
+    window.addEventListener("pointermove",(e)=>{
+      if(!isDragging) return;
+      applyPan(e);
+    });
+    window.addEventListener("pointerup", ()=>{ isDragging=false; });
     function onWheel(eTarget, e){
       e.preventDefault();
       const rect = eTarget.getBoundingClientRect();
@@ -1859,6 +1874,16 @@
     }
     treeRig.addEventListener("wheel", (e) => onWheel(treeRig, e), { passive: false });
     document.getElementById("treeSvg").addEventListener("wheel", (e) => onWheel(treeRig, e), { passive: false });
+    window.addEventListener("wheel", (e) => {
+      if(document.body.classList.contains("detail")) return;
+      // avoid zoom when interacting with header dropdowns
+      const target = e.target;
+      const header = document.querySelector("header");
+      const dropdowns = [document.getElementById("filterPanel"), document.getElementById("domainPanel")];
+      if(header && header.contains(target)) return;
+      if(dropdowns.some(p => p && p.style.display==="block" && p.contains(target))) return;
+      onWheel(treeRig, e);
+    }, { passive:false });
   </script>
 </body>
 </html>
