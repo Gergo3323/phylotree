@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Interaktív törzsfa (animált UI + 3D parallax)</title>
+  <title>Phylotree - DEMO 2026.03.31</title>
 
   <style>
     :root{
@@ -73,7 +73,8 @@
       pointer-events:auto;
     }
     #detail{ position:relative; z-index:20; }
-    #rightCol, #textCard{ pointer-events:auto; }
+    #rightCol, #textCard{ pointer-events:none; }
+    body.detail #rightCol, body.detail #textCard { pointer-events:auto; }
     header{
       position:fixed;
       top:0; left:0; right:0;
@@ -286,6 +287,11 @@
       stroke-width:2;
       filter: drop-shadow(0 0 12px rgba(0,217,255,.22));
     }
+    .hit-area {
+      fill: transparent !important;
+      stroke: none !important;
+      filter: none !important;
+    }
     .node.root circle{
       fill: rgba(76,125,255,.25);
       stroke: rgba(76,125,255,.98);
@@ -307,6 +313,58 @@
       fill: rgba(255,255,255,.20);
       stroke:#FFFFFF;
       filter: drop-shadow(0 0 22px rgba(255,255,255,.35));
+    }
+    /* Progress Ring */
+    .progress-ring {
+      pointer-events: none;
+    }
+    .progress-ring__circle {
+      transition: stroke-dashoffset 0.1s linear;
+      transform: rotate(-90deg);
+      transform-origin: 0 0;
+      fill: none;
+      stroke: var(--neon);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 5px var(--neon));
+      opacity: 0;
+    }
+    .progress-ring.active .progress-ring__circle {
+      opacity: 1;
+    }
+    /* Preview Image */
+    .node-preview {
+      position: absolute;
+      pointer-events: none;
+      width: 120px;
+      height: 90px;
+      border-radius: 8px;
+      border: 1px solid var(--neon);
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,217,255,0.4);
+      background: var(--bg);
+      opacity: 0;
+      transform: scale(0.5) translate(-50%, -100%);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .node-preview.active {
+      opacity: 1;
+      transform: scale(1) translate(-50%, -120%);
+    }
+    .node-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .node-preview .no-img {
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      padding: 4px;
     }
     .innov-dot{
       fill: rgba(255,75,106,.95);
@@ -374,6 +432,12 @@
       object-fit:cover;
       display:block;
       filter: saturate(1.05) contrast(1.05);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0,217,255,0.2);
+      transition: transform 0.5s ease;
+    }
+    #heroImg:hover {
+      transform: scale(1.02);
     }
     #imgNote{
       position:absolute;
@@ -596,6 +660,7 @@
           <div class="t" id="tipT"></div>
           <div class="s" id="tipS"></div>
         </div>
+        <div id="nodePreview" class="node-preview"></div>
       </div>
     </div>
   </div>
@@ -642,7 +707,7 @@
     const CATEGORY_FILTERS = ["Egysejtűek","Szivacsok","Csalánozók","Laposférgek","Gyűrűsférgek","Puhatestűek","Ízeltlábúak","Medveállatkák","Fonálférgek","Tüskésbőrűek","Zsákállatok","Fejgerinchúrosok","Halak","Kétéltűek","Hüllők","Madarak","Emlősök"];
     let enabledGroups = new Set(CATEGORY_FILTERS);
     const H_SPREAD = 1.6;
-    const V_SPREAD = 1.25;
+    const V_SPREAD = 1.6; // Növelt vertikális térköz
     const INITIAL_ZOOM = 0.85; // < 1 -> kicsit ráközelít az alapnézetre
     const TREE_DATA = {
       name: "Élet / Közös ős",
@@ -1103,7 +1168,116 @@
             </ul>
           </div>
         `,
-        image:null,
+        image: "images/szivacsok.webp",
+        quizUrl:null
+      },
+      "Ízeltlábúak":{
+        title:"Ízeltlábúak törzse",
+        subtitle:"Külső vázzal és ízelt végtagokkal rendelkező vedlő állatok.",
+        tags:["Ízeltlábúak","Ecdysozoa","Külső váz"],
+        rich: `
+          <div class="section">
+            <h3>Általános jellemzés</h3>
+            <ul>
+              <li>Különnemű szelvényezettség, ízelt lábak.</li>
+              <li>Egyrétegű hámréteget kitintartalmú kutikula fedi (külső váz).</li>
+              <li>Hormonálisan szabályozott vedlés a növekedéshez.</li>
+              <li>Belső harántcsíkolt izomzat.</li>
+              <li>Dúcidegrendszer, pont vagy összetett szemek.</li>
+              <li>Váltivarúak, belső megtermékenyítés.</li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3>Légzés és keringés</h3>
+            <ul>
+              <li><strong>Rákok:</strong> Kopoltyú, fejlettebb keringés (hemocianin).</li>
+              <li><strong>Pókok:</strong> Lemezes tüdő vagy légcsőrendszer.</li>
+              <li><strong>Rovarok:</strong> Légcsőrendszer (trachea), amely az egész testet behálózza.</li>
+              <li>Nyílt keringési rendszer, háti oldali szívvel.</li>
+              <li>Rovaroknál a keringés nem szállít gázokat a trachea miatt.</li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3>Emésztés és kiválasztás</h3>
+            <ul>
+              <li>Háromszakaszos, kétnyílású tápcsatorna.</li>
+              <li><strong>Kiválasztás (Rovarok/Pókok):</strong> Malpighi-edények a közép- és utóbél határán.</li>
+              <li><strong>Kiválasztás (Rákok):</strong> Csápmirigy (zöldmirigy).</li>
+              <li>Rákoknak és pókoknak van középbéli mirigyük.</li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3>Érzékszervek</h3>
+            <ul>
+              <li><strong>Pókok:</strong> Általában 8 db pontszem.</li>
+              <li><strong>Rovarok:</strong> Összetett szemek (mozgásérzékelés), fésűs/fonalas csápok.</li>
+              <li><strong>Hallószerv:</strong> Timpanális szerv a potrohon vagy a lábakon.</li>
+            </ul>
+          </div>
+        `,
+        image: "images/izeltlabuak.webp",
+        quizUrl:null
+      },
+      "Rovarok":{
+        title:"Rovarok osztálya",
+        subtitle:"A legnépesebb ízeltlábú csoport: fej, tor és potroh.",
+        tags:["Rovarok","Insecta","Ízeltlábúak"],
+        rich: `
+          <div class="section">
+            <h3>Testfelépítés</h3>
+            <ul>
+              <li><strong>Testtájak:</strong> Fej, tor és potroh.</li>
+              <li><strong>Tor:</strong> 3 pár ízelt járóláb és általában 2 pár szárny.</li>
+              <li><strong>Szárny:</strong> A kitinváz erekkel dúsan átszőtt hártyaszerű függeléke.</li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3>Táplálkozás (Szájszervek)</h3>
+            <ul>
+              <li><strong>Rágó:</strong> pl. hangyák, bogarak, sáskák, szitakötők.</li>
+              <li><strong>Nyaló-szívó:</strong> pl. méhek, legyek.</li>
+              <li><strong>Szúró-szívó:</strong> pl. szúnyogok.</li>
+              <li><strong>Szívó-pödörnyelv:</strong> pl. lepkék.</li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3>Egyedfejlődés</h3>
+            <ul>
+              <li><strong>Kifejlés:</strong> pl. sáska, szöcske, tücsök.</li>
+              <li><strong>Átváltozás:</strong> pl. szitakötők.</li>
+              <li><strong>Teljes átalakulás:</strong> Pete → lárva → báb → imágó. (Bogarak, lepkék, legyek).</li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3>Életmód és egészségügy</h3>
+            <ul>
+              <li><strong>Államalkotó rovarok:</strong> Méhek, darazsak, hangyák.</li>
+              <li><strong>Paraziták:</strong> Fejtetű, ágyipoloska, levéltetvek, bolha.</li>
+              <li><strong>Kórokozó-terjesztők:</strong> Szúnyogok (pl. Malária - Plasmodium), legyek.</li>
+            </ul>
+          </div>
+         `,
+         image: "images/rovarok.jpg",
+         quizUrl:null
+       },
+      "Hüllők":{
+        title:"Hüllők osztálya",
+        subtitle:"Szárazföldi gerincesek pikkelyes bőrrel.",
+        tags:["Hüllők","Reptilia","Amnionosok"],
+        props:"Pikkelyes bőr, tüdővel lélegeznek, változó testhőmérséklet.",
+        did:"Tojásaikat a szárazföldre rakják.",
+        fun:"Sok fajuk képes hosszú ideig táplálék nélkül maradni.",
+        image: "images/hüllők.jpg",
+        quizUrl:null
+      },
+      "Krokodil-hüllők":{
+        title:"Krokodil-hüllők",
+        subtitle:"Félvízi ragadozó hüllők.",
+        tags:["Krokodilok","Archosauria"],
+        props:"Erős állkapcsok, páncélozott bőr, négyrekeszes szív.",
+        did:"A madarak legközelebbi élő rokonai.",
+        fun:"Nagyon gondos szülők, védelmezik az utódaikat.",
+        image: "images/krokodilok.webp",
         quizUrl:null
       },
       microlobatas_szivacs:{
@@ -1458,6 +1632,7 @@
     const tip = document.getElementById("tip");
     const tipT = document.getElementById("tipT");
     const tipS = document.getElementById("tipS");
+    const nodePreview = document.getElementById("nodePreview");
     const heroImg = document.getElementById("heroImg");
     const imageTitle = document.getElementById("imageTitle");
     const titleEl = document.getElementById("title");
@@ -1519,10 +1694,10 @@
       const cloned = cloneFiltered(TREE_DATA, enabledGroups, true);
       return compressRoot(cloned);
     }
-    function buildTree(){
-      const rect = treeRig.getBoundingClientRect();
-      const width = rect.width || 1000;
-      const height = rect.height || 600;
+    function buildTree(keepView = false){
+      // Fix logical dimensions to avoid layout jumps on resize/mode-switch
+      const width = 1200; 
+      const height = 800;
       const data = filteredData();
       const root = d3.hierarchy(data);
       const treemap = d3.tree().size([height-80, width-200]).separation((a,b)=>{
@@ -1575,17 +1750,20 @@
         w: (maxX - minX) + marginLeft + marginRight,
         h: (maxY - minY) + marginTop + marginBottom
       };
-      if(INITIAL_ZOOM < 1){
-        const vw = fullView.w * INITIAL_ZOOM;
-        const vh = fullView.h * INITIAL_ZOOM;
-        view = {
-          x: fullView.x + (fullView.w - vw)/2,
-          y: fullView.y + (fullView.h - vh)/2,
-          w: vw,
-          h: vh
-        };
-      }else{
-        view = { ...fullView };
+
+      if(!keepView) {
+        if(INITIAL_ZOOM < 1){
+          const vw = fullView.w * INITIAL_ZOOM;
+          const vh = fullView.h * INITIAL_ZOOM;
+          view = {
+            x: fullView.x + (fullView.w - vw)/2,
+            y: fullView.y + (fullView.h - vh)/2,
+            w: vw,
+            h: vh
+          };
+        }else{
+          view = { ...fullView };
+        }
       }
       setViewBox(view);
       svg.selectAll("*").remove();
@@ -1616,11 +1794,25 @@
         .selectAll("circle.innov-dot")
         .data(innovData)
         .enter()
-        .append("circle")
-        .attr("class","innov-dot")
-        .attr("r",4)
-        .attr("cx", d=>d.x)
-        .attr("cy", d=>d.y)
+        .append("g")
+        .attr("class","innov-dot-g")
+        .style("cursor","pointer")
+        .each(function(d){
+          const g = d3.select(this);
+          // Hit area for innovation dot
+          g.append("circle")
+            .attr("class", "hit-area")
+            .attr("r", 15)
+            .attr("cx", d.x)
+            .attr("cy", d.y)
+            .style("pointer-events", "all");
+          
+          g.append("circle")
+            .attr("class","innov-dot")
+            .attr("r",4)
+            .attr("cx", d.x)
+            .attr("cy", d.y);
+        })
         .on("pointermove",(event,d)=>{
           tipT.textContent = d.node.data.name + " – újdonságok";
           tipS.textContent = d.node.data.innovations.join(" • ");
@@ -1636,17 +1828,145 @@
           const chain = new Set(d.node.ancestors());
           svg.selectAll(".link").classed("highlight", l => chain.has(l.target));
         });
+
       const drawNodes = nodes.filter(n => !(n.data && n.data.type==="internal" && (!n.data.name || n.data.name.trim()==="")));
-      const nodeG = svg.append("g").selectAll("g").data(drawNodes).enter().append("g").attr("class", d => { let c = "node"; if(d.depth===0) c += " root"; if(d.data.type==="category") c += " category"; if(d.data.type==="species") c += " species"; return c; }).attr("transform", d => `translate(${X(d)},${Y(d)})`).style("cursor","pointer");
+      const nodeG = svg.append("g").selectAll("g").data(drawNodes).enter().append("g")
+        .attr("class", d => { 
+          let c = "node"; 
+          if(d.depth===0) c += " root"; 
+          if(d.data.type==="category") c += " category"; 
+          if(d.data.type==="subcat") c += " subcat"; // subcat class added
+          if(d.data.type==="species") c += " species"; 
+          return c; 
+        })
+        .attr("transform", d => `translate(${X(d)},${Y(d)})`)
+        .style("cursor","pointer")
+        .style("pointer-events", "all"); // Keep this to catch all child events
+
+      // Hit area for the whole node (circle + text area)
+      // We'll use a single larger circle that covers the node and the beginning of the text
+      nodeG.append("circle")
+        .attr("class", "hit-area")
+        .attr("r", 30) 
+        .style("pointer-events", "all");
+
       nodeG.append("circle")
         .attr("r", d => { if(d.depth===0) return 13; if(d.data.type==="category") return 11; if(d.data.type==="subcat") return 9.5; return 7.5; });
+      
+      // Progress Ring
+      const progressG = nodeG.append("g")
+        .attr("class", "progress-ring");
+      
+      progressG.append("circle")
+        .attr("class", "progress-ring__circle")
+        .attr("r", d => {
+          const baseR = (d.depth===0) ? 13 : (d.data.type==="category") ? 11 : (d.data.type==="subcat") ? 9.5 : 7.5;
+          return baseR + 5;
+        })
+        .each(function(d) {
+          const r = parseFloat(d3.select(this).attr("r"));
+          const circum = 2 * Math.PI * r;
+          d3.select(this)
+            .style("stroke-dasharray", `${circum} ${circum}`)
+            .style("stroke-dashoffset", circum);
+        });
+
       nodeG.append("text")
         .attr("dy",".35em")
         .attr("x", d => d.depth===0 ? -14 : 12)
         .style("text-anchor", d => d.depth===0 ? "end" : "start")
+        .style("pointer-events", "all") // Let the text itself be clickable too
         .text(d => d.data.name);
-      nodeG.on("pointermove",(event,d)=>{ tipT.textContent = d.data.name; if(d.data.type==="category"){ tipS.textContent = "Kategória – kattints, hogy rázúmolj erre az ágra."; } else if(d.data.type==="subcat" || d.data.type==="internal"){ tipS.textContent = "Elágazás – kattints, hogy részletesen lásd ezt az ágat."; } else { const ref = d.data.ref; if(ref && CONTENT[ref]){ tipS.textContent = CONTENT[ref].subtitle || ""; } else { tipS.textContent = ""; } } tip.style.display="block"; const r = treeRig.getBoundingClientRect(); tip.style.left = (event.clientX - r.left) + "px"; tip.style.top = (event.clientY - r.top) + "px"; }).on("pointerleave",()=>{ tip.style.display="none"; }).on("pointerdown",(event,d)=>{ event.preventDefault(); event.stopPropagation(); selectNode(d); });
+
+      nodeG.on("pointermove",(event,d)=>{ 
+        const r = treeRig.getBoundingClientRect(); 
+
+        // Progress logic
+        if (!activeNode || activeNode !== d) {
+          startHoverProgress(event.currentTarget, d);
+        }
+      })
+      .on("pointerleave",(event)=>{ 
+        stopHoverProgress();
+      })
+      .on("pointerdown",(event,d)=>{ event.preventDefault(); event.stopPropagation(); stopHoverProgress(); selectNode(d); });
     }
+
+    let activeNode = null;
+    let hoverTimer = null;
+    let hoverRAF = null;
+    const hoverDuration = 1000; // 1 second
+
+    function startHoverProgress(el, d) {
+      stopHoverProgress();
+      activeNode = d;
+      const progressRing = d3.select(el).select(".progress-ring");
+      const progressCircle = progressRing.select(".progress-ring__circle");
+      
+      progressRing.classed("active", true);
+      const r = parseFloat(progressCircle.attr("r"));
+      const circum = 2 * Math.PI * r;
+      
+      const startTime = performance.now();
+      
+      function update() {
+        const elapsed = performance.now() - startTime;
+        const p = Math.min(elapsed / hoverDuration, 1);
+        const offset = circum - (p * circum);
+        
+        progressCircle.style("stroke-dashoffset", offset);
+        
+        if (p < 1) {
+          hoverRAF = requestAnimationFrame(update);
+        } else {
+          showNodePreview(el, d);
+        }
+      }
+      
+      hoverRAF = requestAnimationFrame(update);
+    }
+
+    function stopHoverProgress() {
+      if (hoverRAF) cancelAnimationFrame(hoverRAF);
+      if (hoverTimer) clearTimeout(hoverTimer);
+      
+      if (activeNode) {
+        d3.selectAll(".progress-ring").classed("active", false);
+        d3.selectAll(".progress-ring__circle").each(function() {
+          const r = parseFloat(d3.select(this).attr("r"));
+          const circum = 2 * Math.PI * r;
+          d3.select(this).style("stroke-dashoffset", circum);
+        });
+        activeNode = null;
+      }
+      
+      nodePreview.classList.remove("active");
+    }
+
+    function showNodePreview(el, d) {
+      let contentKey = null;
+      if(d.data.ref && CONTENT[d.data.ref]) contentKey = d.data.ref;
+      else if(CONTENT[d.data.name]) contentKey = d.data.name;
+      
+      const c = (contentKey && CONTENT[contentKey]) ? CONTENT[contentKey] : null;
+      const imgPath = c ? c.image : null;
+      
+      if (imgPath) {
+        nodePreview.innerHTML = `<img src="${imgPath}" alt="${d.data.name}">`;
+      } else {
+        nodePreview.innerHTML = `<div class="no-img">Nincs kép a(z) ${d.data.name} csoporthoz</div>`;
+      }
+      
+      const r = treeRig.getBoundingClientRect();
+      const circleEl = el.querySelector("circle:not(.hit-area):not(.progress-ring__circle)");
+      const circleRect = circleEl ? circleEl.getBoundingClientRect() : el.getBoundingClientRect();
+
+      // Calculate position relative to the stage/treeRig
+      nodePreview.style.left = (circleRect.left - r.left + circleRect.width / 2) + "px";
+      nodePreview.style.top = (circleRect.top - r.top) + "px";
+      nodePreview.classList.add("active");
+    }
+
     function selectNode(d){
       svg.selectAll(".node").classed("selected", n => n === d);
       const chain = new Set(d.ancestors());
@@ -1711,7 +2031,10 @@
         document.querySelectorAll("#textCard .box").forEach(b => b.style.display="");
       }
       imageTitle.textContent = "Kép";
-      if(c.image) heroImg.src = c.image;
+      const placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'%3E%3Cdefs%3E%3CradialGradient id='g' cx='30%25' cy='30%25'%3E%3Cstop offset='0%25' stop-color='%23151f5a'/%3E%3Cstop offset='55%25' stop-color='%23060a17'/%3E%3Cstop offset='100%25' stop-color='%23060a17'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' fill='%2300d9ff' font-family='Arial' font-size='42' text-anchor='middle'%3EK%C3%A9p helye%3C/text%3E%3C/svg%3E";
+      heroImg.src = c.image ? c.image : placeholder;
+      if(c.image) document.getElementById("imgNote").style.display = "none";
+      else document.getElementById("imgNote").style.display = "block";
     }
     backBtn.addEventListener("click", ()=>{
       if(fullView){
@@ -1812,8 +2135,7 @@
     }
     buildTree();
     animateRig();
-    window.addEventListener("resize", ()=>{ buildTree(); });
-    treeRig.addEventListener("transitionend",(e)=>{ if(e.propertyName === "inset" || e.propertyName === "transform"){ buildTree(); } });
+    window.addEventListener("resize", ()=>{ buildTree(true); });
     const stageEl = document.querySelector(".stage");
     let isDragging = false, dragStartX = 0, dragStartY = 0, startView = null;
     // Pan / drag handling
@@ -1821,7 +2143,7 @@
       const header = document.querySelector("header");
       const dropdowns = [document.getElementById("filterPanel"), document.getElementById("domainPanel")];
       if(header && header.contains(target)) return true;
-      if(target && target.closest && (target.closest(".node") || target.closest(".innov-dot"))) return true;
+      if(target && target.closest && (target.closest(".node") || target.closest(".innov-dot") || target.closest(".innov-dot-g"))) return true;
       if(dropdowns.some(p => p && p.style.display==="block" && p.contains(target))) return true;
       return false;
     }
