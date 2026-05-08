@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mielőtt felébredtem - Könyv Drop Countdown</title>
+    <title>Mielőtt felébredtem - Könyv Drop Progress</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #f3f3f3;
-            --accent-color: #d4af37; /* Goldish accent */
+            --accent-color: #d4af37;
             --bg-dark: #0a0a0a;
             --text-muted: #a0a0a0;
+            --progress-bg: rgba(255, 255, 255, 0.08);
+            --progress-fill: linear-gradient(90deg, #d4af37 0%, #f5d76e 50%, #d4af37 100%);
         }
 
         * {
@@ -117,44 +119,6 @@
             font-style: italic;
         }
 
-        /* Countdown Styles */
-        .countdown-container {
-            display: flex;
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .countdown-item {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1.5rem;
-            border-radius: 12px;
-            min-width: 120px;
-            transition: all 0.3s ease;
-        }
-
-        .countdown-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent-color);
-        }
-
-        .number {
-            display: block;
-            font-size: 3rem;
-            font-weight: 600;
-            line-height: 1;
-            margin-bottom: 0.5rem;
-            color: var(--primary-color);
-        }
-
-        .label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent-color);
-        }
-
         .trilogy-badge {
             margin-top: 1rem;
             padding: 0.5rem 1.5rem;
@@ -165,16 +129,71 @@
             display: inline-block;
         }
 
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            .countdown-container { gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
-            .countdown-item { min-width: 80px; padding: 1rem; }
-            .number { font-size: 2rem; }
-            .cover-image { width: 220px; }
+        .progress-section {
+            width: min(720px, 100%);
+            margin-top: 1rem;
         }
 
-        /* Floating particles animation */
+        .progress-topline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+        }
+
+        .progress-percent {
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .progress-track {
+            position: relative;
+            width: 100%;
+            height: 22px;
+            background: var(--progress-bg);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.06);
+        }
+
+        .progress-fill {
+            width: 22%;
+            height: 100%;
+            border-radius: 999px;
+            background: var(--progress-fill);
+            position: relative;
+            overflow: hidden;
+            transition: width 1s ease;
+            box-shadow: 0 0 18px rgba(212, 175, 55, 0.45);
+        }
+
+        .progress-fill::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -40%;
+            width: 40%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+            animation: shimmer 1.8s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -40%; }
+            100% { left: 100%; }
+        }
+
+        .progress-note {
+            margin-top: 1rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
         .particles {
             position: fixed;
             top: 0;
@@ -198,6 +217,12 @@
             90% { opacity: 0.5; }
             100% { transform: translateY(-10vh) translateX(100px); opacity: 0; }
         }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .cover-image { width: 220px; }
+            .progress-topline { font-size: 0.85rem; }
+        }
     </style>
 </head>
 <body>
@@ -210,77 +235,64 @@
                 <div class="glow"></div>
                 <img src="c03770d5-31c6-4d38-9662-13bd555c7385.png" alt="Mielőtt felébredtem borító" class="cover-image">
             </div>
-            
+
             <p class="subtitle">Hamarosan érkezik</p>
             <h1>Mielőtt felébredtem</h1>
             <p class="author">Farkas Gergő</p>
             <div class="trilogy-badge">Egy trilógia első része</div>
         </div>
 
-        <div class="countdown-container">
-            <div class="countdown-item">
-                <span class="number" id="days">00</span>
-                <span class="label">Nap</span>
+        <div class="progress-section">
+            <div class="progress-topline">
+                <span>Előrehaladás</span>
+                <span class="progress-percent" id="progressText">22%</span>
             </div>
-            <div class="countdown-item">
-                <span class="number" id="hours">00</span>
-                <span class="label">Óra</span>
+            <div class="progress-track" aria-label="Kiadási előrehaladás">
+                <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="countdown-item">
-                <span class="number" id="minutes">00</span>
-                <span class="label">Perc</span>
-            </div>
-            <div class="countdown-item">
-                <span class="number" id="seconds">00</span>
-                <span class="label">Másodperc</span>
-            </div>
+            <div class="progress-note">A teljes betöltés dátuma: 2026.05.15.</div>
         </div>
     </div>
 
     <script>
-        // Set the countdown date
-        const countDownDate = new Date("May 8, 2026 23:00:00").getTime();
+        const targetDate = new Date("2026-05-15T00:00:00").getTime();
+        const startPercent = 22;
 
-        function updateCountdown() {
+        function updateProgress() {
             const now = new Date().getTime();
-            const distance = countDownDate - now;
+            const startDate = targetDate - 7 * 24 * 60 * 60 * 1000;
+            const totalDuration = targetDate - startDate;
+            const elapsed = now - startDate;
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            let progress = startPercent + (elapsed / totalDuration) * (100 - startPercent);
+            progress = Math.max(startPercent, Math.min(100, progress));
 
-            document.getElementById("days").innerText = days.toString().padStart(2, '0');
-            document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
-            document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
-            document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
+            document.getElementById("progressFill").style.width = progress.toFixed(2) + "%";
+            document.getElementById("progressText").innerText = Math.round(progress) + "%";
 
-            if (distance < 0) {
-                clearInterval(x);
-                document.querySelector(".countdown-container").innerHTML = "<h2>MÁR ELÉRHETŐ!</h2>";
+            if (progress >= 100) {
+                document.getElementById("progressText").innerText = "100%";
             }
         }
 
-        // Update every second
-        const x = setInterval(updateCountdown, 1000);
-        updateCountdown();
+        updateProgress();
+        setInterval(updateProgress, 1000);
 
-        // Add some floating particles for effect
         const particlesContainer = document.getElementById('particles');
         const particleCount = 20;
 
         for (let i = 0; i < particleCount; i++) {
             const particle = document.createElement('div');
             particle.className = 'particle';
-            
+
             const size = Math.random() * 5 + 2 + 'px';
             particle.style.width = size;
             particle.style.height = size;
-            
+
             particle.style.left = Math.random() * 100 + 'vw';
             particle.style.animationDuration = Math.random() * 10 + 15 + 's';
             particle.style.animationDelay = Math.random() * 20 + 's';
-            
+
             particlesContainer.appendChild(particle);
         }
     </script>
