@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fejlesztés alatt</title>
+
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #0f172a;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+  }
+
+  /* Középső szöveg */
+  .center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 8vw;
+    font-weight: bold;
+    text-align: center;
+    z-index: 10;
+    text-shadow: 0 0 20px rgba(0,0,0,0.6);
+  }
+
+  /* Alakzatok */
+  .shape {
+    position: absolute;
+    opacity: 0.6;
+    animation: float linear infinite;
+  }
+
+  .circle {
+    border-radius: 50%;
+    background: #38bdf8;
+  }
+
+  .square {
+    background: #f472b6;
+  }
+
+  .triangle {
+    width: 0;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom: 45px solid #34d399;
+    background: transparent;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-120vh) rotate(360deg);
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="center-text">Fejlesztés alatt</div>
+
+<script>
+  const shapes = ["circle", "square", "triangle"];
+
+  function createShape() {
+    const el = document.createElement("div");
+    const type = shapes[Math.floor(Math.random() * shapes.length)];
+    
+    el.classList.add("shape", type);
+
+    const size = Math.random() * 40 + 20;
+    el.style.width = size + "px";
+    el.style.height = size + "px";
+
+    el.style.left = Math.random() * window.innerWidth + "px";
+    el.style.animationDuration = (Math.random() * 5 + 5) + "s";
+
+    document.body.appendChild(el);
+
+    setTimeout(() => {
+      el.remove();
+    }, 10000);
+  }
+
+  setInterval(createShape, 300);
+</script>
+
+</body>
+</html>
