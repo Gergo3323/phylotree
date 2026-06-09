@@ -1,98 +1,1108 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Fejlesztés alatt</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolygónk Jövője – Globális Felmelegedés & Ózonréteg</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050A14;
+    --bg2: #070D1A;
+    --green: #00FF88;
+    --orange: #FF4500;
+    --blue: #0A84FF;
+    --warn: #FFAA00;
+    --text: #E8EDF5;
+    --muted: #7A8599;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.07);
+  }
+
+  html { scroll-behavior: smooth; }
+
   body {
-    margin: 0;
-    overflow: hidden;
-    background: #0f172a;
-    font-family: Arial, sans-serif;
-    height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.7;
   }
 
-  /* Középső szöveg */
-  .center-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 8vw;
-    font-weight: bold;
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--green); border-radius: 2px; }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 18px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(5,10,20,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    transition: all .3s;
+  }
+  .nav-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--green); letter-spacing: -0.02em;
+  }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    color: var(--muted); font-size: .85rem; text-decoration: none;
+    transition: color .2s; font-weight: 500; letter-spacing: 0.01em;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
     text-align: center;
-    z-index: 10;
-    text-shadow: 0 0 20px rgba(0,0,0,0.6);
+    position: relative; overflow: hidden;
+    padding: 100px 20px 60px;
   }
 
-  /* Alakzatok */
-  .shape {
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,255,136,.06) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 20% 80%, rgba(255,69,0,.05) 0%, transparent 60%);
+  }
+
+  .hero-orbs {
+    position: absolute; inset: 0; overflow: hidden; z-index: 0;
+  }
+  .orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); opacity: .25; animation: drift 12s ease-in-out infinite;
+  }
+  .orb1 { width: 500px; height: 500px; background: var(--green); top: -100px; left: -150px; animation-delay: 0s; }
+  .orb2 { width: 400px; height: 400px; background: var(--orange); bottom: -80px; right: -100px; animation-delay: -4s; }
+  .orb3 { width: 300px; height: 300px; background: var(--blue); top: 30%; left: 60%; animation-delay: -8s; }
+
+  @keyframes drift {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(30px,-20px) scale(1.05); }
+    66% { transform: translate(-20px,25px) scale(.95); }
+  }
+
+  /* stars */
+  .stars {
+    position: absolute; inset: 0; z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 50%, rgba(255,255,255,.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 60%, rgba(255,255,255,.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 80%, rgba(255,255,255,.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 70%, rgba(255,255,255,.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 65% 40%, rgba(255,255,255,.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 85%, rgba(255,255,255,.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 5% 45%, rgba(255,255,255,.5) 0%, transparent 100%);
+    animation: twinkle 4s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle { from { opacity: .6; } to { opacity: 1; } }
+
+  .hero-content { position: relative; z-index: 1; max-width: 860px; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,255,136,.1); border: 1px solid rgba(0,255,136,.3);
+    color: var(--green); font-size: .75rem; font-weight: 600;
+    padding: 6px 14px; border-radius: 999px; letter-spacing: .08em; text-transform: uppercase;
+    margin-bottom: 28px;
+    animation: fadeUp .8s ease both;
+  }
+  .badge-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.8); opacity: .5; }
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 700; line-height: 1.05;
+    letter-spacing: -0.04em;
+    animation: fadeUp .9s .15s ease both;
+  }
+  h1 .accent { color: var(--green); }
+  h1 .danger { color: var(--orange); }
+
+  .hero-sub {
+    margin-top: 24px; font-size: 1.1rem; color: var(--muted); max-width: 600px; margin-inline: auto;
+    animation: fadeUp .9s .3s ease both;
+  }
+
+  .hero-scroll {
+    margin-top: 56px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    animation: fadeUp .9s .5s ease both;
+  }
+  .scroll-line {
+    width: 1px; height: 60px;
+    background: linear-gradient(to bottom, var(--green), transparent);
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0%,100% { opacity: 0; transform: scaleY(0); transform-origin: top; }
+    30%,70% { opacity: 1; transform: scaleY(1); }
+  }
+  .scroll-label { font-size: .7rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
+
+  /* ─── PLANET VISUAL ─── */
+  .planet-wrap {
+    position: relative; margin: 32px auto 0;
+    width: 220px; height: 220px;
+    animation: fadeUp .9s .4s ease both;
+  }
+  .planet {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #1a4a8c, #050A14);
+    box-shadow: 0 0 60px rgba(0,255,136,.25), inset -20px -20px 40px rgba(0,0,0,.6);
+    animation: rotatePlanet 20s linear infinite;
+    overflow: hidden;
+    position: relative;
+  }
+  .planet::before {
+    content: '';
+    position: absolute; inset: 0; border-radius: 50%;
+    background: repeating-linear-gradient(
+      -30deg,
+      transparent, transparent 12px,
+      rgba(0,255,136,.04) 12px, rgba(0,255,136,.04) 14px
+    );
+  }
+  @keyframes rotatePlanet {
+    from { filter: hue-rotate(0deg); }
+    to { filter: hue-rotate(30deg); }
+  }
+  .planet-ring {
     position: absolute;
-    opacity: 0.6;
-    animation: float linear infinite;
-  }
-
-  .circle {
+    top: 50%; left: 50%;
+    width: 280px; height: 60px;
+    border: 2px solid rgba(0,255,136,.2);
     border-radius: 50%;
-    background: #38bdf8;
+    transform: translate(-50%, -50%) rotateX(75deg);
+    animation: ringPulse 3s ease-in-out infinite;
+  }
+  @keyframes ringPulse {
+    0%,100% { border-color: rgba(0,255,136,.15); }
+    50% { border-color: rgba(0,255,136,.4); }
   }
 
-  .square {
-    background: #f472b6;
+  /* ─── SECTIONS ─── */
+  section { padding: 100px 20px; position: relative; }
+  .container { max-width: 1000px; margin: 0 auto; }
+  .container-wide { max-width: 1200px; margin: 0 auto; }
+
+  .section-label {
+    display: inline-block;
+    font-size: .7rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--green); margin-bottom: 14px;
   }
 
-  .triangle {
-    width: 0;
-    height: 0;
-    border-left: 25px solid transparent;
-    border-right: 25px solid transparent;
-    border-bottom: 45px solid #34d399;
-    background: transparent;
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 700; line-height: 1.15;
+    letter-spacing: -0.03em; margin-bottom: 20px;
+  }
+  h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.25rem; font-weight: 600;
+    margin-bottom: 10px; letter-spacing: -0.01em;
   }
 
-  @keyframes float {
-    0% {
-      transform: translateY(100vh) rotate(0deg);
-    }
-    100% {
-      transform: translateY(-120vh) rotate(360deg);
-    }
+  p { color: var(--muted); line-height: 1.8; margin-bottom: 14px; }
+  p:last-child { margin-bottom: 0; }
+  p strong { color: var(--text); font-weight: 600; }
+
+  /* ─── REVEAL ANIMATION ─── */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ─── OZONE SECTION ─── */
+  #ozone { background: var(--bg2); }
+
+  .ozone-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+    margin-top: 48px;
+  }
+  @media(max-width:720px){ .ozone-grid { grid-template-columns: 1fr; } }
+
+  .fact-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px 24px;
+    transition: border-color .3s, transform .3s;
+  }
+  .fact-card:hover { border-color: rgba(0,255,136,.3); transform: translateY(-4px); }
+  .fact-icon { font-size: 2.4rem; margin-bottom: 14px; }
+
+  /* ─── FREON SECTION ─── */
+  .freon-molecule {
+    display: flex; justify-content: center; margin: 48px 0;
+  }
+  .mol-svg { width: 280px; height: 140px; }
+
+  .props-row {
+    display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px;
+  }
+  .prop-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(0,255,136,.07); border: 1px solid rgba(0,255,136,.2);
+    color: var(--green); padding: 8px 16px; border-radius: 8px;
+    font-size: .85rem; font-weight: 500;
+  }
+  .prop-chip.danger-chip {
+    background: rgba(255,69,0,.07); border-color: rgba(255,69,0,.2); color: var(--orange);
+  }
+
+  /* ─── OZONE DESTRUCTION ─── */
+  #destruction { background: var(--bg2); }
+
+  .chain-steps {
+    display: flex; flex-direction: column; gap: 0;
+    margin-top: 48px;
+    position: relative;
+  }
+  .chain-steps::before {
+    content: '';
+    position: absolute; left: 26px; top: 52px; bottom: 52px;
+    width: 2px; background: linear-gradient(to bottom, var(--green), var(--orange));
+  }
+  .chain-step {
+    display: flex; gap: 24px; align-items: flex-start;
+    padding: 20px 0; position: relative;
+  }
+  .step-num {
+    width: 52px; height: 52px; min-width: 52px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--green);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 1rem; color: var(--green);
+    position: relative; z-index: 1;
+    transition: background .3s;
+  }
+  .chain-step:hover .step-num { background: rgba(0,255,136,.1); }
+  .step-body h3 { margin-top: 10px; }
+
+  .danger-box {
+    margin-top: 40px;
+    background: rgba(255,69,0,.08);
+    border: 1px solid rgba(255,69,0,.3);
+    border-left: 4px solid var(--orange);
+    border-radius: 12px; padding: 22px 26px;
+    font-size: 1.05rem; color: var(--text);
+  }
+  .danger-box span { color: var(--orange); font-weight: 700; font-size: 1.2rem; }
+
+  /* ─── OZONE HOLE TABLE ─── */
+  #ozone-hole { background: var(--bg); }
+
+  .ozone-table-wrap {
+    margin-top: 40px; overflow-x: auto;
+    border: 1px solid var(--border); border-radius: 16px;
+  }
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: .9rem;
+  }
+  thead tr { background: rgba(0,255,136,.07); }
+  th {
+    padding: 16px 20px; text-align: left;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; color: var(--green);
+    font-size: .8rem; letter-spacing: .05em; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 14px 20px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,.02); color: var(--text); }
+  td:first-child { color: var(--text); font-weight: 500; }
+
+  /* ─── UV SECTION ─── */
+  #uv { background: var(--bg2); }
+
+  .uv-cards {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 20px;
+    margin-top: 48px;
+  }
+  @media(max-width:720px){ .uv-cards { grid-template-columns: 1fr; } }
+
+  .uv-card {
+    border-radius: 16px; padding: 28px 22px;
+    position: relative; overflow: hidden;
+    transition: transform .3s;
+  }
+  .uv-card:hover { transform: translateY(-6px); }
+  .uv-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .uva { background: rgba(10,132,255,.08); border: 1px solid rgba(10,132,255,.2); }
+  .uva::before { background: var(--blue); }
+  .uvb { background: rgba(255,170,0,.08); border: 1px solid rgba(255,170,0,.2); }
+  .uvb::before { background: var(--warn); }
+  .uvc { background: rgba(255,69,0,.08); border: 1px solid rgba(255,69,0,.2); }
+  .uvc::before { background: var(--orange); }
+  .uv-type { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+  .uva .uv-type { color: var(--blue); }
+  .uvb .uv-type { color: var(--warn); }
+  .uvc .uv-type { color: var(--orange); }
+  .uv-badge {
+    display: inline-block; font-size: .7rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .uva .uv-badge { background: rgba(10,132,255,.15); color: var(--blue); }
+  .uvb .uv-badge { background: rgba(255,170,0,.15); color: var(--warn); }
+  .uvc .uv-badge { background: rgba(255,69,0,.15); color: var(--orange); }
+
+  .uv-health {
+    margin-top: 56px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 36px 32px;
+  }
+  .uv-health h3 { font-size: 1.4rem; margin-bottom: 24px; }
+  .health-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 16px; }
+  .health-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 16px; border-radius: 10px;
+    background: rgba(255,255,255,.03); border: 1px solid var(--border);
+  }
+  .health-icon { font-size: 1.5rem; }
+  .health-text { font-size: .88rem; color: var(--muted); line-height: 1.5; }
+  .health-text strong { color: var(--text); display: block; margin-bottom: 3px; }
+
+  /* ─── GREENHOUSE SECTION ─── */
+  #greenhouse { background: var(--bg); }
+
+  .gh-visual {
+    margin: 48px auto;
+    max-width: 700px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 36px; text-align: center;
+  }
+  .gh-svg { width: 100%; max-width: 560px; height: auto; }
+
+  .gas-cards {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 20px;
+    margin-top: 40px;
+  }
+  @media(max-width:720px){ .gas-cards { grid-template-columns: 1fr; } }
+
+  .gas-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px 20px;
+    text-align: center; transition: transform .3s;
+  }
+  .gas-card:hover { transform: translateY(-4px); border-color: rgba(0,255,136,.2); }
+  .gas-formula {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem; font-weight: 700; color: var(--green);
+    margin-bottom: 8px;
+  }
+  .gas-name { color: var(--muted); font-size: .9rem; margin-bottom: 12px; }
+
+  /* ─── CONSEQUENCES ─── */
+  #consequences { background: var(--bg2); }
+
+  .timeline {
+    margin-top: 60px; position: relative;
+    border-left: 2px solid var(--border); padding-left: 40px;
+  }
+  .tl-item {
+    margin-bottom: 48px; position: relative;
+  }
+  .tl-dot {
+    position: absolute; left: -49px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--orange); border: 3px solid var(--bg2);
+    box-shadow: 0 0 12px rgba(255,69,0,.5);
+    top: 4px;
+  }
+  .tl-year {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem; font-weight: 700; color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .stat-banner {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 20px;
+    margin: 48px 0;
+  }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.2rem; font-weight: 700; color: var(--orange);
+    line-height: 1.1; margin-bottom: 6px;
+  }
+  .stat-label { font-size: .8rem; color: var(--muted); letter-spacing: .02em; }
+
+  /* ─── SOLUTIONS ─── */
+  #solutions { background: var(--bg); }
+
+  .solutions-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+    gap: 20px; margin-top: 48px;
+  }
+  .sol-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px 22px;
+    text-align: center;
+    transition: border-color .3s, transform .3s;
+  }
+  .sol-card:hover { border-color: rgba(0,255,136,.4); transform: translateY(-6px); }
+  .sol-icon { font-size: 3rem; margin-bottom: 16px; }
+  .sol-card h3 { color: var(--green); margin-bottom: 10px; }
+
+  /* ─── VIDEO SECTION ─── */
+  #video { background: var(--bg2); text-align: center; }
+  .video-wrap {
+    margin-top: 48px; border-radius: 20px; overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 0 60px rgba(0,255,136,.1);
+    max-width: 800px; margin-inline: auto;
+    aspect-ratio: 16/9;
+  }
+  .video-wrap iframe { width: 100%; height: 100%; border: 0; }
+
+  /* ─── CTA ─── */
+  #cta {
+    background: var(--bg);
+    text-align: center; padding: 100px 20px;
+  }
+  .cta-box {
+    max-width: 680px; margin: 0 auto;
+    background: linear-gradient(135deg, rgba(0,255,136,.06), rgba(255,69,0,.04));
+    border: 1px solid rgba(0,255,136,.2);
+    border-radius: 24px; padding: 56px 48px;
+  }
+  .cta-box h2 { font-size: clamp(1.6rem, 4vw, 2.6rem); margin-bottom: 16px; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    padding: 60px 20px 40px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    text-align: center;
+  }
+  .footer-label {
+    font-size: .8rem; color: var(--muted);
+    margin-bottom: 24px; letter-spacing: .04em;
+  }
+  .contact-row {
+    display: flex; align-items: center; justify-content: center; gap: 20px;
+    flex-wrap: wrap;
+  }
+  .contact-link {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--muted); text-decoration: none;
+    padding: 12px 22px;
+    border: 1px solid var(--border);
+    border-radius: 12px; font-size: .9rem;
+    transition: all .25s; font-weight: 500;
+  }
+  .contact-link:hover {
+    color: var(--text);
+    border-color: rgba(0,255,136,.3);
+    background: rgba(0,255,136,.05);
+    transform: translateY(-2px);
+  }
+  .contact-link svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .footer-copy {
+    margin-top: 36px; font-size: .75rem; color: rgba(122,133,153,.5);
+  }
+
+  /* ─── UTILS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .divider {
+    height: 1px; background: var(--border); margin: 0;
+  }
+
+  /* progress bar */
+  #progress {
+    position: fixed; top: 0; left: 0; height: 3px; z-index: 200;
+    background: linear-gradient(to right, var(--green), var(--orange));
+    transition: width .1s;
   }
 </style>
 </head>
-
 <body>
 
-<div class="center-text">Fejlesztés alatt</div>
+<div id="progress"></div>
+
+<nav>
+  <div class="nav-logo">🌍 Bolygónk Jövője</div>
+  <div class="nav-links">
+    <a href="#ozone">Ózon</a>
+    <a href="#uv">UV</a>
+    <a href="#greenhouse">Üvegház</a>
+    <a href="#consequences">Következmények</a>
+    <a href="#solutions">Megoldások</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+  </div>
+  <div class="stars"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      Éghajlatváltozás · Ózonréteg · Globális Felmelegedés
+    </div>
+    <h1>
+      Bolygónk<br>
+      <span class="accent">jövője</span> a<br>
+      <span class="danger">tétje</span>
+    </h1>
+    <p class="hero-sub">
+      Egy döntéstől vagyunk arra, hogy megmentsük azt, amit szüleink és nagyszüleink még természetesnek vehettek. De az idő fogy.
+    </p>
+    <div class="planet-wrap">
+      <div class="planet"></div>
+      <div class="planet-ring"></div>
+    </div>
+    <div class="hero-scroll">
+      <span class="scroll-label">Görgess</span>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ ÓZON ═══════════════════════ -->
+<section id="ozone">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">01 — Az ózon</span>
+      <h2>Mi az az <span style="color:var(--green)">ózon</span>?</h2>
+      <p>Az ózon (O₃) egy különleges gáz, amely három oxigénatomból áll. Védi a Földet a Nap káros ultraibolya (UV) sugárzásától — egyfajta láthatatlan pajzs bolygónk körül. Az UV-sugárzás hatására a légkörben folyamatosan keletkezik és bomlik, így egy dinamikus egyensúlyi rendszert alkotva.</p>
+    </div>
+
+    <div class="ozone-grid reveal" style="transition-delay:.15s">
+      <div class="fact-card">
+        <div class="fact-icon">⚗️</div>
+        <h3>Kémiai felépítés</h3>
+        <p>Az ózon molekulája 3 oxigénatomból áll (O₃), szemben a közönséges oxigénnel (O₂). Ez a kis különbség óriási védelmet nyújt a Föld élővilágának.</p>
+      </div>
+      <div class="fact-card">
+        <div class="fact-icon">🛡️</div>
+        <h3>Fő feladat: védelmet nyújtani</h3>
+        <p>Az ózonréteg elnyeli az UV-B és UV-C sugarak nagy részét, megakadályozva, hogy azok elérjék a Föld felszínét és kárt tegyenek az élőlényekben.</p>
+      </div>
+      <div class="fact-card">
+        <div class="fact-icon">🔄</div>
+        <h3>Dinamikus egyensúly</h3>
+        <p>A sztratoszférában az ózon folyamatosan termelődik és bomlik. Normál esetben egy egyensúly áll fenn — az emberi tevékenység azonban ezt az egyensúlyt felborította.</p>
+      </div>
+      <div class="fact-card">
+        <div class="fact-icon">🌐</div>
+        <h3>Elhelyezkedés</h3>
+        <p>Az ózonréteg a sztratoszférában helyezkedik el, 15–35 km magasságban a Föld felszíne felett — éppen ott, ahol a Nap UV-sugárzása eléri bolygónkat.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ FREONOK ═══════════════════════ -->
+<section id="freons" style="background:var(--bg)">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">02 — Freonok</span>
+      <h2>A <span style="color:var(--warn)">freon</span> mint veszély</h2>
+      <p>A freonok — kémiai nevükön klór-fluor-szénhidrogének (CFC-k) — az ipari forradalom egyik „csodaszerei" voltak. Nem mérgező, nem tűzveszélyes, nem robbanékony, és olcsón előállítható vegyületek — tökéletes ipari anyagnak tűntek. Hűtőszekrényekbe, spray-palackokba és légkondicionálókba töltötték őket, anélkül hogy sejtették volna, milyen hatást fejtenek ki a légkörre.</p>
+    </div>
+
+    <div class="freon-molecule reveal" style="transition-delay:.1s">
+      <svg class="mol-svg" viewBox="0 0 280 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="140" cy="60" r="24" fill="rgba(255,170,0,.15)" stroke="#FFAA00" stroke-width="2"/>
+        <text x="140" y="65" text-anchor="middle" fill="#FFAA00" font-size="13" font-family="Space Grotesk, sans-serif" font-weight="700">C</text>
+        <line x1="116" y1="60" x2="60" y2="40" stroke="rgba(255,255,255,.2)" stroke-width="2"/>
+        <circle cx="42" cy="34" r="18" fill="rgba(0,132,255,.1)" stroke="#0A84FF" stroke-width="2"/>
+        <text x="42" y="39" text-anchor="middle" fill="#0A84FF" font-size="12" font-family="Space Grotesk, sans-serif" font-weight="700">F</text>
+        <line x1="164" y1="60" x2="220" y2="40" stroke="rgba(255,255,255,.2)" stroke-width="2"/>
+        <circle cx="238" cy="34" r="18" fill="rgba(0,132,255,.1)" stroke="#0A84FF" stroke-width="2"/>
+        <text x="238" y="39" text-anchor="middle" fill="#0A84FF" font-size="12" font-family="Space Grotesk, sans-serif" font-weight="700">F</text>
+        <line x1="125" y1="79" x2="80" y2="100" stroke="rgba(255,255,255,.2)" stroke-width="2"/>
+        <circle cx="64" cy="107" r="18" fill="rgba(255,69,0,.1)" stroke="#FF4500" stroke-width="2"/>
+        <text x="64" y="112" text-anchor="middle" fill="#FF4500" font-size="12" font-family="Space Grotesk, sans-serif" font-weight="700">Cl</text>
+        <line x1="155" y1="79" x2="200" y2="100" stroke="rgba(255,255,255,.2)" stroke-width="2"/>
+        <circle cx="216" cy="107" r="18" fill="rgba(255,69,0,.1)" stroke="#FF4500" stroke-width="2"/>
+        <text x="216" y="112" text-anchor="middle" fill="#FF4500" font-size="12" font-family="Space Grotesk, sans-serif" font-weight="700">Cl</text>
+      </svg>
+    </div>
+
+    <div class="props-row reveal" style="transition-delay:.2s">
+      <div class="prop-chip">✅ Nem mérgező</div>
+      <div class="prop-chip">✅ Nem tűzveszélyes</div>
+      <div class="prop-chip">✅ Nem robbanékony</div>
+      <div class="prop-chip">✅ Olcsó előállítani</div>
+      <div class="prop-chip danger-chip">☠️ Pusztítja az ózonréteget</div>
+      <div class="prop-chip danger-chip">☠️ Évtizedekig aktív a légkörben</div>
+    </div>
+
+    <div class="reveal" style="margin-top:32px; transition-delay:.3s">
+      <p>Ezeket a vegyületeket rengeteg területen alkalmazták: hűtőszekrényekben hűtőközegként, aeroszol spray-kben hajtógázként, és légkondicionáló rendszerekben. Az emberiség tömegesen használta őket — és közben megnyitotta Pandora szelencéjét.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ PUSZTULÁS ═══════════════════════ -->
+<section id="destruction">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">03 — Pusztulás folyamata</span>
+      <h2>Hogyan pusztítják a <span style="color:var(--orange)">freonok</span> az ózonréteget?</h2>
+      <p>A folyamat kísértetiesen egyszerű, és következményei annál súlyosabbak. A freonok molekulái rendkívül stabilak — ez tette őket vonzóvá az ipar számára. De ez az előnyük egyben a legnagyobb veszélyük is.</p>
+    </div>
+
+    <div class="chain-steps reveal" style="transition-delay:.1s">
+      <div class="chain-step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Felszabadulás és felemelkedés</h3>
+          <p>A freonok a használat során a levegőbe kerülnek. Mivel stabil molekulák, nem bomlanak le az alsó légkörben, hanem lassan feljutnak a sztratoszférába — akár 15–35 km magasságra.</p>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>UV-sugárzás hatása</h3>
+          <p>A sztratoszférában az intenzív UV-sugárzás hatására a freonmolekulák felbomlanak. Ez a folyamat az alsó légkörben nem történik meg — éppen ezért olyan veszélyesek.</p>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Szabad klóratom keletkezik</h3>
+          <p>A lebomlás során szabad klóratomok szabadulnak fel. Ezek az atomok rendkívül reakcióképesek — pontosan ott, ahol az ózonmolekulák tartózkodnak.</p>
+        </div>
+      </div>
+      <div class="chain-step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h3>Lánc-reakció az ózon rovására</h3>
+          <p>A szabad klóratom megtámadja az ózonmolekulát (O₃), elvonja tőle az egyik oxigénatomot, majd az így keletkező klór-oxid tovább reagál — a klóratom felszabadul és újra pusztít.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="danger-box reveal" style="transition-delay:.3s">
+      ⚠️ <strong>Döbbenetes tény:</strong> egyetlen klóratom <span>több ezer ózonmolekulát</span> is képes lebontani — mielőtt végleg inaktiválódna. Ez láncreakció, ami az egész ózonréteget veszélyezteti.
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ ÓZONLYUK ═══════════════════════ -->
+<section id="ozone-hole">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">04 — Az ózonlyuk</span>
+      <h2>Az „<span style="color:var(--orange)">ózonlyuk</span>" az Antarktisz felett</h2>
+      <p>Az „ózonlyuk" nem valódi lyuk, hanem egy rendkívül elvékonyodott terület az ózonrétegben, amely évente visszatér az Antarktisz felett. A mért adatok egyértelműen mutatják a CFC-k hatását és a Montreali Egyezmény (1987) szerepét a tendencia lassításában.</p>
+    </div>
+
+    <div class="ozone-table-wrap reveal" style="transition-delay:.15s">
+      <table>
+        <thead>
+          <tr>
+            <th>Év</th>
+            <th>Max. kiterjedés (km²)</th>
+            <th>Ózonszint csökkenés</th>
+            <th>Megjegyzés</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1980</td><td>~1 millió</td><td>minimális</td><td>Kezdeti jelei a problémának</td></tr>
+          <tr><td>1985</td><td>~7 millió</td><td>~25%</td><td>Felfedezik a jelenséget</td></tr>
+          <tr><td>1987</td><td>~15 millió</td><td>~40%</td><td>Montreali Egyezmény aláírása</td></tr>
+          <tr><td>1993</td><td>~24 millió</td><td>~55%</td><td>Rekordméretek elérése közelít</td></tr>
+          <tr><td>2000</td><td>~29,4 millió</td><td>~65%</td><td>Valaha mért legnagyobb méret</td></tr>
+          <tr><td>2010</td><td>~22 millió</td><td>~55%</td><td>CFC-k csökkenése érezhető</td></tr>
+          <tr><td>2020</td><td>~24 millió</td><td>~53%</td><td>Lassú, fokozatos gyógyulás</td></tr>
+          <tr><td>2024</td><td>~18–20 millió</td><td>~45%</td><td>Óvatos optimizmus</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="reveal" style="margin-top:28px; transition-delay:.25s">
+      <p>A Montreali Egyezmény az egyik legsikeresebb globális környezetvédelmi megállapodás: a CFC-k fokozatos kivonásával az ózonréteg lassan gyógyul. Tudósok becslése szerint a réteg a 21. század közepére részben regenerálódhat — ha tartjuk magunkat a szabályokhoz.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ UV ═══════════════════════ -->
+<section id="uv">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">05 — UV sugárzás</span>
+      <h2>Az <span style="color:var(--warn)">ultraibolya</span> sugárzás típusai</h2>
+      <p>Az ultraibolya (UV) sugárzás a Nap láthatatlan sugárzásának egy formája, amely három fő típusra osztható. Energiájuk és veszélyességük egyre nő, de az ózonréteg — ha egészséges — megvédi tőlük a Föld felszínét.</p>
+    </div>
+
+    <div class="uv-cards reveal" style="transition-delay:.1s">
+      <div class="uv-card uva">
+        <div class="uv-type">UV-A</div>
+        <div class="uv-badge">Legkevésbé energikus</div>
+        <p>Az összes UV-sugárzás kb. <strong style="color:var(--blue)">95%-a</strong> UV-A. Majdnem teljesen eléri a Föld felszínét, és mélyen behatol a bőrbe — öregedést és hosszú távú bőrkárosodást okoz.</p>
+      </div>
+      <div class="uv-card uvb">
+        <div class="uv-type">UV-B</div>
+        <div class="uv-badge">Közepesen erős</div>
+        <p>Részben elnyeli az ózonréteg, de egy része <strong style="color:var(--warn)">átjut</strong>. Energiája nagyobb az UV-A-nál, leégést, bőrrákat okoz — és az ózonréteg vékonyodásával egyre több jut belőle a felszínre.</p>
+      </div>
+      <div class="uv-card uvc">
+        <div class="uv-type">UV-C</div>
+        <div class="uv-badge">Legveszélyesebb</div>
+        <p>Nagyon nagy energiájú, halálos a legtöbb élőlényre. Normál esetben az ózonréteg <strong style="color:var(--orange)">teljesen elnyeli</strong> — de az ózonréteg vékonyodásával ez a védelmi vonal egyre gyengül.</p>
+      </div>
+    </div>
+
+    <div class="uv-health reveal" style="transition-delay:.25s">
+      <h3>🩺 Az UV-sugárzás hatásai az emberi egészségre</h3>
+      <div class="health-grid">
+        <div class="health-item">
+          <div class="health-icon">🔴</div>
+          <div class="health-text"><strong>Melanoma (bőrrák)</strong>Az UV-B az egyik fő kiváltója a melanomának, a legveszélyesebb bőrrák-típusnak.</div>
+        </div>
+        <div class="health-item">
+          <div class="health-icon">👁️</div>
+          <div class="health-text"><strong>Szürkehályog</strong>A szem lencsékét az UV-sugárzás károsítja, ami hályoghoz és vaksághoz vezet.</div>
+        </div>
+        <div class="health-item">
+          <div class="health-icon">🛡️</div>
+          <div class="health-text"><strong>Immunrendszer gyengülése</strong>Erős UV-expozíció csökkenti a bőr immunvédekezési képességét.</div>
+        </div>
+        <div class="health-item">
+          <div class="health-icon">🔥</div>
+          <div class="health-text"><strong>Leégés, öregedés</strong>UV-A mélyen hatol a bőrbe, ráncosodást, pigmentfoltokat és tartós károsodást okoz.</div>
+        </div>
+        <div class="health-item">
+          <div class="health-icon">🧬</div>
+          <div class="health-text"><strong>DNS-károsodás</strong>Az UV-sugárzás közvetlenül károsítja a sejtek DNS-ét, mutációkat okozva.</div>
+        </div>
+        <div class="health-item">
+          <div class="health-icon">⚠️</div>
+          <div class="health-text"><strong>Növekvő kockázat</strong>Az ózonréteg vékonyodásával az UV-expozíció globálisan növekszik — különösen a déli féltekén.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ ÜVEGHÁZ ═══════════════════════ -->
+<section id="greenhouse">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">06 — Üvegházhatás</span>
+      <h2>Az <span style="color:var(--green)">üvegházhatás</span> mechanizmusa</h2>
+      <p>A Napból érkező, rövid hullámhosszú, nagy energiájú sugárzás áthatol a légkörön. A légkör egy kis részét visszaveri, de nagy részét átengedni a felszín felé. A Föld felszíne felmelegszik, majd hosszú hullámhosszú, alacsony energiájú hőt sugároz vissza. Ezt a hőt az üvegházhatású gázok „csapdába ejtik" — elnyelik, majd visszasugározzák a Föld felé, tovább melegítve a légkört. Ez természetes folyamat — de az emberi kibocsátás miatt az egyensúly felborult.</p>
+    </div>
+
+    <div class="gh-visual reveal" style="transition-delay:.1s">
+      <svg class="gh-svg" viewBox="0 0 560 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Sun -->
+        <circle cx="50" cy="50" r="30" fill="rgba(255,170,0,.2)" stroke="#FFAA00" stroke-width="2"/>
+        <text x="50" y="55" text-anchor="middle" fill="#FFAA00" font-size="18">☀️</text>
+        <!-- Arrows incoming -->
+        <line x1="82" y1="50" x2="200" y2="80" stroke="#FFAA00" stroke-width="2" stroke-dasharray="6,3"/>
+        <polygon points="198,73 206,83 194,85" fill="#FFAA00"/>
+        <!-- Atmosphere band -->
+        <rect x="180" y="60" width="220" height="20" rx="6" fill="rgba(0,255,136,.08)" stroke="rgba(0,255,136,.3)" stroke-width="1.5"/>
+        <text x="290" y="74" text-anchor="middle" fill="rgba(0,255,136,.8)" font-size="9" font-family="Inter, sans-serif" letter-spacing="1">LÉGKÖR</text>
+        <!-- Arrow through atmosphere -->
+        <line x1="290" y1="80" x2="290" y2="155" stroke="#FFAA00" stroke-width="2"/>
+        <polygon points="283,153 297,153 290,163" fill="#FFAA00"/>
+        <!-- Ground -->
+        <rect x="160" y="165" width="260" height="18" rx="4" fill="rgba(139,90,43,.3)" stroke="rgba(139,90,43,.6)" stroke-width="1"/>
+        <text x="290" y="177" text-anchor="middle" fill="rgba(200,150,100,.9)" font-size="9" font-family="Inter, sans-serif" letter-spacing="1">FÖLD FELSZÍNE</text>
+        <!-- Arrow back up -->
+        <line x1="340" y1="163" x2="340" y2="88" stroke="#FF4500" stroke-width="2" stroke-dasharray="5,3"/>
+        <polygon points="333,90 347,90 340,80" fill="#FF4500"/>
+        <!-- Greenhouse gas -->
+        <ellipse cx="340" cy="115" rx="32" ry="18" fill="rgba(255,69,0,.1)" stroke="#FF4500" stroke-width="1.5"/>
+        <text x="340" y="119" text-anchor="middle" fill="#FF4500" font-size="9" font-family="Inter, sans-serif">CO₂/CH₄</text>
+        <!-- Re-radiation arrow -->
+        <line x1="320" y1="120" x2="260" y2="150" stroke="#FF4500" stroke-width="1.5"/>
+        <polygon points="258,142 264,154 270,146" fill="#FF4500"/>
+        <!-- Labels -->
+        <text x="82" y="44" fill="#FFAA00" font-size="9" font-family="Inter, sans-serif">UV &amp; látható fény</text>
+        <text x="380" y="100" fill="#FF4500" font-size="9" font-family="Inter, sans-serif">hővisszasugárzás</text>
+        <text x="180" y="140" fill="#FF4500" font-size="8.5" font-family="Inter, sans-serif">csapdába ejtett hő</text>
+      </svg>
+    </div>
+
+    <div class="gas-cards reveal" style="transition-delay:.2s">
+      <div class="gas-card">
+        <div class="gas-formula">CO₂</div>
+        <div class="gas-name">Szén-dioxid</div>
+        <p>A fosszilis tüzelőanyagok elégetésével, erdőirtással és ipari folyamatokban keletkezik. Az emberi tevékenység legfontosabb üvegházhatású gáza — koncentrációja az ipari forradalom óta 50%-kal nőtt.</p>
+      </div>
+      <div class="gas-card">
+        <div class="gas-formula">CH₄</div>
+        <div class="gas-name">Metán</div>
+        <p>A CO₂-nél kb. 80-szor erősebb üvegházhatású gáz rövid távon. Szarvasmarhák, rizstermesztés, gázkitermelés és az olvadó permafrost bocsátja ki. A jövőben különösen nagy kockázatot jelent.</p>
+      </div>
+      <div class="gas-card">
+        <div class="gas-formula">H₂O</div>
+        <div class="gas-name">Vízgőz</div>
+        <p>A légkör legfontosabb természetes üvegházhatású gáza — de a felmelegedés növeli a vízgőz tartalmát, ami visszacsatolásként tovább erősíti a melegedést. Önmagát erősítő folyamat.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ KÖVETKEZMÉNYEK ═══════════════════════ -->
+<section id="consequences">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">07 — Következmények</span>
+      <h2>A globális felmelegedés <span style="color:var(--orange)">következményei</span></h2>
+      <p>Nem holnap, nem száz év múlva. A változások már most zajlanak, és ha nem teszünk semmit, a közelgő évtizedek drámai fordulatokat hoznak az emberiség és az egész bolygó számára.</p>
+    </div>
+
+    <div class="stat-banner reveal" style="transition-delay:.1s">
+      <div class="stat-card">
+        <div class="stat-num">143M</div>
+        <div class="stat-label">emlős elpusztult az ausztráliai tűzvészben (2020)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">2,5Md</div>
+        <div class="stat-label">hüllő veszett oda ugyanabban a katasztrófában</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">26%</div>
+        <div class="stat-label">az óceánok annyival savasabbak lettek az elmúlt évtizedekben</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">7M</div>
+        <div class="stat-label">ember hal meg évente a légszennyezés miatt</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">70 m</div>
+        <div class="stat-label">tengerszintemelkedés fenyeget ha minden jég elolvad</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">−3 év</div>
+        <div class="stat-label">ennyivel rövidíti meg átlagosan mindenki életét a légszennyezés</div>
+      </div>
+    </div>
+
+    <div class="timeline reveal" style="transition-delay:.2s">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">Ma</div>
+        <p>Az óceánok CO₂-t nyelnek el — de telítőnek elérik kapacitásukat. A szén-dioxid szénsavvá alakulva pusztítja a vízalatti ökoszisztémákat. A korallzátonyok fele már meghalt. A jégsapkák olvadnak: Grönland <strong>másodpercenként 10 ezer köbméter jeget</strong> veszít. A sötét szárazföld láthatóvá válik alatta, és elkezdi önmaga alulról olvasztani a jeget — visszafordíthatatlan folyamat indul el.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--warn);box-shadow:0 0 12px rgba(255,170,0,.5)"></div>
+        <div class="tl-year" style="color:var(--warn)">2040-es évek</div>
+        <p>A bolygó jégtakarói kritikus mértékben olvadnak el. Az eddig fagyott talajból (permafrost) <strong>óriási mennyiségű metán</strong> szabadul fel — és a metán a CO₂-nél is erősebb üvegházhatású gáz. A globális felmelegedés rohamosan felgyorsul, öngerjesztő folyamatba lép.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2050-es évek</div>
+        <p>Az óceánok tovább melegszenek és savasodnak. A korallzátonyok <strong>világszerte meghalnak</strong>. A tengeri ökoszisztémák összeomolnak. Az energia-, ivóvíz- és élelemhiány tömeges vándorlásokhoz és fegyveres konfliktusokhoz vezet.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-year">2080-as évek</div>
+        <p>Az időjárás kiszámíthatatlanná válik. A termőföldek a túltermelés következtében kimerülnek. A rovarok eltűnnek — a beporzó rovarok nélkül az emberiség élelmiszertermelése összeomlik.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="background:#555;box-shadow:none"></div>
+        <div class="tl-year" style="color:var(--muted)">2100</div>
+        <p>Ha nem teszünk semmit: a bolygó nagy részben <strong style="color:var(--orange)">élhetetlenné válik</strong>. Ha a grönlandi jégsapka elolvad, a tengerszint <strong>7 méterrel</strong> emelkedik. Ha minden jég elolvad: <strong>70 méterrel</strong>. Az összes partvárosi civilizáció víz alá kerül. Ez vár azokra, akik ma születnek.</p>
+      </div>
+    </div>
+
+    <div class="danger-box reveal" style="margin-top:40px; transition-delay:.4s; border-color:rgba(255,69,0,.4)">
+      <p style="color:var(--text); margin:0">„Az életmódunk bizonyítottan nem fenntartható — vagyis egyszer véget ér. Már így is visszafordíthatatlan károkat okoztunk. Fajokat irtottunk ki és teljes ökoszisztémákat taroltunk le. <span style="color:var(--orange); font-weight:700">Nem csak megszüntetnünk kell az üvegházhatású gázok kibocsátását, hanem ki is kell vonnunk a bolygót jelenleg is melegítő szén-dioxidot."</span></p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ MEGOLDÁSOK ═══════════════════════ -->
+<section id="solutions">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">08 — Megoldások</span>
+      <h2>Mit <span style="color:var(--green)">tehetünk</span>?</h2>
+      <p>A helyzet nem reménytelen — de azonnali és határozott lépésekre van szükség. Egyéni szinten is sokat tehetsz, és kollektíven még többet. A változás most kezdődik.</p>
+    </div>
+
+    <div class="solutions-grid reveal" style="transition-delay:.1s">
+      <div class="sol-card">
+        <div class="sol-icon">🌳</div>
+        <h3>Faültetés</h3>
+        <p>Az erdők a CO₂ természetes elnyelői. Minden elültetett fa aktívan vonja ki a szén-dioxidot a légkörből, és élőhelyet ad a biodiverzitásnak.</p>
+      </div>
+      <div class="sol-card">
+        <div class="sol-icon">🚌</div>
+        <h3>Közösségi közlekedés</h3>
+        <p>A személyautók az egyik legnagyobb CO₂-forrás. Egy teli busz százszor hatékonyabb, mint ugyanannyi ember saját autóval — minden utazás számít.</p>
+      </div>
+      <div class="sol-card">
+        <div class="sol-icon">🛴</div>
+        <h3>Elektromos roller / kerékpár</h3>
+        <p>Rövid távolságokra a legtisztább megoldás. Nulla közvetlen emisszió, nincs dugó, és egészséges is. Az emberiség egyik legjobb találmánya az éghajlat szempontjából.</p>
+      </div>
+      <div class="sol-card">
+        <div class="sol-icon">♻️</div>
+        <h3>Újrahasznosítás</h3>
+        <p>Az anyagok újrafelhasználása drasztikusan csökkenti az ipari energiafelhasználást és a nyersanyag-kitermelést. Kevesebb hulladék, kevesebb emisszió, hosszabb erőforrás-ciklus.</p>
+      </div>
+      <div class="sol-card">
+        <div class="sol-icon">🌱</div>
+        <h3>Tudatos fogyasztás</h3>
+        <p>Amit megveszünk, hogyan eszünk, mit viselünk — minden döntés ökológiai lábnyomot hagy. A növényi alapú étrend például az egyik leghatékonyabb egyéni lépés.</p>
+      </div>
+      <div class="sol-card">
+        <div class="sol-icon">⚡</div>
+        <h3>Megújuló energia</h3>
+        <p>A nap- és szélenergia már ma olcsóbb, mint a fosszilis tüzelőanyagok. Az áttérés a megújulókra globálisan a legfontosabb strukturális lépés a klímaváltozás ellen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ VIDEÓ ═══════════════════════ -->
+<section id="video">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-label">Ajánlott tartalom</span>
+      <h2>Nézd meg — <span style="color:var(--green)">értsd meg</span></h2>
+      <p>Ez a videó mindent összefoglal, amit a klímaváltozásról tudni érdemes. Kötelező megtekintés mindenkinek, aki komolyan veszi a jövőjét.</p>
+    </div>
+
+    <div class="video-wrap reveal" style="transition-delay:.15s">
+      <iframe
+        src="https://www.youtube.com/embed/SpTRaCjrJG4"
+        title="Klímaváltozás videó"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════ CTA ═══════════════════════ -->
+<section id="cta">
+  <div class="cta-box reveal">
+    <h2>A döntés <span style="color:var(--green)">a mi kezünkben</span> van</h2>
+    <p style="font-size:1.05rem; color:var(--muted); margin-top:16px">Rá kellett jönnünk, hogy ez a törékeny világ nem bírja ki az emberi mohóságot. Végül választás elé állított minket: tovább pusztítjuk — vagy megmentjük, amit lehet.</p>
+    <p style="color:var(--muted); margin-top:12px">Megtanulunk végre a természettel összhangban élni.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer>
+  <div class="footer-label">Készítette: Farkas Gergő · Kapcsolat</div>
+  <div class="contact-row">
+    <a href="https://www.instagram.com/frks_geryy" target="_blank" rel="noopener" class="contact-link">
+      <!-- Instagram SVG icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+      </svg>
+      @frks_geryy
+    </a>
+    <a href="mailto:gergo@phylotree.hu" class="contact-link">
+      <!-- Email SVG icon -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+      gergo@phylotree.hu
+    </a>
+  </div>
+  <div class="footer-copy">© 2025 · Globális Felmelegedés &amp; Ózonréteg Prezentáció</div>
+</footer>
 
 <script>
-  const shapes = ["circle", "square", "triangle"];
+  // ─── SCROLL PROGRESS BAR ───
+  window.addEventListener('scroll', () => {
+    const prog = document.getElementById('progress');
+    const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    prog.style.width = scrolled + '%';
+  });
 
-  function createShape() {
-    const el = document.createElement("div");
-    const type = shapes[Math.floor(Math.random() * shapes.length)];
-    
-    el.classList.add("shape", type);
+  // ─── REVEAL ON SCROLL ───
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
 
-    const size = Math.random() * 40 + 20;
-    el.style.width = size + "px";
-    el.style.height = size + "px";
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    el.style.left = Math.random() * window.innerWidth + "px";
-    el.style.animationDuration = (Math.random() * 5 + 5) + "s";
-
-    document.body.appendChild(el);
-
-    setTimeout(() => {
-      el.remove();
-    }, 10000);
-  }
-
-  setInterval(createShape, 300);
+  // ─── NAV SHRINK ───
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if (window.scrollY > 60) {
+      nav.style.padding = '12px 40px';
+    } else {
+      nav.style.padding = '18px 40px';
+    }
+  });
 </script>
-
 </body>
 </html>
