@@ -58,6 +58,46 @@
   }
   .nav-links a:hover { color: var(--text); }
 
+  /* Hamburger Menu */
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    z-index: 110;
+  }
+  .menu-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--green);
+    transition: all 0.3s;
+  }
+
+  @media (max-width: 860px) {
+    nav { padding: 15px 24px; }
+    .menu-toggle { display: flex; }
+    .nav-links {
+      position: fixed;
+      top: 0; right: -100%;
+      width: 80%; height: 100vh;
+      background: var(--bg);
+      flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 32px;
+      transition: right 0.4s cubic-bezier(0.77,0.2,0.05,1.0);
+      box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+      border-left: 1px solid var(--border);
+    }
+    .nav-links.active { right: 0; }
+    .nav-links a { font-size: 1.2rem; }
+
+    /* Hamburger Animation */
+    .menu-toggle.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+  }
+
   /* ─── HERO ─── */
   #hero {
     min-height: 100vh;
@@ -548,6 +588,42 @@
     height: 1px; background: var(--border); margin: 0;
   }
 
+  /* ─── RESPONSIVE ADJUSTMENTS ─── */
+  @media (max-width: 720px) {
+    section { padding: 60px 20px; }
+    
+    .hero-content { padding-top: 40px; }
+    .hero-sub { font-size: 1rem; }
+    .planet-wrap { width: 160px; height: 160px; }
+    .planet-ring { width: 200px; height: 45px; }
+
+    .chain-steps::before { left: 20px; }
+    .step-num { width: 42px; height: 42px; min-width: 42px; font-size: 0.9rem; }
+    .chain-step { gap: 16px; }
+
+    .uv-health { padding: 24px 20px; }
+    .uv-health h3 { font-size: 1.2rem; }
+    .health-grid { grid-template-columns: 1fr; }
+
+    .gh-visual { padding: 20px; }
+    .gh-svg { min-width: 400px; transform: scale(0.9); transform-origin: center; }
+    .gh-visual { overflow-x: auto; }
+
+    .timeline { padding-left: 30px; }
+    .tl-dot { left: -39px; width: 14px; height: 14px; }
+    .tl-year { font-size: 1.3rem; }
+
+    .cta-box { padding: 40px 24px; }
+    
+    .contact-link { width: 100%; justify-content: center; }
+  }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 2.5rem; }
+    .nav-logo { font-size: 1rem; }
+    .gh-svg { min-width: 320px; }
+  }
+
   /* progress bar */
   #progress {
     position: fixed; top: 0; left: 0; height: 3px; z-index: 200;
@@ -562,6 +638,11 @@
 
 <nav>
   <div class="nav-logo">🌍 Bolygónk Jövője</div>
+  <div class="menu-toggle" id="mobile-menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
   <div class="nav-links">
     <a href="#ozone">Ózon</a>
     <a href="#uv">UV</a>
@@ -1076,6 +1157,22 @@
 </footer>
 
 <script>
+  // ─── MOBILE MENU ───
+  const menuToggle = document.getElementById('mobile-menu');
+  const navLinks = document.querySelector('.nav-links');
+
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('active');
+    navLinks.classList.toggle('active');
+  });
+
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+      menuToggle.classList.remove('active');
+      navLinks.classList.remove('active');
+    });
+  });
+
   // ─── SCROLL PROGRESS BAR ───
   window.addEventListener('scroll', () => {
     const prog = document.getElementById('progress');
