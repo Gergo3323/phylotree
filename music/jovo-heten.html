@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jövő héten — Farkas Gergő</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0c0a16;
+    --bg-1:#161129;
+    --bg-2:#1e1638;
+    --ink:#f2eefc;
+    --ink-dim:#a79fc4;
+    --accent:#c9a8ff;
+    --accent-2:#ff8fb1;
+    --line: rgba(242,238,252,0.10);
+    --line-strong: rgba(242,238,252,0.18);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(201,168,255,0.14), transparent 60%),
+      radial-gradient(ellipse 700px 600px at 100% 20%, rgba(255,143,177,0.10), transparent 55%),
+      var(--bg-0);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* faint drifting grain / noise-ish texture via layered gradients */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .wrap{
+    max-width:960px;
+    margin:0 auto;
+    padding:0 28px;
+    position:relative;
+    z-index:1;
+  }
+
+  /* ===== Header / week strip ===== */
+  header{
+    padding:32px 0 0;
+  }
+
+  .weekstrip{
+    display:flex;
+    gap:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    color:var(--ink-dim);
+    opacity:0.7;
+  }
+
+  .weekstrip span{
+    padding:5px 9px;
+    border:1px solid var(--line);
+    border-radius:6px;
+  }
+
+  .weekstrip span.active{
+    color:var(--bg-0);
+    background:var(--accent);
+    border-color:var(--accent);
+    font-weight:600;
+  }
+
+  /* ===== Hero ===== */
+  .hero{
+    padding:90px 0 70px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:26px;
+  }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--accent-2);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    opacity:0;
+    animation: fadeUp 0.8s ease forwards;
+    animation-delay:0.1s;
+  }
+
+  .eyebrow::before{
+    content:"";
+    width:22px;
+    height:1px;
+    background:var(--accent-2);
+  }
+
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(48px, 9vw, 104px);
+    line-height:0.98;
+    letter-spacing:-0.02em;
+    opacity:0;
+    animation: fadeUp 0.9s ease forwards;
+    animation-delay:0.25s;
+  }
+
+  h1 em{
+    font-style:normal;
+    background:linear-gradient(100deg, var(--accent), var(--accent-2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .byline{
+    font-size:17px;
+    color:var(--ink-dim);
+    opacity:0;
+    animation: fadeUp 0.9s ease forwards;
+    animation-delay:0.4s;
+  }
+
+  .byline strong{
+    color:var(--ink);
+    font-weight:600;
+  }
+
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(18px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* ===== Player ===== */
+  .player{
+    margin-top:14px;
+    border:1px solid var(--line-strong);
+    border-radius:20px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+    backdrop-filter:blur(12px);
+    padding:28px;
+    width:100%;
+    opacity:0;
+    animation: fadeUp 1s ease forwards;
+    animation-delay:0.55s;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .player::after{
+    content:"";
+    position:absolute;
+    top:-40%;
+    left:-10%;
+    width:60%;
+    height:180%;
+    background:radial-gradient(circle, rgba(201,168,255,0.10), transparent 70%);
+    pointer-events:none;
+  }
+
+  .viz-row{
+    display:flex;
+    align-items:center;
+    gap:22px;
+    position:relative;
+    z-index:1;
+  }
+
+  .play-btn{
+    flex:none;
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    border:1px solid var(--line-strong);
+    background:radial-gradient(circle at 30% 30%, rgba(201,168,255,0.25), rgba(201,168,255,0.05));
+    color:var(--ink);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    position:relative;
+  }
+
+  .play-btn:hover{
+    transform:scale(1.06);
+    border-color:var(--accent);
+    box-shadow:0 0 28px rgba(201,168,255,0.28);
+  }
+
+  .play-btn:active{ transform:scale(0.97); }
+
+  .play-btn svg{ width:22px; height:22px; }
+  .play-btn .icon-pause{ display:none; }
+  .player.is-playing .icon-play{ display:none; }
+  .player.is-playing .icon-pause{ display:block; }
+
+  canvas#viz{
+    flex:1;
+    height:64px;
+    width:100%;
+    display:block;
+  }
+
+  .time-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-top:20px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--ink-dim);
+    position:relative;
+    z-index:1;
+  }
+
+  .seek{
+    flex:1;
+    -webkit-appearance:none;
+    appearance:none;
+    height:4px;
+    border-radius:2px;
+    background:linear-gradient(90deg, var(--accent) 0%, var(--accent) var(--progress,0%), rgba(255,255,255,0.12) var(--progress,0%));
+    outline:none;
+    cursor:pointer;
+  }
+
+  .seek::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    background:var(--ink);
+    box-shadow:0 0 0 3px rgba(201,168,255,0.35);
+    cursor:pointer;
+  }
+
+  .seek::-moz-range-thumb{
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    background:var(--ink);
+    box-shadow:0 0 0 3px rgba(201,168,255,0.35);
+    cursor:pointer;
+    border:none;
+  }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:22px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+    position:relative;
+    z-index:1;
+  }
+
+  .meta-row .label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+  }
+
+  .vol-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .vol-row svg{ width:16px; height:16px; color:var(--ink-dim); flex:none; }
+
+  .vol{
+    width:90px;
+    -webkit-appearance:none;
+    appearance:none;
+    height:4px;
+    border-radius:2px;
+    background:linear-gradient(90deg, var(--ink-dim) 0%, var(--ink-dim) var(--volp,70%), rgba(255,255,255,0.12) var(--volp,70%));
+    outline:none;
+    cursor:pointer;
+  }
+
+  .vol::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:11px; height:11px; border-radius:50%;
+    background:var(--ink);
+    cursor:pointer;
+  }
+  .vol::-moz-range-thumb{
+    width:11px; height:11px; border-radius:50%;
+    background:var(--ink); border:none; cursor:pointer;
+  }
+
+  /* ===== Divider / info section ===== */
+  .info{
+    padding:70px 0 60px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:40px;
+    border-top:1px solid var(--line);
+  }
+
+  .info h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:14px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:14px;
+  }
+
+  .info p{
+    font-size:15px;
+    line-height:1.7;
+    color:var(--ink-dim);
+  }
+
+  /* ===== Footer / copyright ===== */
+  footer{
+    border-top:1px solid var(--line);
+    padding:34px 0 50px;
+  }
+
+  .copyright{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    padding:20px 22px;
+    border:1px solid rgba(255,143,177,0.28);
+    border-radius:14px;
+    background:rgba(255,143,177,0.05);
+  }
+
+  .copyright svg{
+    flex:none;
+    width:20px;
+    height:20px;
+    color:var(--accent-2);
+    margin-top:2px;
+  }
+
+  .copyright p{
+    font-size:13px;
+    line-height:1.65;
+    color:var(--ink-dim);
+  }
+
+  .copyright p strong{
+    color:var(--ink);
+  }
+
+  .foot-meta{
+    margin-top:22px;
+    display:flex;
+    justify-content:space-between;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+    opacity:0.6;
+    letter-spacing:0.04em;
+  }
+
+  @media (max-width:640px){
+    .info{ grid-template-columns:1fr; padding:50px 0; }
+    .viz-row{ gap:14px; }
+    canvas#viz{ height:48px; }
+    .player{ padding:20px; }
+    .foot-meta{ flex-direction:column; gap:6px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-delay:0s !important; transition-duration:0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="weekstrip" aria-hidden="true">
+      <span>H</span><span>K</span><span>SZE</span><span>CS</span><span>P</span><span>SZO</span><span>V</span>
+      <span class="active">JÖVŐ&nbsp;HÉT</span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Új dal &middot; most hallgatható</div>
+    <h1>Jövő<br><em>héten</em></h1>
+    <p class="byline">Készítette: <strong>Farkas Gergő</strong> &middot; Remastered</p>
+
+    <div class="player" id="player">
+      <div class="viz-row">
+        <button class="play-btn" id="playBtn" aria-label="Lejátszás">
+          <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+        </button>
+        <canvas id="viz" width="800" height="64"></canvas>
+      </div>
+
+      <div class="time-row">
+        <span id="curTime">0:00</span>
+        <input type="range" class="seek" id="seek" min="0" max="100" value="0" step="0.1">
+        <span id="durTime">0:00</span>
+      </div>
+
+      <div class="meta-row">
+        <span class="label">Jövő héten — Farkas Gergő</span>
+        <div class="vol-row">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 10v4h4l5 5V5L7 10H3zm13.5 2a4.5 4.5 0 00-2.5-4.03v8.06A4.5 4.5 0 0016.5 12z"/></svg>
+          <input type="range" class="vol" id="vol" min="0" max="1" value="0.75" step="0.01">
+        </div>
+      </div>
+    </div>
+
+    <audio id="audio" src="jovo-heten.mp3" preload="metadata"></audio>
+  </section>
+
+  <section class="info">
+    <div>
+      <h2>Miről szól</h2>
+      <p>Egy dal a várakozásról — arról a bizonytalan pillanatról, amikor minden csak &bdquo;jövő héten&rdquo; történik meg. Farkas Gergő szerzeménye, most remasterelt hangzással.</p>
+    </div>
+    <div>
+      <h2>Hallgasd meg</h2>
+      <p>Ez az oldal kizárólag a barátaimnak készült, hogy meghallgathassák a dalt. Kérlek, ne oszd meg nyilvánosan a linket vagy a fájlt.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="copyright">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9.5"/><path d="M14.5 9.3a3 3 0 100 5.4"/></svg>
+      <p><strong>Szerzői jogvédelem alatt álló tartalom.</strong> Ez a felvétel (&bdquo;Jövő héten&rdquo;, szerző: Farkas Gergő) szerzői jogi védelem alatt áll. A dal engedély nélküli másolása, terjesztése vagy nyilvános megosztása jogsértésnek minősül, és jogi következményeket vonhat maga után. Az oldal kizárólag magáncélú meghallgatásra készült.</p>
+    </div>
+    <div class="foot-meta">
+      <span>© Farkas Gergő</span>
+      <span>Jövő héten — Remastered</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const audio = document.getElementById('audio');
+  const playBtn = document.getElementById('playBtn');
+  const player = document.getElementById('player');
+  const seek = document.getElementById('seek');
+  const vol = document.getElementById('vol');
+  const curTime = document.getElementById('curTime');
+  const durTime = document.getElementById('durTime');
+  const canvas = document.getElementById('viz');
+  const ctx = canvas.getContext('2d');
+
+  let audioCtx, analyser, source, dataArray, bufferLength;
+  let rafId;
+
+  function fmt(t){
+    if(!isFinite(t)) return '0:00';
+    const m = Math.floor(t/60);
+    const s = Math.floor(t%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  function setupAudioGraph(){
+    if(audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 128;
+    bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+
+  function resizeCanvas(){
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function drawIdle(){
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0,0,rect.width,rect.height);
+    const bars = 48;
+    const gap = 3;
+    const bw = rect.width/bars - gap;
+    ctx.fillStyle = 'rgba(242,238,252,0.14)';
+    for(let i=0;i<bars;i++){
+      const h = 3;
+      const x = i*(bw+gap);
+      const y = rect.height/2 - h/2;
+      ctx.fillRect(x,y,bw,h);
+    }
+  }
+
+  function draw(){
+    rafId = requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(dataArray);
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0,0,rect.width,rect.height);
+
+    const bars = 48;
+    const gap = 3;
+    const bw = rect.width/bars - gap;
+    const step = Math.floor(bufferLength/bars);
+
+    const grad = ctx.createLinearGradient(0,0,rect.width,0);
+    grad.addColorStop(0, '#c9a8ff');
+    grad.addColorStop(1, '#ff8fb1');
+    ctx.fillStyle = grad;
+
+    for(let i=0;i<bars;i++){
+      let v = dataArray[i*step] || 0;
+      let h = Math.max(3, (v/255) * rect.height);
+      const x = i*(bw+gap);
+      const y = (rect.height - h)/2;
+      ctx.beginPath();
+      const r = Math.min(3, bw/2);
+      roundRect(ctx, x, y, bw, h, r);
+      ctx.fill();
+    }
+  }
+
+  function roundRect(c,x,y,w,h,r){
+    c.moveTo(x+r,y);
+    c.arcTo(x+w,y,x+w,y+h,r);
+    c.arcTo(x+w,y+h,x,y+h,r);
+    c.arcTo(x,y+h,x,y,r);
+    c.arcTo(x,y,x+w,y,r);
+    c.closePath();
+  }
+
+  drawIdle();
+
+  playBtn.addEventListener('click', async function(){
+    setupAudioGraph();
+    if(audioCtx.state === 'suspended') await audioCtx.resume();
+
+    if(audio.paused){
+      await audio.play();
+      player.classList.add('is-playing');
+      draw();
+    } else {
+      audio.pause();
+      player.classList.remove('is-playing');
+      cancelAnimationFrame(rafId);
+      drawIdle();
+    }
+  });
+
+  audio.addEventListener('ended', function(){
+    player.classList.remove('is-playing');
+    cancelAnimationFrame(rafId);
+    drawIdle();
+    seek.value = 0;
+    seek.style.setProperty('--progress','0%');
+  });
+
+  audio.addEventListener('loadedmetadata', function(){
+    durTime.textContent = fmt(audio.duration);
+    seek.max = audio.duration;
+  });
+
+  audio.addEventListener('timeupdate', function(){
+    curTime.textContent = fmt(audio.currentTime);
+    if(!seek.dragging){
+      seek.value = audio.currentTime;
+      const pct = (audio.currentTime/(audio.duration||1))*100;
+      seek.style.setProperty('--progress', pct+'%');
+    }
+  });
+
+  seek.addEventListener('input', function(){
+    audio.currentTime = seek.value;
+    const pct = (seek.value/(audio.duration||1))*100;
+    seek.style.setProperty('--progress', pct+'%');
+  });
+
+  vol.addEventListener('input', function(){
+    audio.volume = vol.value;
+    vol.style.setProperty('--volp', (vol.value*100)+'%');
+  });
+  audio.volume = vol.value;
+
+})();
+</script>
+
+</body>
+</html>
