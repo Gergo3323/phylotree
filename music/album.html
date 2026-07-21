@@ -6,387 +6,469 @@
 <title>Farkas Gergő — Album</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-0:#0c0a16;
-    --bg-1:#141024;
-    --ink:#f2eefc;
-    --ink-dim:#a79fc4;
-    --ink-faint:#6f6790;
-    --accent:#c9a8ff;
-    --accent-2:#ff8fb1;
-    --line: rgba(242,238,252,0.09);
-    --line-strong: rgba(242,238,252,0.16);
-    --player-h: 96px;
+    --bg-0:#0a0806;
+    --bg-1:#141009;
+    --cream:#f4ead9;
+    --cream-dim:#b5a893;
+    --cream-faint:#7a6f5e;
+    --amber:#ffb454;
+    --amber-dim:#a67b3f;
+    --coral:#ff7a5c;
+    --vinyl-0:#1c1712;
+    --vinyl-1:#0e0b08;
+    --line: rgba(244,234,217,0.09);
+    --line-strong: rgba(244,234,217,0.17);
+    --player-h: 88px;
+    --bass:0;
   }
 
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
 
   body{
-    background:
-      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(201,168,255,0.13), transparent 60%),
-      radial-gradient(ellipse 700px 600px at 100% 10%, rgba(255,143,177,0.09), transparent 55%),
-      var(--bg-0);
-    color:var(--ink);
+    background:var(--bg-0);
+    color:var(--cream);
     font-family:'Inter', sans-serif;
     min-height:100vh;
-    padding-bottom:calc(var(--player-h) + 24px);
+    padding-bottom:calc(var(--player-h) + 20px);
     position:relative;
+    overflow-x:hidden;
   }
 
-  body::before{
-    content:"";
+  .glow{
     position:fixed;
-    inset:0;
-    background-image:
-      repeating-linear-gradient(115deg, rgba(255,255,255,0.014) 0px, rgba(255,255,255,0.014) 1px, transparent 1px, transparent 3px);
+    top:-20%;
+    left:50%;
+    width:900px;
+    height:900px;
+    transform:translateX(-50%) scale(calc(1 + var(--bass) * 0.18));
+    background:radial-gradient(circle, rgba(255,180,84,0.16), rgba(255,122,92,0.07) 45%, transparent 70%);
+    filter:blur(10px);
+    opacity:calc(0.55 + var(--bass) * 0.45);
     pointer-events:none;
     z-index:0;
+    transition:transform 0.08s linear, opacity 0.08s linear;
+  }
+
+  .grain{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode:overlay;
   }
 
   .wrap{
-    max-width:760px;
+    max-width:640px;
     margin:0 auto;
-    padding:0 24px;
+    padding:0 22px;
     position:relative;
-    z-index:1;
+    z-index:2;
   }
 
-  /* ===== Hero ===== */
-  .hero{
-    padding:64px 0 40px;
+  .eyebrow-row{
     display:flex;
     align-items:center;
-    gap:24px;
-  }
-
-  .cover{
-    flex:none;
-    width:112px;
-    height:112px;
-    border-radius:20px;
-    position:relative;
-    background:
-      radial-gradient(circle at 30% 25%, rgba(201,168,255,0.55), transparent 55%),
-      radial-gradient(circle at 75% 75%, rgba(255,143,177,0.45), transparent 55%),
-      linear-gradient(150deg, #241c3f, #150f26);
-    border:1px solid var(--line-strong);
-    overflow:hidden;
-    opacity:0;
-    animation: fadeUp 0.8s ease forwards;
-    animation-delay:0.05s;
-  }
-
-  .cover::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 8px);
-  }
-
-  .cover .bars{
-    position:absolute;
-    left:0; right:0; bottom:0;
-    height:40%;
-    display:flex;
-    align-items:flex-end;
-    gap:4px;
-    padding:0 14px 12px;
-  }
-  .cover .bars i{
-    flex:1;
-    background:rgba(242,238,252,0.85);
-    border-radius:2px;
-    animation: coverbar 1.6s ease-in-out infinite;
-  }
-  .cover .bars i:nth-child(1){ height:35%; animation-delay:0s; }
-  .cover .bars i:nth-child(2){ height:70%; animation-delay:0.15s; }
-  .cover .bars i:nth-child(3){ height:45%; animation-delay:0.3s; }
-  .cover .bars i:nth-child(4){ height:85%; animation-delay:0.45s; }
-  .cover .bars i:nth-child(5){ height:55%; animation-delay:0.6s; }
-
-  @keyframes coverbar{
-    0%,100%{ transform:scaleY(0.5); }
-    50%{ transform:scaleY(1); }
-  }
-
-  .hero-text{
-    opacity:0;
-    animation: fadeUp 0.9s ease forwards;
-    animation-delay:0.15s;
-  }
-
-  .eyebrow{
+    justify-content:center;
+    gap:9px;
+    padding:36px 0 0;
     font-family:'JetBrains Mono', monospace;
     font-size:11px;
-    letter-spacing:0.16em;
+    letter-spacing:0.2em;
     text-transform:uppercase;
-    color:var(--accent-2);
-    margin-bottom:8px;
+    color:var(--amber-dim);
+    opacity:0;
+    animation:fadeIn 1s ease forwards;
+    animation-delay:0.1s;
+  }
+  .eyebrow-row .dot{ color:var(--cream-faint); }
+
+  @keyframes fadeIn{ to{ opacity:1; } }
+
+  .turntable-section{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:30px 0 8px;
   }
 
-  h1{
-    font-family:'Space Grotesk', sans-serif;
+  .turntable{
+    position:relative;
+    width:clamp(210px, 56vw, 300px);
+    aspect-ratio:1;
+    opacity:0;
+    animation:dropIn 0.9s cubic-bezier(.22,1,.36,1) forwards;
+    animation-delay:0.25s;
+  }
+
+  @keyframes dropIn{
+    from{ opacity:0; transform:translateY(-26px) scale(0.92); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+
+  .plinth{
+    position:absolute;
+    inset:-14%;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #2a2119, #0c0906 72%);
+    box-shadow:
+      0 30px 60px -20px rgba(0,0,0,0.7),
+      inset 0 0 0 1px var(--line);
+  }
+
+  canvas.ring-viz{
+    position:absolute;
+    inset:-32%;
+    width:164%;
+    height:164%;
+    pointer-events:none;
+  }
+
+  .platter{
+    position:absolute;
+    inset:6%;
+    border-radius:50%;
+    background:
+      repeating-radial-gradient(circle at center,
+        var(--vinyl-0) 0px, var(--vinyl-0) 2px,
+        var(--vinyl-1) 2px, var(--vinyl-1) 4px);
+    box-shadow:
+      inset 0 0 0 1px rgba(244,234,217,0.06),
+      inset 0 8px 20px rgba(0,0,0,0.5);
+    animation:spin 2.6s linear infinite;
+    animation-play-state:paused;
+  }
+  .platter.spinning{ animation-play-state:running; }
+
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .label{
+    position:absolute;
+    inset:32%;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 35% 30%, #ffcf8c, #ffb454 45%, #d9853f 100%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    box-shadow:0 0 0 1px rgba(0,0,0,0.25), inset 0 2px 6px rgba(255,255,255,0.35), inset 0 -6px 10px rgba(0,0,0,0.2);
+  }
+  .label::after{
+    content:"";
+    position:absolute;
+    width:14%;
+    height:14%;
+    border-radius:50%;
+    background:var(--bg-0);
+    box-shadow:inset 0 1px 2px rgba(0,0,0,0.6);
+  }
+  .label-artist{
+    font-family:'Fraunces', serif;
     font-weight:700;
-    font-size:clamp(28px, 6vw, 40px);
+    font-size:clamp(9px, 2.1vw, 11px);
+    letter-spacing:0.03em;
+    color:#3a2410;
+    line-height:1.15;
+  }
+  .label-track{
+    margin-top:4px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:clamp(7px, 1.6vw, 8.5px);
+    letter-spacing:0.05em;
+    color:#5c3c1c;
+    max-width:80%;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .tonearm{
+    position:absolute;
+    top:-6%;
+    right:-8%;
+    width:52%;
+    height:52%;
+    transform-origin:88% 12%;
+    transform:rotate(-24deg);
+    transition:transform 0.7s cubic-bezier(.34,1.2,.4,1);
+    z-index:3;
+  }
+  .tonearm.dropped{ transform:rotate(4deg); }
+
+  .tonearm .pivot{
+    position:absolute;
+    top:6%;
+    right:6%;
+    width:16%;
+    height:16%;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #4a4038, #1a1512);
+    box-shadow:0 2px 6px rgba(0,0,0,0.5);
+  }
+  .tonearm .arm{
+    position:absolute;
+    top:12%;
+    right:12%;
+    width:4%;
+    height:78%;
+    background:linear-gradient(90deg, #3a332c, #55493c 50%, #3a332c);
+    border-radius:3px;
+    transform-origin:top center;
+    box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+  .tonearm .headshell{
+    position:absolute;
+    top:86%;
+    right:6.5%;
+    width:13%;
+    height:8%;
+    background:linear-gradient(120deg, #2a241e, #4a3f34);
+    border-radius:2px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.5);
+  }
+
+  .now-playing{
+    margin-top:26px;
+    text-align:center;
+    min-height:52px;
+    opacity:0;
+    animation:fadeIn 0.8s ease forwards;
+    animation-delay:0.5s;
+  }
+  .np-title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(20px, 4.6vw, 27px);
     letter-spacing:-0.01em;
-    line-height:1.05;
+    transition:opacity 0.25s ease;
+  }
+  .np-sub{
+    margin-top:4px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--amber-dim);
   }
 
-  .hero-sub{
-    margin-top:6px;
-    font-size:14px;
-    color:var(--ink-dim);
-  }
-
-  @keyframes fadeUp{
-    from{opacity:0; transform:translateY(14px);}
-    to{opacity:1; transform:translateY(0);}
-  }
-
-  /* ===== Track list ===== */
   .tracklist{
+    margin-top:40px;
     border-top:1px solid var(--line);
   }
 
   .track{
-    display:grid;
-    grid-template-columns:34px 1fr auto;
+    display:flex;
     align-items:center;
-    gap:16px;
-    padding:16px 6px;
+    gap:12px;
+    padding:15px 4px;
     border-bottom:1px solid var(--line);
     cursor:pointer;
     position:relative;
     opacity:0;
-    animation: fadeUp 0.6s ease forwards;
-    transition: background 0.2s ease;
-    border-radius:10px;
+    animation:slideIn 0.6s ease forwards;
+    transition:background 0.25s ease;
   }
-  .track:hover{ background:rgba(255,255,255,0.03); }
-  .track:nth-child(1){ animation-delay:0.25s; }
-  .track:nth-child(2){ animation-delay:0.33s; }
-  .track:nth-child(3){ animation-delay:0.41s; }
-  .track:nth-child(4){ animation-delay:0.49s; }
+  .track:hover{ background:rgba(255,180,84,0.035); }
+  .track:nth-child(1){ animation-delay:0.55s; }
+  .track:nth-child(2){ animation-delay:0.65s; }
+  .track:nth-child(3){ animation-delay:0.75s; }
+  .track:nth-child(4){ animation-delay:0.85s; }
 
-  .track .num{
+  @keyframes slideIn{
+    from{ opacity:0; transform:translateX(-10px); }
+    to{ opacity:1; transform:translateX(0); }
+  }
+
+  .side{
+    flex:none;
+    width:22px;
     font-family:'JetBrains Mono', monospace;
-    font-size:13px;
-    color:var(--ink-faint);
-    text-align:center;
-    position:relative;
-    height:20px;
+    font-size:10.5px;
+    letter-spacing:0.03em;
+    color:var(--cream-faint);
   }
 
-  .track .num .n{ transition:opacity 0.15s ease; }
-  .track .num .play-ico,
-  .track .num .eq{
-    display:none;
+  .ind{
+    flex:none;
+    width:26px;
+    height:20px;
+    position:relative;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--cream-faint);
+  }
+  .ind .n, .ind .play-ico, .ind .eq{
     position:absolute;
     inset:0;
-    align-items:center;
-    justify-content:center;
-  }
-  .track:hover .num .n{ opacity:0; }
-  .track:hover .num .play-ico{ display:flex; }
-  .track .num .play-ico svg{ width:14px; height:14px; color:var(--ink); }
-
-  .track.playing .num .n{ opacity:0; }
-  .track.playing .num .play-ico{ display:none !important; }
-  .track.playing:hover .num .play-ico{ display:none !important; }
-  .track.playing .num .eq{
     display:flex;
-    gap:2.5px;
+    align-items:center;
   }
-  .track.playing .num .eq i{
+  .ind .play-ico, .ind .eq{ display:none; }
+  .ind .play-ico svg{ width:13px; height:13px; color:var(--cream); }
+  .track:hover .ind .n{ opacity:0; }
+  .track:hover .ind .play-ico{ display:flex; }
+
+  .track.playing .ind .n{ opacity:0; }
+  .track.playing .ind .play-ico{ display:none !important; }
+  .track.playing .ind .eq{ display:flex; gap:2.5px; align-items:flex-end; height:14px; }
+  .track.playing .ind .eq i{
     width:2.5px;
-    background:var(--accent);
+    background:var(--amber);
     border-radius:1px;
-    animation: eqbar 1s ease-in-out infinite;
+    animation:eqbar 0.9s ease-in-out infinite;
   }
-  .track.playing .num .eq i:nth-child(1){ height:6px; animation-delay:0s; }
-  .track.playing .num .eq i:nth-child(2){ height:12px; animation-delay:0.2s; }
-  .track.playing .num .eq i:nth-child(3){ height:8px; animation-delay:0.4s; }
-  @keyframes eqbar{
-    0%,100%{ transform:scaleY(0.4); }
-    50%{ transform:scaleY(1); }
-  }
-  .track.playing:not(.paused) .num .eq i{ animation-play-state:running; }
-  .track.playing.paused .num .eq i{ animation-play-state:paused; }
+  .track.playing .ind .eq i:nth-child(1){ height:5px; animation-delay:0s; }
+  .track.playing .ind .eq i:nth-child(2){ height:13px; animation-delay:0.2s; }
+  .track.playing .ind .eq i:nth-child(3){ height:8px; animation-delay:0.4s; }
+  @keyframes eqbar{ 0%,100%{ transform:scaleY(0.35);} 50%{ transform:scaleY(1);} }
+  .track.playing.paused .ind .eq i{ animation-play-state:paused; }
 
-  .track-info{ min-width:0; }
   .track-title{
-    font-family:'Space Grotesk', sans-serif;
+    font-family:'Fraunces', serif;
+    font-weight:500;
     font-size:16px;
-    font-weight:600;
-    letter-spacing:-0.005em;
+    letter-spacing:-0.003em;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-    transition:color 0.2s ease;
+    max-width:56%;
+    transition:color 0.25s ease;
   }
-  .track.playing .track-title{ color:var(--accent); }
+  .track.playing .track-title{ color:var(--amber); }
 
-  .track-artist{
-    margin-top:2px;
-    font-size:13px;
-    color:var(--ink-dim);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+  .fill{
+    flex:1;
+    height:0;
+    border-bottom:2px dotted rgba(181,168,147,0.3);
+    transform:translateY(-3px);
+    min-width:16px;
   }
 
   .track-dur{
+    flex:none;
     font-family:'JetBrains Mono', monospace;
-    font-size:12px;
-    color:var(--ink-faint);
-    flex:none;
+    font-size:11.5px;
+    color:var(--cream-faint);
   }
 
-  /* ===== Sticky player ===== */
-  .playerbar{
-    position:fixed;
-    left:0; right:0; bottom:0;
-    height:var(--player-h);
-    padding: 10px 18px calc(10px + env(safe-area-inset-bottom));
-    background:rgba(15,12,26,0.75);
-    backdrop-filter:blur(18px) saturate(1.3);
-    border-top:1px solid var(--line-strong);
-    display:flex;
-    align-items:center;
-    gap:16px;
-    z-index:10;
-    transform:translateY(0);
-    transition:transform 0.4s cubic-bezier(.2,.8,.2,1);
-  }
-  .playerbar.hidden{ transform:translateY(100%); }
-
-  .pb-info{
-    flex:1;
-    min-width:0;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-  }
-  .pb-title{
-    font-family:'Space Grotesk', sans-serif;
-    font-weight:600;
-    font-size:14px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  .pb-artist{
-    font-size:12px;
-    color:var(--ink-dim);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+  @media (max-width:420px){
+    .track-title{ max-width:48%; }
+    .fill{ display:none; }
+    .track-dur{ margin-left:auto; }
   }
 
-  .pb-viz{
-    flex:none;
-    width:120px;
-    height:36px;
-    display:none;
-  }
-  @media (min-width:560px){ .pb-viz{ display:block; } }
-
-  .pb-controls{
-    flex:none;
-    display:flex;
-    align-items:center;
-    gap:10px;
-  }
-
-  .pb-btn{
-    background:none;
-    border:none;
-    color:var(--ink-dim);
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:6px;
-    transition:color 0.2s ease, transform 0.2s ease;
-  }
-  .pb-btn:hover{ color:var(--ink); }
-  .pb-btn svg{ width:18px; height:18px; }
-
-  .pb-play{
-    width:42px; height:42px;
-    border-radius:50%;
-    background:radial-gradient(circle at 30% 30%, rgba(201,168,255,0.3), rgba(201,168,255,0.08));
-    border:1px solid var(--line-strong);
-    color:var(--ink);
-  }
-  .pb-play:hover{ transform:scale(1.06); border-color:var(--accent); }
-  .pb-play svg{ width:18px; height:18px; }
-  .pb-play .ic-pause{ display:none; }
-  .playerbar.playing .pb-play .ic-play{ display:none; }
-  .playerbar.playing .pb-play .ic-pause{ display:block; }
-
-  .pb-progress-wrap{
-    position:absolute;
-    top:-1px; left:0; right:0;
-    height:3px;
-  }
-  .pb-progress{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg, var(--accent), var(--accent-2));
-  }
-  .pb-seek{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    opacity:0;
-    cursor:pointer;
-  }
-
-  @media (max-width:520px){
-    .pb-artist{ display:none; }
-    .pb-controls{ gap:4px; }
-    .playerbar{ gap:10px; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); }
-  }
-
-  /* ===== Footer ===== */
   footer{
-    margin-top:46px;
-    border-top:1px solid var(--line);
-    padding-top:26px;
+    margin-top:44px;
+    padding-top:24px;
   }
 
   .copyright{
     display:flex;
-    gap:12px;
+    gap:11px;
     align-items:flex-start;
-    padding:18px 20px;
-    border:1px solid rgba(255,143,177,0.26);
-    border-radius:14px;
-    background:rgba(255,143,177,0.045);
+    padding:16px 18px;
+    border:1px solid rgba(255,122,92,0.25);
+    border-radius:12px;
+    background:rgba(255,122,92,0.04);
   }
-  .copyright svg{
-    flex:none; width:18px; height:18px;
-    color:var(--accent-2);
-    margin-top:2px;
-  }
-  .copyright p{
-    font-size:12.5px;
-    line-height:1.6;
-    color:var(--ink-dim);
-  }
-  .copyright p strong{ color:var(--ink); }
+  .copyright svg{ flex:none; width:17px; height:17px; color:var(--coral); margin-top:2px; }
+  .copyright p{ font-size:12px; line-height:1.6; color:var(--cream-dim); }
+  .copyright p strong{ color:var(--cream); }
 
   .foot-meta{
-    margin-top:18px;
+    margin-top:16px;
     font-family:'JetBrains Mono', monospace;
-    font-size:11px;
-    color:var(--ink-faint);
+    font-size:10.5px;
+    color:var(--cream-faint);
+    letter-spacing:0.05em;
+  }
+
+  .playerbar{
+    position:fixed;
+    left:0; right:0; bottom:0;
+    height:var(--player-h);
+    padding:9px 16px calc(9px + env(safe-area-inset-bottom));
+    background:rgba(10,8,6,0.8);
+    backdrop-filter:blur(16px) saturate(1.2);
+    border-top:1px solid var(--line-strong);
+    display:flex;
+    align-items:center;
+    gap:14px;
+    z-index:10;
+    transform:translateY(0);
+    transition:transform 0.45s cubic-bezier(.2,.8,.2,1);
+  }
+  .playerbar.hidden{ transform:translateY(100%); }
+
+  .pb-progress-wrap{ position:absolute; top:-1px; left:0; right:0; height:2.5px; }
+  .pb-progress{ height:100%; width:0%; background:linear-gradient(90deg, var(--amber), var(--coral)); }
+  .pb-seek{ position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+
+  .pb-lcd{
+    flex:none;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:6px 10px;
+    border-radius:8px;
+    background:rgba(255,180,84,0.06);
+    border:1px solid rgba(255,180,84,0.16);
+    min-width:0;
+  }
+  .pb-title{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:500;
+    font-size:12px;
+    color:var(--amber);
+    text-shadow:0 0 8px rgba(255,180,84,0.35);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:36vw;
+  }
+  .pb-time{
+    margin-top:2px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    color:var(--cream-faint);
     letter-spacing:0.04em;
+  }
+
+  .pb-viz{ flex:1; height:34px; display:none; min-width:0; }
+  @media (min-width:560px){ .pb-viz{ display:block; } }
+
+  .pb-controls{ flex:none; display:flex; align-items:center; gap:8px; }
+  .pb-btn{
+    background:none; border:none; color:var(--cream-dim); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; padding:6px;
+    transition:color 0.2s ease;
+  }
+  .pb-btn:hover{ color:var(--cream); }
+  .pb-btn svg{ width:17px; height:17px; }
+
+  .pb-play{
+    width:40px; height:40px; border-radius:50%;
+    background:radial-gradient(circle at 32% 30%, rgba(255,180,84,0.28), rgba(255,180,84,0.06));
+    border:1px solid rgba(255,180,84,0.3);
+    color:var(--cream);
+  }
+  .pb-play:hover{ border-color:var(--amber); }
+  .pb-play svg{ width:16px; height:16px; }
+  .pb-play .ic-pause{ display:none; }
+  .playerbar.playing .pb-play .ic-play{ display:none; }
+  .playerbar.playing .pb-play .ic-pause{ display:block; }
+
+  @media (max-width:520px){
+    .pb-lcd{ max-width:38vw; }
+    .pb-title{ max-width:32vw; }
+    .pb-time{ display:none; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -396,22 +478,38 @@
 </head>
 <body>
 
+<div class="glow" id="glow"></div>
+<div class="grain"></div>
+
 <div class="wrap">
 
-  <div class="hero">
-    <div class="cover">
-      <div class="bars"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="eyebrow-row">
+    <span>Album</span><span class="dot">·</span><span>Farkas Gergő</span>
+  </div>
+
+  <div class="turntable-section">
+    <div class="turntable" id="turntable">
+      <div class="plinth"></div>
+      <canvas class="ring-viz" id="ringViz"></canvas>
+      <div class="platter" id="platter">
+        <div class="label">
+          <div class="label-artist">FARKAS<br>GERGŐ</div>
+          <div class="label-track" id="labelTrack">—</div>
+        </div>
+      </div>
+      <div class="tonearm" id="tonearm">
+        <div class="pivot"></div>
+        <div class="arm"></div>
+        <div class="headshell"></div>
+      </div>
     </div>
-    <div class="hero-text">
-      <div class="eyebrow">Album &middot; 4 szám</div>
-      <h1>Farkas Gergő</h1>
-      <p class="hero-sub">Kattints egy számra a lejátszáshoz</p>
+    <div class="now-playing">
+      <div class="np-title" id="npTitle">Válassz egy számot</div>
+      <div class="np-sub">Farkas Gergő</div>
     </div>
   </div>
 
-  <div class="tracklist" id="tracklist">
-    <!-- tracks injected by JS -->
-  </div>
+  <div class="tracklist" id="tracklist"></div>
 
   <footer>
     <div class="copyright">
@@ -429,12 +527,12 @@
     <input type="range" class="pb-seek" id="pbSeek" min="0" max="100" value="0" step="0.1">
   </div>
 
-  <canvas class="pb-viz" id="pbViz" width="240" height="72"></canvas>
-
-  <div class="pb-info">
+  <div class="pb-lcd">
     <div class="pb-title" id="pbTitle">—</div>
-    <div class="pb-artist" id="pbArtist">—</div>
+    <div class="pb-time" id="pbTime">0:00 / 0:00</div>
   </div>
+
+  <canvas class="pb-viz" id="pbViz"></canvas>
 
   <div class="pb-controls">
     <button class="pb-btn" id="pbPrev" aria-label="Előző szám">
@@ -456,10 +554,10 @@
 (function(){
   const ARTIST = "Farkas Gergő";
   const TRACKS = [
-    { title: "Nem mindenki marad", file: "01-nem-mindenki-marad.mp3" },
-    { title: "Itt Leszek Veled", file: "02-itt-leszek-veled.mp3" },
-    { title: "Jövő héten", file: "03-jovo-heten.mp3" },
-    { title: "Elengedi most a jó lány az", file: "04-elengedi-most-a-jo-lany-az.mp3" }
+    { title: "Nem mindenki marad", file: "01-nem-mindenki-marad.mp3", side: "A1" },
+    { title: "Itt Leszek Veled", file: "02-itt-leszek-veled.mp3", side: "A2" },
+    { title: "Jövő héten", file: "03-jovo-heten.mp3", side: "B1" },
+    { title: "Elengedi most a jó lány az", file: "04-elengedi-most-a-jo-lany-az.mp3", side: "B2" }
   ];
 
   const audio = document.getElementById('audio');
@@ -469,11 +567,17 @@
   const pbPrev = document.getElementById('pbPrev');
   const pbNext = document.getElementById('pbNext');
   const pbTitle = document.getElementById('pbTitle');
-  const pbArtist = document.getElementById('pbArtist');
+  const pbTime = document.getElementById('pbTime');
   const pbProgress = document.getElementById('pbProgress');
   const pbSeek = document.getElementById('pbSeek');
   const pbViz = document.getElementById('pbViz');
   const vctx = pbViz.getContext('2d');
+  const ringViz = document.getElementById('ringViz');
+  const rctx = ringViz.getContext('2d');
+  const platter = document.getElementById('platter');
+  const tonearm = document.getElementById('tonearm');
+  const npTitle = document.getElementById('npTitle');
+  const labelTrack = document.getElementById('labelTrack');
 
   let currentIndex = -1;
   let audioCtx, analyser, source, dataArray, bufferLength;
@@ -486,33 +590,27 @@
     return `${m}:${s}`;
   }
 
-  // build track list
   TRACKS.forEach((t, i) => {
     const el = document.createElement('div');
     el.className = 'track';
     el.dataset.index = i;
     el.innerHTML = `
-      <div class="num">
+      <div class="side">${t.side}</div>
+      <div class="ind">
         <span class="n">${(i+1).toString().padStart(2,'0')}</span>
         <span class="play-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
         <span class="eq"><i></i><i></i><i></i></span>
       </div>
-      <div class="track-info">
-        <div class="track-title">${t.title}</div>
-        <div class="track-artist">${ARTIST}</div>
-      </div>
+      <div class="track-title">${t.title}</div>
+      <div class="fill"></div>
       <div class="track-dur" id="dur-${i}">—:—</div>
     `;
     el.addEventListener('click', () => {
-      if(currentIndex === i){
-        togglePlay();
-      } else {
-        loadTrack(i, true);
-      }
+      if(currentIndex === i){ togglePlay(); }
+      else{ loadTrack(i, true); }
     });
     tracklistEl.appendChild(el);
 
-    // preload durations
     const probe = new Audio();
     probe.preload = 'metadata';
     probe.src = t.file;
@@ -526,7 +624,7 @@
     if(audioCtx) return;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 64;
+    analyser.fftSize = 128;
     bufferLength = analyser.frequencyBinCount;
     dataArray = new Uint8Array(bufferLength);
     source = audioCtx.createMediaElementSource(audio);
@@ -534,45 +632,23 @@
     analyser.connect(audioCtx.destination);
   }
 
-  function resizeViz(){
+  function resizeCanvases(){
     const dpr = window.devicePixelRatio || 1;
-    const rect = pbViz.getBoundingClientRect();
-    if(rect.width === 0) return;
-    pbViz.width = rect.width * dpr;
-    pbViz.height = rect.height * dpr;
-    vctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  window.addEventListener('resize', resizeViz);
 
-  function drawViz(){
-    rafId = requestAnimationFrame(drawViz);
-    if(!analyser) return;
-    analyser.getByteFrequencyData(dataArray);
-    const rect = pbViz.getBoundingClientRect();
-    if(rect.width === 0) return;
-    vctx.clearRect(0,0,rect.width,rect.height);
-
-    const bars = 24;
-    const gap = 2.5;
-    const bw = rect.width/bars - gap;
-    const step = Math.floor(bufferLength/bars) || 1;
-
-    const grad = vctx.createLinearGradient(0,0,rect.width,0);
-    grad.addColorStop(0, '#c9a8ff');
-    grad.addColorStop(1, '#ff8fb1');
-    vctx.fillStyle = grad;
-
-    for(let i=0;i<bars;i++){
-      let v = dataArray[i*step] || 0;
-      let h = Math.max(2, (v/255) * rect.height);
-      const x = i*(bw+gap);
-      const y = (rect.height - h)/2;
-      vctx.beginPath();
-      const r = Math.min(2, bw/2);
-      roundRect(vctx, x, y, bw, h, r);
-      vctx.fill();
+    const rr = ringViz.getBoundingClientRect();
+    if(rr.width > 0){
+      ringViz.width = rr.width * dpr;
+      ringViz.height = rr.height * dpr;
+      rctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    const pr = pbViz.getBoundingClientRect();
+    if(pr.width > 0){
+      pbViz.width = pr.width * dpr;
+      pbViz.height = pr.height * dpr;
+      vctx.setTransform(dpr,0,0,dpr,0,0);
     }
   }
+  window.addEventListener('resize', resizeCanvases);
 
   function roundRect(c,x,y,w,h,r){
     c.moveTo(x+r,y);
@@ -582,6 +658,93 @@
     c.arcTo(x,y,x+w,y,r);
     c.closePath();
   }
+
+  function drawIdleRing(){
+    const rect = ringViz.getBoundingClientRect();
+    if(rect.width === 0) return;
+    rctx.clearRect(0,0,rect.width,rect.height);
+    const cx = rect.width/2, cy = rect.height/2;
+    const baseR = rect.width * 0.305;
+    const bars = 56;
+    rctx.strokeStyle = 'rgba(244,234,217,0.10)';
+    rctx.lineWidth = 2;
+    rctx.lineCap = 'round';
+    for(let i=0;i<bars;i++){
+      const angle = (i/bars)*Math.PI*2 - Math.PI/2;
+      const x1 = cx + Math.cos(angle)*baseR;
+      const y1 = cy + Math.sin(angle)*baseR;
+      const x2 = cx + Math.cos(angle)*(baseR+3);
+      const y2 = cy + Math.sin(angle)*(baseR+3);
+      rctx.beginPath();
+      rctx.moveTo(x1,y1);
+      rctx.lineTo(x2,y2);
+      rctx.stroke();
+    }
+  }
+
+  function drawLoop(){
+    rafId = requestAnimationFrame(drawLoop);
+    if(!analyser) return;
+    analyser.getByteFrequencyData(dataArray);
+
+    const rect = ringViz.getBoundingClientRect();
+    if(rect.width > 0){
+      rctx.clearRect(0,0,rect.width,rect.height);
+      const cx = rect.width/2, cy = rect.height/2;
+      const baseR = rect.width * 0.305;
+      const bars = 56;
+      const step = Math.floor(bufferLength/bars) || 1;
+      for(let i=0;i<bars;i++){
+        const v = dataArray[i*step] || 0;
+        const len = 2 + (v/255) * (rect.width * 0.12);
+        const angle = (i/bars)*Math.PI*2 - Math.PI/2;
+        const x1 = cx + Math.cos(angle)*baseR;
+        const y1 = cy + Math.sin(angle)*baseR;
+        const x2 = cx + Math.cos(angle)*(baseR+len);
+        const y2 = cy + Math.sin(angle)*(baseR+len);
+        const t = i/bars;
+        rctx.strokeStyle = t < 0.5 ? '#ffb454' : '#ff7a5c';
+        rctx.lineWidth = 2.2;
+        rctx.lineCap = 'round';
+        rctx.beginPath();
+        rctx.moveTo(x1,y1);
+        rctx.lineTo(x2,y2);
+        rctx.stroke();
+      }
+    }
+
+    const pr = pbViz.getBoundingClientRect();
+    if(pr.width > 0){
+      vctx.clearRect(0,0,pr.width,pr.height);
+      const bars2 = 28;
+      const gap = 2.5;
+      const bw = pr.width/bars2 - gap;
+      const step2 = Math.floor(bufferLength/bars2) || 1;
+      const grad = vctx.createLinearGradient(0,0,pr.width,0);
+      grad.addColorStop(0, '#ffb454');
+      grad.addColorStop(1, '#ff7a5c');
+      vctx.fillStyle = grad;
+      for(let i=0;i<bars2;i++){
+        const v = dataArray[i*step2] || 0;
+        const h = Math.max(2, (v/255) * pr.height);
+        const x = i*(bw+gap);
+        const y = (pr.height - h)/2;
+        vctx.beginPath();
+        roundRect(vctx, x, y, bw, h, Math.min(2, bw/2));
+        vctx.fill();
+      }
+    }
+
+    let bassSum = 0;
+    const bassBins = 6;
+    for(let i=0;i<bassBins;i++) bassSum += dataArray[i] || 0;
+    const bass = (bassSum/(bassBins*255));
+    document.documentElement.style.setProperty('--bass', bass.toFixed(3));
+  }
+
+  drawIdleRing();
+  window.addEventListener('load', () => setTimeout(resizeCanvases, 60));
+  setTimeout(resizeCanvases, 200);
 
   function updateTrackStates(){
     document.querySelectorAll('.track').forEach(el => {
@@ -595,8 +758,9 @@
     currentIndex = i;
     const t = TRACKS[i];
     audio.src = t.file;
+    npTitle.textContent = t.title;
+    labelTrack.textContent = t.side + ' · ' + t.title;
     pbTitle.textContent = t.title;
-    pbArtist.textContent = ARTIST;
     playerbar.classList.remove('hidden');
     updateTrackStates();
     if(autoplay){
@@ -604,33 +768,24 @@
       if(audioCtx.state === 'suspended') await audioCtx.resume();
       try{ await audio.play(); }catch(e){}
     }
-    setTimeout(resizeViz, 50);
+    resizeCanvases();
   }
 
   async function togglePlay(){
-    if(currentIndex === -1){
-      loadTrack(0, true);
-      return;
-    }
+    if(currentIndex === -1){ loadTrack(0, true); return; }
     setupAudioGraph();
     if(audioCtx.state === 'suspended') await audioCtx.resume();
-    if(audio.paused){
-      await audio.play();
-    } else {
-      audio.pause();
-    }
+    if(audio.paused){ await audio.play(); } else { audio.pause(); }
   }
 
   function playNext(){
     if(currentIndex === -1) return;
-    const next = (currentIndex + 1) % TRACKS.length;
-    loadTrack(next, true);
+    loadTrack((currentIndex + 1) % TRACKS.length, true);
   }
   function playPrev(){
     if(currentIndex === -1) return;
     if(audio.currentTime > 3){ audio.currentTime = 0; return; }
-    const prev = (currentIndex - 1 + TRACKS.length) % TRACKS.length;
-    loadTrack(prev, true);
+    loadTrack((currentIndex - 1 + TRACKS.length) % TRACKS.length, true);
   }
 
   pbPlay.addEventListener('click', togglePlay);
@@ -639,14 +794,20 @@
 
   audio.addEventListener('play', () => {
     playerbar.classList.add('playing');
+    platter.classList.add('spinning');
+    tonearm.classList.add('dropped');
     updateTrackStates();
     cancelAnimationFrame(rafId);
-    drawViz();
+    drawLoop();
   });
   audio.addEventListener('pause', () => {
     playerbar.classList.remove('playing');
+    platter.classList.remove('spinning');
+    tonearm.classList.remove('dropped');
     updateTrackStates();
     cancelAnimationFrame(rafId);
+    drawIdleRing();
+    document.documentElement.style.setProperty('--bass', '0');
   });
   audio.addEventListener('ended', playNext);
 
@@ -654,12 +815,11 @@
     const pct = (audio.currentTime/(audio.duration||1))*100;
     pbProgress.style.width = pct + '%';
     if(!pbSeek.dragging) pbSeek.value = pct;
+    pbTime.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration);
   });
 
   pbSeek.addEventListener('input', () => {
-    if(audio.duration){
-      audio.currentTime = (pbSeek.value/100) * audio.duration;
-    }
+    if(audio.duration){ audio.currentTime = (pbSeek.value/100) * audio.duration; }
   });
 
   document.addEventListener('keydown', (e) => {
