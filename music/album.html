@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Farkas Gergő — Album</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0c0a16;
+    --bg-1:#141024;
+    --ink:#f2eefc;
+    --ink-dim:#a79fc4;
+    --ink-faint:#6f6790;
+    --accent:#c9a8ff;
+    --accent-2:#ff8fb1;
+    --line: rgba(242,238,252,0.09);
+    --line-strong: rgba(242,238,252,0.16);
+    --player-h: 96px;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(201,168,255,0.13), transparent 60%),
+      radial-gradient(ellipse 700px 600px at 100% 10%, rgba(255,143,177,0.09), transparent 55%),
+      var(--bg-0);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding-bottom:calc(var(--player-h) + 24px);
+    position:relative;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.014) 0px, rgba(255,255,255,0.014) 1px, transparent 1px, transparent 3px);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:0 24px;
+    position:relative;
+    z-index:1;
+  }
+
+  /* ===== Hero ===== */
+  .hero{
+    padding:64px 0 40px;
+    display:flex;
+    align-items:center;
+    gap:24px;
+  }
+
+  .cover{
+    flex:none;
+    width:112px;
+    height:112px;
+    border-radius:20px;
+    position:relative;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(201,168,255,0.55), transparent 55%),
+      radial-gradient(circle at 75% 75%, rgba(255,143,177,0.45), transparent 55%),
+      linear-gradient(150deg, #241c3f, #150f26);
+    border:1px solid var(--line-strong);
+    overflow:hidden;
+    opacity:0;
+    animation: fadeUp 0.8s ease forwards;
+    animation-delay:0.05s;
+  }
+
+  .cover::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 8px);
+  }
+
+  .cover .bars{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:40%;
+    display:flex;
+    align-items:flex-end;
+    gap:4px;
+    padding:0 14px 12px;
+  }
+  .cover .bars i{
+    flex:1;
+    background:rgba(242,238,252,0.85);
+    border-radius:2px;
+    animation: coverbar 1.6s ease-in-out infinite;
+  }
+  .cover .bars i:nth-child(1){ height:35%; animation-delay:0s; }
+  .cover .bars i:nth-child(2){ height:70%; animation-delay:0.15s; }
+  .cover .bars i:nth-child(3){ height:45%; animation-delay:0.3s; }
+  .cover .bars i:nth-child(4){ height:85%; animation-delay:0.45s; }
+  .cover .bars i:nth-child(5){ height:55%; animation-delay:0.6s; }
+
+  @keyframes coverbar{
+    0%,100%{ transform:scaleY(0.5); }
+    50%{ transform:scaleY(1); }
+  }
+
+  .hero-text{
+    opacity:0;
+    animation: fadeUp 0.9s ease forwards;
+    animation-delay:0.15s;
+  }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--accent-2);
+    margin-bottom:8px;
+  }
+
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:clamp(28px, 6vw, 40px);
+    letter-spacing:-0.01em;
+    line-height:1.05;
+  }
+
+  .hero-sub{
+    margin-top:6px;
+    font-size:14px;
+    color:var(--ink-dim);
+  }
+
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(14px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* ===== Track list ===== */
+  .tracklist{
+    border-top:1px solid var(--line);
+  }
+
+  .track{
+    display:grid;
+    grid-template-columns:34px 1fr auto;
+    align-items:center;
+    gap:16px;
+    padding:16px 6px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    position:relative;
+    opacity:0;
+    animation: fadeUp 0.6s ease forwards;
+    transition: background 0.2s ease;
+    border-radius:10px;
+  }
+  .track:hover{ background:rgba(255,255,255,0.03); }
+  .track:nth-child(1){ animation-delay:0.25s; }
+  .track:nth-child(2){ animation-delay:0.33s; }
+  .track:nth-child(3){ animation-delay:0.41s; }
+  .track:nth-child(4){ animation-delay:0.49s; }
+
+  .track .num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    color:var(--ink-faint);
+    text-align:center;
+    position:relative;
+    height:20px;
+  }
+
+  .track .num .n{ transition:opacity 0.15s ease; }
+  .track .num .play-ico,
+  .track .num .eq{
+    display:none;
+    position:absolute;
+    inset:0;
+    align-items:center;
+    justify-content:center;
+  }
+  .track:hover .num .n{ opacity:0; }
+  .track:hover .num .play-ico{ display:flex; }
+  .track .num .play-ico svg{ width:14px; height:14px; color:var(--ink); }
+
+  .track.playing .num .n{ opacity:0; }
+  .track.playing .num .play-ico{ display:none !important; }
+  .track.playing:hover .num .play-ico{ display:none !important; }
+  .track.playing .num .eq{
+    display:flex;
+    gap:2.5px;
+  }
+  .track.playing .num .eq i{
+    width:2.5px;
+    background:var(--accent);
+    border-radius:1px;
+    animation: eqbar 1s ease-in-out infinite;
+  }
+  .track.playing .num .eq i:nth-child(1){ height:6px; animation-delay:0s; }
+  .track.playing .num .eq i:nth-child(2){ height:12px; animation-delay:0.2s; }
+  .track.playing .num .eq i:nth-child(3){ height:8px; animation-delay:0.4s; }
+  @keyframes eqbar{
+    0%,100%{ transform:scaleY(0.4); }
+    50%{ transform:scaleY(1); }
+  }
+  .track.playing:not(.paused) .num .eq i{ animation-play-state:running; }
+  .track.playing.paused .num .eq i{ animation-play-state:paused; }
+
+  .track-info{ min-width:0; }
+  .track-title{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:-0.005em;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    transition:color 0.2s ease;
+  }
+  .track.playing .track-title{ color:var(--accent); }
+
+  .track-artist{
+    margin-top:2px;
+    font-size:13px;
+    color:var(--ink-dim);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .track-dur{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    color:var(--ink-faint);
+    flex:none;
+  }
+
+  /* ===== Sticky player ===== */
+  .playerbar{
+    position:fixed;
+    left:0; right:0; bottom:0;
+    height:var(--player-h);
+    padding: 10px 18px calc(10px + env(safe-area-inset-bottom));
+    background:rgba(15,12,26,0.75);
+    backdrop-filter:blur(18px) saturate(1.3);
+    border-top:1px solid var(--line-strong);
+    display:flex;
+    align-items:center;
+    gap:16px;
+    z-index:10;
+    transform:translateY(0);
+    transition:transform 0.4s cubic-bezier(.2,.8,.2,1);
+  }
+  .playerbar.hidden{ transform:translateY(100%); }
+
+  .pb-info{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .pb-title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .pb-artist{
+    font-size:12px;
+    color:var(--ink-dim);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .pb-viz{
+    flex:none;
+    width:120px;
+    height:36px;
+    display:none;
+  }
+  @media (min-width:560px){ .pb-viz{ display:block; } }
+
+  .pb-controls{
+    flex:none;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .pb-btn{
+    background:none;
+    border:none;
+    color:var(--ink-dim);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:6px;
+    transition:color 0.2s ease, transform 0.2s ease;
+  }
+  .pb-btn:hover{ color:var(--ink); }
+  .pb-btn svg{ width:18px; height:18px; }
+
+  .pb-play{
+    width:42px; height:42px;
+    border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, rgba(201,168,255,0.3), rgba(201,168,255,0.08));
+    border:1px solid var(--line-strong);
+    color:var(--ink);
+  }
+  .pb-play:hover{ transform:scale(1.06); border-color:var(--accent); }
+  .pb-play svg{ width:18px; height:18px; }
+  .pb-play .ic-pause{ display:none; }
+  .playerbar.playing .pb-play .ic-play{ display:none; }
+  .playerbar.playing .pb-play .ic-pause{ display:block; }
+
+  .pb-progress-wrap{
+    position:absolute;
+    top:-1px; left:0; right:0;
+    height:3px;
+  }
+  .pb-progress{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+  }
+  .pb-seek{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    opacity:0;
+    cursor:pointer;
+  }
+
+  @media (max-width:520px){
+    .pb-artist{ display:none; }
+    .pb-controls{ gap:4px; }
+    .playerbar{ gap:10px; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); }
+  }
+
+  /* ===== Footer ===== */
+  footer{
+    margin-top:46px;
+    border-top:1px solid var(--line);
+    padding-top:26px;
+  }
+
+  .copyright{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    padding:18px 20px;
+    border:1px solid rgba(255,143,177,0.26);
+    border-radius:14px;
+    background:rgba(255,143,177,0.045);
+  }
+  .copyright svg{
+    flex:none; width:18px; height:18px;
+    color:var(--accent-2);
+    margin-top:2px;
+  }
+  .copyright p{
+    font-size:12.5px;
+    line-height:1.6;
+    color:var(--ink-dim);
+  }
+  .copyright p strong{ color:var(--ink); }
+
+  .foot-meta{
+    margin-top:18px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--ink-faint);
+    letter-spacing:0.04em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-delay:0s !important; transition-duration:0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="cover">
+      <div class="bars"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="hero-text">
+      <div class="eyebrow">Album &middot; 4 szám</div>
+      <h1>Farkas Gergő</h1>
+      <p class="hero-sub">Kattints egy számra a lejátszáshoz</p>
+    </div>
+  </div>
+
+  <div class="tracklist" id="tracklist">
+    <!-- tracks injected by JS -->
+  </div>
+
+  <footer>
+    <div class="copyright">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9.5"/><path d="M14.5 9.3a3 3 0 100 5.4"/></svg>
+      <p><strong>Szerzői jogvédelem alatt álló tartalom.</strong> A fenti felvételek szerzője Farkas Gergő, és szerzői jogi védelem alatt állnak. Engedély nélküli másolásuk, terjesztésük vagy nyilvános megosztásuk jogsértésnek minősül, és jogi következményeket vonhat maga után. Az oldal kizárólag magáncélú meghallgatásra készült.</p>
+    </div>
+    <div class="foot-meta">© Farkas Gergő</div>
+  </footer>
+
+</div>
+
+<div class="playerbar hidden" id="playerbar">
+  <div class="pb-progress-wrap">
+    <div class="pb-progress" id="pbProgress"></div>
+    <input type="range" class="pb-seek" id="pbSeek" min="0" max="100" value="0" step="0.1">
+  </div>
+
+  <canvas class="pb-viz" id="pbViz" width="240" height="72"></canvas>
+
+  <div class="pb-info">
+    <div class="pb-title" id="pbTitle">—</div>
+    <div class="pb-artist" id="pbArtist">—</div>
+  </div>
+
+  <div class="pb-controls">
+    <button class="pb-btn" id="pbPrev" aria-label="Előző szám">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+    </button>
+    <button class="pb-btn pb-play" id="pbPlay" aria-label="Lejátszás">
+      <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+    </button>
+    <button class="pb-btn" id="pbNext" aria-label="Következő szám">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg>
+    </button>
+  </div>
+</div>
+
+<audio id="audio" preload="metadata"></audio>
+
+<script>
+(function(){
+  const ARTIST = "Farkas Gergő";
+  const TRACKS = [
+    { title: "Nem mindenki marad", file: "01-nem-mindenki-marad.mp3" },
+    { title: "Itt Leszek Veled", file: "02-itt-leszek-veled.mp3" },
+    { title: "Jövő héten", file: "03-jovo-heten.mp3" },
+    { title: "Elengedi most a jó lány az", file: "04-elengedi-most-a-jo-lany-az.mp3" }
+  ];
+
+  const audio = document.getElementById('audio');
+  const tracklistEl = document.getElementById('tracklist');
+  const playerbar = document.getElementById('playerbar');
+  const pbPlay = document.getElementById('pbPlay');
+  const pbPrev = document.getElementById('pbPrev');
+  const pbNext = document.getElementById('pbNext');
+  const pbTitle = document.getElementById('pbTitle');
+  const pbArtist = document.getElementById('pbArtist');
+  const pbProgress = document.getElementById('pbProgress');
+  const pbSeek = document.getElementById('pbSeek');
+  const pbViz = document.getElementById('pbViz');
+  const vctx = pbViz.getContext('2d');
+
+  let currentIndex = -1;
+  let audioCtx, analyser, source, dataArray, bufferLength;
+  let rafId;
+
+  function fmt(t){
+    if(!isFinite(t) || t == null) return '0:00';
+    const m = Math.floor(t/60);
+    const s = Math.floor(t%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  // build track list
+  TRACKS.forEach((t, i) => {
+    const el = document.createElement('div');
+    el.className = 'track';
+    el.dataset.index = i;
+    el.innerHTML = `
+      <div class="num">
+        <span class="n">${(i+1).toString().padStart(2,'0')}</span>
+        <span class="play-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        <span class="eq"><i></i><i></i><i></i></span>
+      </div>
+      <div class="track-info">
+        <div class="track-title">${t.title}</div>
+        <div class="track-artist">${ARTIST}</div>
+      </div>
+      <div class="track-dur" id="dur-${i}">—:—</div>
+    `;
+    el.addEventListener('click', () => {
+      if(currentIndex === i){
+        togglePlay();
+      } else {
+        loadTrack(i, true);
+      }
+    });
+    tracklistEl.appendChild(el);
+
+    // preload durations
+    const probe = new Audio();
+    probe.preload = 'metadata';
+    probe.src = t.file;
+    probe.addEventListener('loadedmetadata', () => {
+      const d = document.getElementById('dur-'+i);
+      if(d) d.textContent = fmt(probe.duration);
+    });
+  });
+
+  function setupAudioGraph(){
+    if(audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 64;
+    bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+
+  function resizeViz(){
+    const dpr = window.devicePixelRatio || 1;
+    const rect = pbViz.getBoundingClientRect();
+    if(rect.width === 0) return;
+    pbViz.width = rect.width * dpr;
+    pbViz.height = rect.height * dpr;
+    vctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', resizeViz);
+
+  function drawViz(){
+    rafId = requestAnimationFrame(drawViz);
+    if(!analyser) return;
+    analyser.getByteFrequencyData(dataArray);
+    const rect = pbViz.getBoundingClientRect();
+    if(rect.width === 0) return;
+    vctx.clearRect(0,0,rect.width,rect.height);
+
+    const bars = 24;
+    const gap = 2.5;
+    const bw = rect.width/bars - gap;
+    const step = Math.floor(bufferLength/bars) || 1;
+
+    const grad = vctx.createLinearGradient(0,0,rect.width,0);
+    grad.addColorStop(0, '#c9a8ff');
+    grad.addColorStop(1, '#ff8fb1');
+    vctx.fillStyle = grad;
+
+    for(let i=0;i<bars;i++){
+      let v = dataArray[i*step] || 0;
+      let h = Math.max(2, (v/255) * rect.height);
+      const x = i*(bw+gap);
+      const y = (rect.height - h)/2;
+      vctx.beginPath();
+      const r = Math.min(2, bw/2);
+      roundRect(vctx, x, y, bw, h, r);
+      vctx.fill();
+    }
+  }
+
+  function roundRect(c,x,y,w,h,r){
+    c.moveTo(x+r,y);
+    c.arcTo(x+w,y,x+w,y+h,r);
+    c.arcTo(x+w,y+h,x,y+h,r);
+    c.arcTo(x,y+h,x,y,r);
+    c.arcTo(x,y,x+w,y,r);
+    c.closePath();
+  }
+
+  function updateTrackStates(){
+    document.querySelectorAll('.track').forEach(el => {
+      const i = parseInt(el.dataset.index, 10);
+      el.classList.toggle('playing', i === currentIndex);
+      el.classList.toggle('paused', i === currentIndex && audio.paused);
+    });
+  }
+
+  async function loadTrack(i, autoplay){
+    currentIndex = i;
+    const t = TRACKS[i];
+    audio.src = t.file;
+    pbTitle.textContent = t.title;
+    pbArtist.textContent = ARTIST;
+    playerbar.classList.remove('hidden');
+    updateTrackStates();
+    if(autoplay){
+      setupAudioGraph();
+      if(audioCtx.state === 'suspended') await audioCtx.resume();
+      try{ await audio.play(); }catch(e){}
+    }
+    setTimeout(resizeViz, 50);
+  }
+
+  async function togglePlay(){
+    if(currentIndex === -1){
+      loadTrack(0, true);
+      return;
+    }
+    setupAudioGraph();
+    if(audioCtx.state === 'suspended') await audioCtx.resume();
+    if(audio.paused){
+      await audio.play();
+    } else {
+      audio.pause();
+    }
+  }
+
+  function playNext(){
+    if(currentIndex === -1) return;
+    const next = (currentIndex + 1) % TRACKS.length;
+    loadTrack(next, true);
+  }
+  function playPrev(){
+    if(currentIndex === -1) return;
+    if(audio.currentTime > 3){ audio.currentTime = 0; return; }
+    const prev = (currentIndex - 1 + TRACKS.length) % TRACKS.length;
+    loadTrack(prev, true);
+  }
+
+  pbPlay.addEventListener('click', togglePlay);
+  pbNext.addEventListener('click', playNext);
+  pbPrev.addEventListener('click', playPrev);
+
+  audio.addEventListener('play', () => {
+    playerbar.classList.add('playing');
+    updateTrackStates();
+    cancelAnimationFrame(rafId);
+    drawViz();
+  });
+  audio.addEventListener('pause', () => {
+    playerbar.classList.remove('playing');
+    updateTrackStates();
+    cancelAnimationFrame(rafId);
+  });
+  audio.addEventListener('ended', playNext);
+
+  audio.addEventListener('timeupdate', () => {
+    const pct = (audio.currentTime/(audio.duration||1))*100;
+    pbProgress.style.width = pct + '%';
+    if(!pbSeek.dragging) pbSeek.value = pct;
+  });
+
+  pbSeek.addEventListener('input', () => {
+    if(audio.duration){
+      audio.currentTime = (pbSeek.value/100) * audio.duration;
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if(e.code === 'Space' && document.activeElement.tagName !== 'INPUT'){
+      e.preventDefault();
+      togglePlay();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
