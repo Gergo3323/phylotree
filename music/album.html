@@ -58,6 +58,7 @@
   .blob:nth-child(2){ top:-6%; right:-14%; animation-duration:28s; animation-delay:-4s; }
   .blob:nth-child(3){ bottom:2%; left:-10%; animation-duration:26s; animation-delay:-9s; }
   .blob:nth-child(4){ bottom:-16%; right:-12%; animation-duration:30s; animation-delay:-14s; }
+  .blob:nth-child(5){ top:38%; left:32%; animation-duration:32s; animation-delay:-19s; }
 
   @keyframes drift{
     0%,100%{ transform:translate(0,0) scale(1); }
@@ -149,6 +150,7 @@
   .track:nth-child(2){ animation-delay:0.4s; }
   .track:nth-child(3){ animation-delay:0.5s; }
   .track:nth-child(4){ animation-delay:0.6s; }
+  .track:nth-child(5){ animation-delay:0.7s; }
 
   @keyframes slideIn{
     from{ opacity:0; transform:translateX(-8px); }
@@ -332,6 +334,7 @@
   <div class="blob" id="blob1" style="background:#ff6b8b;"></div>
   <div class="blob" id="blob2" style="background:#5ee6c7;"></div>
   <div class="blob" id="blob3" style="background:#b18aff;"></div>
+  <div class="blob" id="blob4" style="background:#6fb5ff;"></div>
 </div>
 <div class="grain"></div>
 
@@ -389,7 +392,8 @@
     { title: "Nem mindenki marad",          file: "01-nem-mindenki-marad.mp3",          color: "#ffb454", rgb: "255,180,84" },
     { title: "Itt Leszek Veled",             file: "02-itt-leszek-veled.mp3",             color: "#ff6b8b", rgb: "255,107,139" },
     { title: "Jövő héten",                   file: "03-jovo-heten.mp3",                   color: "#5ee6c7", rgb: "94,230,199" },
-    { title: "Elengedi most a jó lány az",   file: "04-elengedi-most-a-jo-lany-az.mp3",   color: "#b18aff", rgb: "177,138,255" }
+    { title: "Elengedi most a jó lány az",   file: "04-elengedi-most-a-jo-lany-az.mp3",   color: "#b18aff", rgb: "177,138,255" },
+    { title: "Ketten az éjben",              file: "05-ketten-az-ejben.mp3",              color: "#6fb5ff", rgb: "111,181,255" }
   ];
 
   const audio = document.getElementById('audio');
