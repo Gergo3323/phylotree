@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Frist Album — Farkas Gergő</title>
+<title>We get it together — Farkas Gergő</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -216,12 +216,6 @@
   }
   .track.playing .track-title{ color: var(--tc); }
 
-  .track-artist{
-    margin-top:2px;
-    font-size:12.5px;
-    color:var(--ink-faint);
-  }
-
   .track-dur{
     flex:none;
     font-family:'JetBrains Mono', monospace;
@@ -319,7 +313,6 @@
 
   @media (max-width:480px){
     .pb-time{ display:none; }
-    .track-artist{ display:none; }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -342,7 +335,7 @@
 
   <div class="hero">
     <div class="eyebrow">Album</div>
-    <h1>Frist Album</h1>
+    <h1>We get it together</h1>
     <p class="artist">Készítette: <strong>Farkas Gergő</strong></p>
   </div>
 
@@ -388,12 +381,13 @@
 <script>
 (function(){
   const ARTIST = "Farkas Gergő";
+  const ALBUM = "We get it together";
   const TRACKS = [
-    { title: "Nem mindenki marad",          file: "01-nem-mindenki-marad.mp3",          color: "#ffb454", rgb: "255,180,84" },
-    { title: "Itt Leszek Veled",             file: "02-itt-leszek-veled.mp3",             color: "#ff6b8b", rgb: "255,107,139" },
-    { title: "Jövő héten",                   file: "03-jovo-heten.mp3",                   color: "#5ee6c7", rgb: "94,230,199" },
-    { title: "Elengedi most a jó lány az",   file: "04-elengedi-most-a-jo-lany-az.mp3",   color: "#b18aff", rgb: "177,138,255" },
-    { title: "Ketten az éjben",              file: "05-ketten-az-ejben.mp3",              color: "#6fb5ff", rgb: "111,181,255" }
+    { title: "Nem mindenki marad",                    file: "01-nem-mindenki-marad.mp3",          color: "#ffb454", rgb: "255,180,84" },
+    { title: "Itt Leszek Veled",                       file: "02-itt-leszek-veled.mp3",             color: "#ff6b8b", rgb: "255,107,139" },
+    { title: "Jövő héten",                             file: "03-jovo-heten.mp3",                   color: "#5ee6c7", rgb: "94,230,199" },
+    { title: "Elengedi most a jó lány az éjt",          file: "04-elengedi-most-a-jo-lany-az.mp3",   color: "#b18aff", rgb: "177,138,255" },
+    { title: "Ketten az éjben",                         file: "05-ketten-az-ejben.mp3",              color: "#6fb5ff", rgb: "111,181,255" }
   ];
 
   const audio = document.getElementById('audio');
@@ -431,7 +425,6 @@
       </div>
       <div class="track-body">
         <div class="track-title">${t.title}</div>
-        <div class="track-artist">${ARTIST}</div>
       </div>
       <div class="track-dur" id="dur-${i}">—:—</div>
     `;
@@ -471,6 +464,43 @@
     root.style.setProperty('--accent-rgb', t.rgb);
   }
 
+  // ===== MediaSession: zárolt képernyő / Bluetooth (autós) vezérlés =====
+  // Ez biztosítja, hogy iPhone-on a záróképernyőn a szám címe (ne az album neve)
+  // jelenjen meg, és hogy Bluetoothon a "előző/következő szám" gombok is működjenek,
+  // ne csak a lejátszás/szünet.
+  function updateMediaSession(t){
+    if(!('mediaSession' in navigator)) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: t.title,
+      artist: ARTIST,
+      album: ALBUM
+    });
+  }
+
+  function updatePositionState(){
+    if(!('mediaSession' in navigator) || !('setPositionState' in navigator.mediaSession)) return;
+    if(!isFinite(audio.duration) || audio.duration <= 0) return;
+    try{
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: Math.min(audio.currentTime, audio.duration)
+      });
+    }catch(e){}
+  }
+
+  if('mediaSession' in navigator){
+    navigator.mediaSession.setActionHandler('play', () => { audio.play().catch(()=>{}); });
+    navigator.mediaSession.setActionHandler('pause', () => { audio.pause(); });
+    navigator.mediaSession.setActionHandler('previoustrack', () => { playPrev(); });
+    navigator.mediaSession.setActionHandler('nexttrack', () => { playNext(); });
+    try{
+      navigator.mediaSession.setActionHandler('seekto', (details) => {
+        if(details.seekTime != null){ audio.currentTime = details.seekTime; }
+      });
+    }catch(e){}
+  }
+
   function loadTrack(i, autoplay){
     currentIndex = i;
     const t = TRACKS[i];
@@ -480,6 +510,7 @@
     playerbar.classList.remove('hidden');
     updateTrackStates();
     updateBlobs();
+    updateMediaSession(t);
     if(autoplay){
       audio.play().catch(()=>{});
     }
@@ -507,18 +538,23 @@
   audio.addEventListener('play', () => {
     playerbar.classList.add('playing');
     updateTrackStates();
+    if('mediaSession' in navigator){ navigator.mediaSession.playbackState = 'playing'; }
   });
   audio.addEventListener('pause', () => {
     playerbar.classList.remove('playing');
     updateTrackStates();
+    if('mediaSession' in navigator){ navigator.mediaSession.playbackState = 'paused'; }
   });
   audio.addEventListener('ended', playNext);
+
+  audio.addEventListener('loadedmetadata', updatePositionState);
 
   audio.addEventListener('timeupdate', () => {
     const pct = (audio.currentTime/(audio.duration||1))*100;
     pbProgress.style.width = pct + '%';
     if(!pbSeek.dragging) pbSeek.value = pct;
     pbTime.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration);
+    updatePositionState();
   });
 
   pbSeek.addEventListener('input', () => {
