@@ -128,16 +128,18 @@
   .cover-art{ position:absolute; inset:0; }
 
   .cover-together{
-    background:
-      radial-gradient(circle at 22% 20%, rgba(255,180,84,0.55), transparent 45%),
-      radial-gradient(circle at 80% 15%, rgba(255,107,139,0.5), transparent 42%),
-      radial-gradient(circle at 15% 80%, rgba(94,230,199,0.45), transparent 42%),
-      radial-gradient(circle at 82% 78%, rgba(177,138,255,0.5), transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(111,181,255,0.4), transparent 55%),
-      #0a0a0d;
-    filter:blur(2px) saturate(1.15);
+    background-image:
+      radial-gradient(circle at 22% 20%, rgba(255,180,84,0.5), transparent 45%),
+      radial-gradient(circle at 80% 15%, rgba(255,107,139,0.45), transparent 42%),
+      radial-gradient(circle at 15% 80%, rgba(94,230,199,0.4), transparent 42%),
+      radial-gradient(circle at 82% 78%, rgba(177,138,255,0.45), transparent 45%),
+      url('couple.png');
+    background-size:cover, cover, cover, cover, cover;
+    background-position:center;
+    background-blend-mode:screen, screen, screen, screen, normal;
+    filter:saturate(1.05);
   }
-  .album-card:hover .cover-together{ filter:blur(0px) saturate(1.3); }
+  .album-card:hover .cover-together{ filter:saturate(1.25); }
 
   .cover-puma{
     background:
@@ -196,7 +198,8 @@
     font-weight:800;
     font-size:11px;
     letter-spacing:0.05em;
-    color:rgba(241,238,247,0.5);
+    color:rgba(241,238,247,0.65);
+    text-shadow:0 1px 4px rgba(0,0,0,0.6);
   }
   .cover-puma ~ .card-mark, .album-card:has(.cover-puma) .card-mark{
     color:#ffb98a;
@@ -375,7 +378,44 @@
     50%{ transform:translate(3%, 4%) scale(1.08); }
   }
 
-  .hero{ padding:34px 0 50px; }
+  .hero{ padding:34px 0 26px; }
+
+  .together-hero{
+    position:relative;
+    margin-top:22px;
+    border-radius:22px;
+    overflow:hidden;
+    aspect-ratio:4/3;
+    border:1px solid var(--line-strong);
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+  }
+  .together-photo{
+    position:absolute; inset:0;
+    background-image:url('couple.png');
+    background-size:cover;
+    background-position:center;
+    animation:togetherZoom 22s ease-in-out infinite alternate;
+  }
+  @keyframes togetherZoom{
+    0%{ transform:scale(1) translate(0,0); }
+    100%{ transform:scale(1.07) translate(-1.5%,-1%); }
+  }
+  .together-glow{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 14% 12%, rgba(255,180,84,0.4), transparent 40%),
+      radial-gradient(circle at 88% 8%, rgba(255,107,139,0.35), transparent 40%),
+      radial-gradient(circle at 8% 92%, rgba(94,230,199,0.32), transparent 42%),
+      radial-gradient(circle at 92% 88%, rgba(177,138,255,0.38), transparent 42%);
+    mix-blend-mode:screen;
+    opacity:0.5;
+    animation:togetherGlowPulse 6s ease-in-out infinite;
+  }
+  @keyframes togetherGlowPulse{
+    0%,100%{ opacity:0.35; }
+    50%{ opacity:0.62; }
+  }
+
   .hero h1{
     font-family:'Space Grotesk', sans-serif;
     font-weight:700;
@@ -427,8 +467,32 @@
     filter:grayscale(1) contrast(1.3) brightness(0.8);
     mix-blend-mode:screen;
     transition:opacity 0.6s ease, filter 0.6s ease;
+    animation:pumaZoom 24s ease-in-out infinite alternate;
+    transform-origin:center 35%;
+  }
+  @keyframes pumaZoom{
+    0%{ transform:scale(1) translate(0,0); }
+    100%{ transform:scale(1.09) translate(-1.5%, 1%); }
   }
   .puma-hero.is-playing .puma-photo{ opacity:0.85; filter:grayscale(1) contrast(1.4) brightness(0.92); }
+
+  .embers{ position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none; }
+  .embers span{
+    position:absolute;
+    bottom:-6%;
+    width:3px; height:3px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(255,190,120,0.95), rgba(255,90,20,0) 70%);
+    box-shadow:0 0 6px 1.5px rgba(255,120,40,0.65);
+    opacity:0;
+    animation:emberRise linear infinite;
+  }
+  @keyframes emberRise{
+    0%{ transform:translate(0,0); opacity:0; }
+    12%{ opacity:0.9; }
+    85%{ opacity:0.4; }
+    100%{ transform:translate(var(--drift, 12px), -260px); opacity:0; }
+  }
 
   .paw-trail{ position:absolute; inset:0; z-index:1; pointer-events:none; }
   .paw-trail svg{
@@ -478,6 +542,7 @@
     50%{ filter:brightness(1.16); }
   }
   .puma-hero.is-playing .puma-word{ animation-duration:1.8s; }
+  .puma-hero.is-playing .embers{ filter:brightness(1.3); }
 
   .puma-sub{
     margin-top:10px;
@@ -627,7 +692,12 @@
       <p class="artist">Készítette: <strong>Farkas Gergő</strong></p>
     </div>
 
-    <div class="tracklist" id="tracklist-together"></div>
+    <div class="together-hero">
+      <div class="together-photo"></div>
+      <div class="together-glow"></div>
+    </div>
+
+    <div class="tracklist" id="tracklist-together" style="margin-top:8px;"></div>
 
     <footer class="credits">
       <div class="copyright">
@@ -650,6 +720,17 @@
     <div class="puma-hero" id="pumaHero">
       <div class="puma-bg"></div>
       <div class="puma-photo"></div>
+      <div class="embers">
+        <span style="left:8%; width:2px; height:2px; animation-duration:7s; animation-delay:0s; --drift:10px;"></span>
+        <span style="left:18%; width:3px; height:3px; animation-duration:9s; animation-delay:1.2s; --drift:-14px;"></span>
+        <span style="left:30%; width:2px; height:2px; animation-duration:6.5s; animation-delay:2.4s; --drift:8px;"></span>
+        <span style="left:44%; width:3px; height:3px; animation-duration:8.5s; animation-delay:0.6s; --drift:-10px;"></span>
+        <span style="left:58%; width:2px; height:2px; animation-duration:7.5s; animation-delay:3s; --drift:16px;"></span>
+        <span style="left:68%; width:3px; height:3px; animation-duration:10s; animation-delay:1.8s; --drift:-8px;"></span>
+        <span style="left:78%; width:2px; height:2px; animation-duration:6.8s; animation-delay:4s; --drift:12px;"></span>
+        <span style="left:88%; width:3px; height:3px; animation-duration:9.5s; animation-delay:2.6s; --drift:-16px;"></span>
+        <span style="left:95%; width:2px; height:2px; animation-duration:7.2s; animation-delay:0.9s; --drift:6px;"></span>
+      </div>
       <div class="paw-trail">
         <svg viewBox="0 0 64 64"><ellipse cx="32" cy="41" rx="16" ry="12.5"/><ellipse cx="13.5" cy="19" rx="7" ry="9"/><ellipse cx="30" cy="10.5" rx="7" ry="9"/><ellipse cx="46.5" cy="12" rx="7" ry="9"/><ellipse cx="54.5" cy="26.5" rx="6" ry="8"/></svg>
         <svg viewBox="0 0 64 64"><ellipse cx="32" cy="41" rx="16" ry="12.5"/><ellipse cx="13.5" cy="19" rx="7" ry="9"/><ellipse cx="30" cy="10.5" rx="7" ry="9"/><ellipse cx="46.5" cy="12" rx="7" ry="9"/><ellipse cx="54.5" cy="26.5" rx="6" ry="8"/></svg>
