@@ -256,8 +256,8 @@
   .puma-section{
     position:relative;
     z-index:3;
-    height:230vh;
-    margin-top:10px;
+    height:140vh;
+    margin-top:120px;
   }
 
   .puma-sticky{
@@ -266,11 +266,19 @@
     height:100vh;
     overflow:hidden;
     background:
-      radial-gradient(120% 90% at 50% 8%, rgba(60,120,80,0.18), transparent 60%),
-      linear-gradient(180deg, #060a07 0%, #081209 30%, #0a150e 55%, #050605 100%);
+      linear-gradient(
+        180deg,
+        #05020a 0%,
+        #05020a 22%,
+        #10061f 40%,
+        #241042 50%,
+        #10061f 60%,
+        #05020a 78%,
+        #05020a 100%
+      );
   }
 
-  /* --- jungle ambience --- */
+  /* --- lila ambience --- */
   .jungle-bg{ position:absolute; inset:0; overflow:hidden; }
 
   .canopy{
@@ -280,47 +288,18 @@
     opacity:0.32;
     animation:jdrift 26s ease-in-out infinite;
   }
-  .canopy.c1{ width:52vw; height:52vw; max-width:640px; max-height:640px; top:-16%; left:-16%; background:#1f6b3f; animation-duration:30s; }
-  .canopy.c2{ width:46vw; height:46vw; max-width:560px; max-height:560px; top:-10%; right:-14%; background:#3a2d6b; animation-duration:34s; animation-delay:-6s; }
-  .canopy.c3{ width:50vw; height:50vw; max-width:600px; max-height:600px; bottom:-18%; left:-8%; background:#173d24; animation-duration:32s; animation-delay:-12s; }
-  .canopy.c4{ width:40vw; height:40vw; max-width:480px; max-height:480px; bottom:-12%; right:-10%; background:#4b3382; animation-duration:28s; animation-delay:-18s; }
+  .canopy.c1{ width:52vw; height:52vw; max-width:640px; max-height:640px; top:-16%; left:-16%; background:#7a4fd8; animation-duration:30s; }
+  .canopy.c2{ width:46vw; height:46vw; max-width:560px; max-height:560px; top:-10%; right:-14%; background:#b388ff; animation-duration:34s; animation-delay:-6s; }
+  .canopy.c3{ width:50vw; height:50vw; max-width:600px; max-height:600px; bottom:-18%; left:-8%; background:#5b2ea8; animation-duration:32s; animation-delay:-12s; }
+  .canopy.c4{ width:40vw; height:40vw; max-width:480px; max-height:480px; bottom:-12%; right:-10%; background:#9a67ea; animation-duration:28s; animation-delay:-18s; }
 
   @keyframes jdrift{
     0%,100%{ transform:translate(0,0) scale(1); }
     50%{ transform:translate(4%, 3%) scale(1.1); }
   }
 
-  .vine{
-    position:absolute;
-    top:-6%;
-    width:2px;
-    height:34%;
-    background:linear-gradient(180deg, rgba(120,200,140,0.28), transparent);
-    filter:blur(0.5px);
-    animation:vinesway 7s ease-in-out infinite;
-    transform-origin:top center;
-  }
-  @keyframes vinesway{ 0%,100%{ transform:rotate(-2deg); } 50%{ transform:rotate(2deg); } }
-
-  .firefly{
-    position:absolute;
-    width:4px; height:4px;
-    border-radius:50%;
-    background:#cfffb0;
-    box-shadow:0 0 6px 2px rgba(207,255,176,0.7);
-    opacity:0;
-    animation:firefly 6s ease-in-out infinite;
-  }
-  @keyframes firefly{
-    0%{ opacity:0; transform:translate(0,0) scale(0.6); }
-    15%{ opacity:0.9; }
-    50%{ opacity:0.5; transform:translate(14px,-18px) scale(1); }
-    85%{ opacity:0.8; }
-    100%{ opacity:0; transform:translate(-8px,-34px) scale(0.6); }
-  }
-
   @media (prefers-reduced-motion: reduce){
-    .canopy, .vine, .firefly{ animation:none !important; }
+    .canopy{ animation:none !important; }
   }
 
   /* --- PUMA wordmark --- */
@@ -353,19 +332,21 @@
     font-size:clamp(64px, 20vw, 220px);
     letter-spacing:-0.03em;
     line-height:1;
-    background:linear-gradient(180deg, #dff5e4 0%, #8fd6a0 45%, #4f8a63 100%);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    filter:drop-shadow(0 0 40px rgba(150,255,180,0.15));
+    color:#05020a;
+    -webkit-text-stroke: 1.2px rgba(179,136,255,0.55);
+    text-stroke: 1.2px rgba(179,136,255,0.55);
+    text-shadow:
+      0 0 1px rgba(179,136,255,0.9),
+      0 0 12px rgba(179,136,255,0.6),
+      0 0 36px rgba(122,79,216,0.45);
   }
 
   /* --- puma art --- */
   .puma-art-outer{
     position:absolute;
     left:50%;
-    bottom:0;
-    width:min(92vw, 620px);
+    bottom:5vh;
+    width:min(92vw, 560px);
     aspect-ratio:800/900;
     transform:translateX(-50%);
     z-index:2;
@@ -379,53 +360,130 @@
   }
   .puma-art-inner.album-playing{ transform:scale(1.045); }
 
-  .puma-svg{ width:100%; height:100%; display:block; overflow:visible; }
+  .puma-img{
+    width:100%; height:100%;
+    display:block;
+    object-fit:contain;
+    filter:drop-shadow(0 20px 60px rgba(0,0,0,0.5));
+    transition:transform 0.7s cubic-bezier(.2,.8,.2,1), filter 0.5s ease;
+  }
 
-  .eye-glow{ transition:filter 0.4s ease; filter:brightness(1) drop-shadow(0 0 6px var(--eye-c)); }
-  .eye-glow.playing{ animation:eyePulse 1.6s ease-in-out infinite; }
-  @keyframes eyePulse{
-    0%,100%{ filter:brightness(1) drop-shadow(0 0 8px var(--eye-c)); }
-    50%{ filter:brightness(1.75) drop-shadow(0 0 30px var(--eye-c)); }
+  .puma-art-inner.album-playing .puma-img{
+    filter:drop-shadow(0 20px 60px rgba(0,0,0,0.5)) drop-shadow(0 0 60px rgba(143,230,172,0.18));
   }
 
   .eye-hotspot{
     position:absolute;
-    width:15%;
+    width:13%;
     aspect-ratio:1/1;
     transform:translate(-50%,-50%);
     border-radius:50%;
-    background:transparent;
     border:none;
     cursor:pointer;
     padding:0;
     -webkit-tap-highlight-color:transparent;
+    background:radial-gradient(circle, rgba(var(--tc-rgb), 0.10) 0%, rgba(var(--tc-rgb), 0.02) 55%, transparent 75%);
+    transition:
+      background 0.4s ease,
+      box-shadow 0.4s ease,
+      transform 0.35s cubic-bezier(.2,.8,.2,1);
+    outline:none;
   }
-  .eye-hotspot:focus-visible{ outline:2px solid rgba(207,255,176,0.7); outline-offset:4px; }
-  .eye-left{ left:36.25%; top:47.8%; }
-  .eye-right{ left:63.75%; top:47.8%; }
+
+  .eye-hotspot::after{
+    content:'';
+    position:absolute;
+    inset:18%;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 38% 38%, rgba(255,255,255,0.25), transparent 45%),
+      radial-gradient(circle, var(--tc) 0%, rgba(var(--tc-rgb), 0.35) 45%, transparent 75%);
+    opacity:0;
+    filter:blur(2px);
+    transition:opacity 0.45s ease, transform 0.45s ease;
+    transform:scale(0.6);
+    mix-blend-mode:screen;
+  }
+
+  .eye-hotspot::before{
+    content:'';
+    position:absolute;
+    inset:-35%;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(var(--tc-rgb), 0.4) 0%, transparent 65%);
+    opacity:0;
+    filter:blur(16px);
+    transition:opacity 0.5s ease, transform 0.5s ease;
+    transform:scale(0.7);
+    pointer-events:none;
+  }
+
+  .eye-hotspot:hover{
+    transform:translate(-50%,-50%) scale(1.08);
+    background:radial-gradient(circle, rgba(var(--tc-rgb), 0.20) 0%, rgba(var(--tc-rgb), 0.06) 55%, transparent 75%);
+  }
+
+  .eye-hotspot:focus-visible{
+    box-shadow:0 0 0 2px rgba(var(--tc-rgb), 0.6);
+  }
+
+  .eye-hotspot.playing{
+    transform:translate(-50%,-50%) scale(1);
+  }
+  .eye-hotspot.playing::before{
+    opacity:1;
+    transform:scale(1.1);
+    animation:haloPulse 2.2s ease-in-out infinite;
+  }
+  .eye-hotspot.playing::after{
+    opacity:1;
+    transform:scale(1);
+    animation:irisPulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes haloPulse{
+    0%,100%{ opacity:0.85; transform:scale(1.05); }
+    50%{ opacity:1; transform:scale(1.25); }
+  }
+  @keyframes irisPulse{
+    0%,100%{ filter:blur(2px) brightness(1); transform:scale(1); }
+    50%{ filter:blur(1px) brightness(1.5); transform:scale(1.08); }
+  }
+
+  .eye-left{ left:37%; top:34.5%; width:11%; }
+  .eye-right{ left:64.5%; top:34.5%; width:11%; }
 
   .eye-caption{
     position:absolute;
     left:50%;
-    top:-14px;
+    top:-8px;
     transform:translate(-50%,-100%);
     font-family:'JetBrains Mono', monospace;
     font-size:10.5px;
     letter-spacing:0.04em;
     color:var(--ink);
-    background:rgba(6,10,7,0.85);
-    border:1px solid var(--line-strong);
-    padding:5px 9px;
-    border-radius:7px;
+    background:rgba(6,10,7,0.88);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(var(--tc-rgb), 0.35);
+    padding:6px 10px;
+    border-radius:8px;
     white-space:nowrap;
     opacity:0;
     pointer-events:none;
     transition:opacity 0.25s ease, transform 0.25s ease;
+    color:var(--tc);
   }
   .eye-hotspot:hover .eye-caption,
   .eye-hotspot:focus-visible .eye-caption{
     opacity:1;
-    transform:translate(-50%,-115%);
+    transform:translate(-50%,-112%);
+  }
+
+  @media (max-width:480px){
+    .eye-caption{ font-size:9.5px; padding:5px 8px; }
+    .eye-left{ left:36%; top:33.5%; width:13%; }
+    .eye-right{ left:65.5%; top:33.5%; width:13%; }
   }
 
   .puma-credit{
@@ -551,11 +609,6 @@
       <div class="canopy c2"></div>
       <div class="canopy c3"></div>
       <div class="canopy c4"></div>
-      <div class="vine" style="left:12%; animation-delay:-1s;"></div>
-      <div class="vine" style="left:22%; height:26%; animation-delay:-3s;"></div>
-      <div class="vine" style="left:78%; animation-delay:-2s;"></div>
-      <div class="vine" style="left:88%; height:30%; animation-delay:-4.5s;"></div>
-      <div id="fireflyLayer"></div>
     </div>
 
     <div class="puma-eyebrow">Album 02</div>
@@ -567,114 +620,14 @@
     <div class="puma-art-outer" id="pumaArtOuter">
       <div class="puma-art-inner" id="pumaArtInner">
 
-        <svg class="puma-svg" viewBox="0 0 800 900" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <defs>
-            <path id="pumaHead" d="M400,190
-              C300,190 220,232 190,322
-              C160,412 165,522 202,612
-              C234,690 282,758 332,818
-              C356,848 380,868 400,880
-              C420,868 444,848 468,818
-              C518,758 566,690 598,612
-              C635,522 640,412 610,322
-              C580,232 500,190 400,190 Z"/>
+        <img class="puma-img" id="pumaImg" src="puma.png" alt="PUMA — album borító" draggable="false">
 
-            <linearGradient id="headGradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#171d18"/>
-              <stop offset="55%" stop-color="#0a0f0a"/>
-              <stop offset="100%" stop-color="#030503"/>
-            </linearGradient>
-
-            <linearGradient id="rimGradient" x1="1" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#9fffc0" stop-opacity="0.85"/>
-              <stop offset="35%" stop-color="#b6a6ff" stop-opacity="0.35"/>
-              <stop offset="100%" stop-color="#b6a6ff" stop-opacity="0"/>
-            </linearGradient>
-
-            <radialGradient id="muzzleGradient" cx="50%" cy="35%" r="65%">
-              <stop offset="0%" stop-color="#2c332b" stop-opacity="0.9"/>
-              <stop offset="100%" stop-color="#151a14" stop-opacity="0"/>
-            </radialGradient>
-
-            <radialGradient id="irisLeft" cx="42%" cy="38%" r="65%">
-              <stop offset="0%" stop-color="#eafff0"/>
-              <stop offset="35%" stop-color="#8fe6ac"/>
-              <stop offset="100%" stop-color="#1c4a2c"/>
-            </radialGradient>
-            <radialGradient id="irisRight" cx="42%" cy="38%" r="65%">
-              <stop offset="0%" stop-color="#f3edff"/>
-              <stop offset="35%" stop-color="#c3a8ff"/>
-              <stop offset="100%" stop-color="#3d2c6a"/>
-            </radialGradient>
-
-            <filter id="grainFilter" x="-20%" y="-20%" width="140%" height="140%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise"/>
-              <feColorMatrix in="noise" type="matrix"
-                values="0 0 0 0 1
-                        0 0 0 0 1
-                        0 0 0 0 1
-                        0 0 0 0.05 0"/>
-            </filter>
-
-            <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="10"/>
-            </filter>
-
-            <clipPath id="headClip">
-              <use href="#pumaHead"/>
-            </clipPath>
-          </defs>
-
-          <!-- ears -->
-          <path d="M212,300 Q256,72 332,292 Q272,250 212,300 Z" fill="url(#headGradient)"/>
-          <path d="M588,300 Q544,72 468,292 Q528,250 588,300 Z" fill="url(#headGradient)"/>
-          <path d="M246,268 Q270,150 298,266 Q272,236 246,268 Z" fill="#241f27" opacity="0.7"/>
-          <path d="M554,268 Q530,150 502,266 Q528,236 554,268 Z" fill="#241f27" opacity="0.7"/>
-
-          <!-- head -->
-          <use href="#pumaHead" fill="url(#headGradient)"/>
-          <use href="#pumaHead" fill="none" stroke="url(#rimGradient)" stroke-width="7" opacity="0.55"/>
-          <use href="#pumaHead" fill="#ffffff" filter="url(#grainFilter)" clip-path="url(#headClip)" opacity="0.7"/>
-
-          <!-- muzzle shading -->
-          <ellipse cx="400" cy="660" rx="150" ry="120" fill="url(#muzzleGradient)"/>
-
-          <!-- nose -->
-          <path d="M378,548 Q400,532 422,548 Q416,574 400,590 Q384,574 378,548 Z" fill="#0d0705" opacity="0.85"/>
-
-          <!-- whiskers -->
-          <g fill="#cfd8cf" opacity="0.35">
-            <circle cx="298" cy="642" r="3.4"/>
-            <circle cx="274" cy="664" r="3.4"/>
-            <circle cx="252" cy="688" r="3.4"/>
-            <circle cx="502" cy="642" r="3.4"/>
-            <circle cx="526" cy="664" r="3.4"/>
-            <circle cx="548" cy="688" r="3.4"/>
-          </g>
-
-          <!-- eyes -->
-          <g id="eyeLeftGroup" class="eye-glow" style="--eye-c:#8fe6ac;">
-            <circle cx="290" cy="430" r="70" fill="#8fe6ac" opacity="0.16" filter="url(#softBlur)"/>
-            <circle cx="290" cy="430" r="50" fill="url(#irisLeft)"/>
-            <circle cx="290" cy="430" r="50" fill="none" stroke="#03150a" stroke-width="2" opacity="0.4"/>
-            <circle cx="278" cy="418" r="12" fill="#0a1a10"/>
-            <circle cx="272" cy="410" r="4" fill="#eafff0" opacity="0.8"/>
-          </g>
-
-          <g id="eyeRightGroup" class="eye-glow" style="--eye-c:#c3a8ff;">
-            <circle cx="510" cy="430" r="70" fill="#c3a8ff" opacity="0.16" filter="url(#softBlur)"/>
-            <circle cx="510" cy="430" r="50" fill="url(#irisRight)"/>
-            <circle cx="510" cy="430" r="50" fill="none" stroke="#12081f" stroke-width="2" opacity="0.4"/>
-            <circle cx="498" cy="418" r="12" fill="#150a24"/>
-            <circle cx="492" cy="410" r="4" fill="#f3edff" opacity="0.8"/>
-          </g>
-        </svg>
-
-        <button class="eye-hotspot eye-left" id="eyeLeftBtn" type="button" aria-label="Lejátszás: A fekete puma" aria-pressed="false">
-          <span class="eye-caption">A fekete puma</span>
+        <button class="eye-hotspot eye-left" id="eyeLeftBtn" type="button" aria-label="Lejátszás: A fekete puma" aria-pressed="false" style="--tc:#ffd24a; --tc-rgb:255,210,74;">
+          <span class="eye-caption">▶ A fekete puma</span>
         </button>
-        <button class="eye-hotspot eye-right" id="eyeRightBtn" type="button" aria-label="Lejátszás: A fekete puma II" aria-pressed="false">
-          <span class="eye-caption">A fekete puma II</span>
+
+        <button class="eye-hotspot eye-right" id="eyeRightBtn" type="button" aria-label="Lejátszás: A fekete puma II" aria-pressed="false" style="--tc:#ffbf33; --tc-rgb:255,191,51;">
+          <span class="eye-caption">▶ A fekete puma II</span>
         </button>
 
       </div>
@@ -746,8 +699,6 @@
 
   const eyeLeftBtn = document.getElementById('eyeLeftBtn');
   const eyeRightBtn = document.getElementById('eyeRightBtn');
-  const eyeLeftGroup = document.getElementById('eyeLeftGroup');
-  const eyeRightGroup = document.getElementById('eyeRightGroup');
   const pumaArtInner = document.getElementById('pumaArtInner');
 
   let currentIndex = -1;
@@ -812,11 +763,14 @@
   function updateEyes(){
     const isTrack5 = currentIndex === 5;
     const isTrack6 = currentIndex === 6;
-    eyeLeftGroup.classList.toggle('playing', isTrack5 && !audio.paused);
-    eyeRightGroup.classList.toggle('playing', isTrack6 && !audio.paused);
+    const pumaAlbum = isTrack5 || isTrack6;
+    const playing = !audio.paused;
+    const glowBoth = pumaAlbum && playing;
+    eyeLeftBtn.classList.toggle('playing', glowBoth);
+    eyeRightBtn.classList.toggle('playing', glowBoth);
     eyeLeftBtn.setAttribute('aria-pressed', String(isTrack5));
     eyeRightBtn.setAttribute('aria-pressed', String(isTrack6));
-    pumaArtInner.classList.toggle('album-playing', (isTrack5 || isTrack6) && !audio.paused);
+    pumaArtInner.classList.toggle('album-playing', glowBoth);
   }
 
   function applyAccent(t){
@@ -946,30 +900,32 @@
   function renderScroll(){
     ticking = false;
 
-    // fade out album-1 ambient blobs as the puma section approaches
+    // ambient blobs fade out as puma approaches - natural
     const secTop = pumaSection.getBoundingClientRect().top + window.scrollY;
-    const fadeStart = secTop - window.innerHeight;
-    const fadeEnd = secTop;
-    let fadeP = (window.scrollY - fadeStart) / Math.max(1, (fadeEnd - fadeStart));
-    fadeP = Math.max(0, Math.min(1, fadeP));
-    blobsEl.style.opacity = String(1 - fadeP);
+    const fadeStart = secTop - window.innerHeight * 0.6;
+    const fadeEnd = secTop + 40;
+    let p = (window.scrollY - fadeStart) / Math.max(1, (fadeEnd - fadeStart));
+    p = Math.max(0, Math.min(1, p));
+    blobsEl.style.opacity = String(1 - p * 0.85);
 
-    // puma grow/parallax progress
+    // puma - reveal quick and stay at 65% (no overscale / pixelation)
     const rect = pumaSection.getBoundingClientRect();
     const total = pumaSection.offsetHeight - window.innerHeight;
     let progress = -rect.top / Math.max(1, total);
     progress = Math.max(0, Math.min(1, progress));
-    const eased = progress * progress * (3 - 2 * progress); // smoothstep
+    // fast ease-in - reaches 65% scale very early
+    const fast = Math.min(1, progress * 1.8);
+    const eased = fast * fast * (3 - 2 * fast);
 
-    const scale = 0.55 + eased * 0.62;
-    const riseY = (1 - eased) * 20;
+    const scale = 0.52 + eased * 0.13; // 0.52 → 0.65 (65% max)
+    const riseY = (1 - eased) * 6;
     pumaArtOuter.style.transform = `translate(-50%, ${riseY}vh) scale(${scale})`;
-    pumaArtOuter.style.opacity = String(Math.min(1, eased * 1.7));
+    pumaArtOuter.style.opacity = String(Math.min(1, 0.55 + eased * 0.45)); // visible quickly
 
-    const textY = (1 - eased) * -5;
-    const textScale = 1 + (1 - eased) * 0.12;
+    const textY = (1 - eased) * -2;
+    const textScale = 1 + (1 - eased) * 0.05;
     pumaTextWrap.style.transform = `translateY(${textY}vh) scale(${textScale})`;
-    pumaTextWrap.style.opacity = String(0.18 + eased * 0.7);
+    pumaTextWrap.style.opacity = String(0.5 + eased * 0.5);
   }
 
   function onScroll(){
@@ -982,19 +938,6 @@
   window.addEventListener('scroll', onScroll, { passive:true });
   window.addEventListener('resize', onScroll);
   renderScroll();
-
-  // ===== fireflies =====
-  const fireflyLayer = document.getElementById('fireflyLayer');
-  const FIREFLY_COUNT = 14;
-  for(let i=0;i<FIREFLY_COUNT;i++){
-    const f = document.createElement('div');
-    f.className = 'firefly';
-    f.style.left = (Math.random()*94 + 3) + '%';
-    f.style.top = (Math.random()*70 + 10) + '%';
-    f.style.animationDelay = (-(Math.random()*6)) + 's';
-    f.style.animationDuration = (4.5 + Math.random()*3) + 's';
-    fireflyLayer.appendChild(f);
-  }
 })();
 </script>
 
