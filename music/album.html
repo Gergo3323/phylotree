@@ -378,49 +378,87 @@
     50%{ transform:translate(3%, 4%) scale(1.08); }
   }
 
-  .hero{ padding:34px 0 26px; }
-
   .together-hero{
     position:relative;
     margin-top:22px;
     border-radius:22px;
     overflow:hidden;
-    aspect-ratio:4/3;
+    min-height:420px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    padding:28px 24px 26px;
     border:1px solid var(--line-strong);
     box-shadow:0 20px 60px rgba(0,0,0,0.4);
   }
   .together-photo{
-    position:absolute; inset:0;
+    position:absolute; inset:0; z-index:0;
     background-image:url('couple.png');
     background-size:cover;
     background-position:center;
   }
+  .together-scrim{
+    position:absolute; inset:0; z-index:1;
+    background:linear-gradient(to top, rgba(8,7,11,0.94) 0%, rgba(8,7,11,0.55) 42%, rgba(8,7,11,0.05) 72%);
+  }
   .together-glow{
-    position:absolute; inset:0;
+    position:absolute; inset:0; z-index:1;
     background:
-      radial-gradient(circle at 14% 12%, rgba(255,180,84,0.4), transparent 40%),
-      radial-gradient(circle at 88% 8%, rgba(255,107,139,0.35), transparent 40%),
-      radial-gradient(circle at 8% 92%, rgba(94,230,199,0.32), transparent 42%),
-      radial-gradient(circle at 92% 88%, rgba(177,138,255,0.38), transparent 42%);
+      radial-gradient(circle at 14% 8%, rgba(255,180,84,0.4), transparent 40%),
+      radial-gradient(circle at 88% 12%, rgba(255,107,139,0.35), transparent 40%),
+      radial-gradient(circle at 10% 92%, rgba(94,230,199,0.3), transparent 42%),
+      radial-gradient(circle at 90% 90%, rgba(177,138,255,0.35), transparent 42%);
     mix-blend-mode:screen;
     opacity:0.5;
     animation:togetherGlowPulse 6s ease-in-out infinite;
   }
   @keyframes togetherGlowPulse{
     0%,100%{ opacity:0.35; }
-    50%{ opacity:0.62; }
+    50%{ opacity:0.6; }
   }
 
-  .hero h1{
+  .together-motes{ position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+  .together-motes span{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(1px);
+    opacity:0;
+    animation:moteFloat ease-in-out infinite;
+  }
+  @keyframes moteFloat{
+    0%{ transform:translateY(6px); opacity:0; }
+    15%{ opacity:0.75; }
+    50%{ transform:translateY(-10px); opacity:0.9; }
+    85%{ opacity:0.4; }
+    100%{ transform:translateY(-18px); opacity:0; }
+  }
+
+  .together-content{ position:relative; z-index:2; }
+  .together-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    display:flex; align-items:center; gap:8px;
+  }
+  .together-eyebrow svg{ width:14px; height:14px; opacity:0.8; }
+
+  .together-word{
+    margin-top:8px;
     font-family:'Space Grotesk', sans-serif;
     font-weight:700;
-    font-size:clamp(42px, 11vw, 68px);
-    letter-spacing:-0.02em;
-    line-height:1;
-    margin-top:10px;
+    font-size:clamp(32px, 8.6vw, 54px);
+    letter-spacing:-0.015em;
+    line-height:1.04;
+    background:linear-gradient(100deg, #ffb454, #ff6b8b 28%, #5ee6c7 54%, #b18aff 76%, #6fb5ff);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    filter:drop-shadow(0 0 22px rgba(177,138,255,0.25)) drop-shadow(0 0 14px rgba(255,180,84,0.25));
   }
-  .artist{ margin-top:10px; font-size:16px; color:var(--ink-dim); }
-  .artist strong{ color:var(--ink); font-weight:600; }
+  .together-sub{ margin-top:10px; font-size:14.5px; color:rgba(241,238,247,0.7); }
+  .together-sub strong{ color:var(--ink); font-weight:600; }
 
   /* ============================================================
      ALBUM 2 — PUMA
@@ -675,15 +713,28 @@
       </button>
     </div>
 
-    <div class="hero">
-      <div class="eyebrow">Album</div>
-      <h1>We get it together</h1>
-      <p class="artist">Készítette: <strong>Farkas Gergő</strong></p>
-    </div>
-
     <div class="together-hero">
       <div class="together-photo"></div>
+      <div class="together-scrim"></div>
       <div class="together-glow"></div>
+      <div class="together-motes">
+        <span style="left:12%; top:70%; width:5px; height:5px; background:#ffb454; animation-duration:6s; animation-delay:0.2s;"></span>
+        <span style="left:22%; top:30%; width:4px; height:4px; background:#ff6b8b; animation-duration:7.5s; animation-delay:1.4s;"></span>
+        <span style="left:38%; top:55%; width:3px; height:3px; background:#5ee6c7; animation-duration:6.8s; animation-delay:2.1s;"></span>
+        <span style="left:55%; top:20%; width:5px; height:5px; background:#b18aff; animation-duration:8s; animation-delay:0.6s;"></span>
+        <span style="left:70%; top:62%; width:4px; height:4px; background:#6fb5ff; animation-duration:7s; animation-delay:2.8s;"></span>
+        <span style="left:82%; top:38%; width:3px; height:3px; background:#ffb454; animation-duration:6.4s; animation-delay:1.8s;"></span>
+        <span style="left:90%; top:75%; width:4px; height:4px; background:#ff6b8b; animation-duration:7.8s; animation-delay:0.9s;"></span>
+      </div>
+
+      <div class="together-content">
+        <div class="together-eyebrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="12" r="6.2"/><circle cx="15" cy="12" r="6.2"/></svg>
+          Album
+        </div>
+        <div class="together-word">We get it together</div>
+        <p class="together-sub">Készítette: <strong>Farkas Gergő</strong></p>
+      </div>
     </div>
 
     <div class="tracklist" id="tracklist-together" style="margin-top:8px;"></div>
